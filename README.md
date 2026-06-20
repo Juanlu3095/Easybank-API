@@ -23,4 +23,4 @@ This command is for Windows.
 
 This diagram shows database tables and their relationships:
 
-![EER Diagram](https://drive.google.com/file/d/1ygWpe75EsFyiQ5__-FpM9oaQ4kv6gZNn/view?usp=sharing)
+![EER Diagram](https://drive.google.com/uc?export=view&id=1ygWpe75EsFyiQ5__-FpM9oaQ4kv6gZNn)
