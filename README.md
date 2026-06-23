@@ -10,6 +10,8 @@ Clone this repo to your computer:
 git clone https://github.com/Juanlu3095/Easybank-API.git
 ```
 
+Make sure you use a PostgreSQL database. This project uses it.
+
 ## Execution
 
 Run this command to download dependencies in pom.xml if not and the app will start:

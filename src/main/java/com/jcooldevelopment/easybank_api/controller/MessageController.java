@@ -20,7 +20,6 @@ import jakarta.validation.Valid;
 import com.jcooldevelopment.easybank_api.dto.Message.CreateMessageDto;
 import com.jcooldevelopment.easybank_api.dto.Message.MessageDto;
 import com.jcooldevelopment.easybank_api.dto.Message.UpdateMessageDto;
-import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,51 +41,35 @@ public class MessageController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Apiresponse<MessageDto>> getMessage(@PathVariable UUID id) {
-        try {
-            MessageDto message = this.messageService.getById(id);
-            return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<MessageDto>("Message found.", message));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Apiresponse<>("Message not found.", null));
-        }
+    public ResponseEntity<Apiresponse<MessageDto>> getMessage(@PathVariable UUID id){
+        MessageDto message = this.messageService.getById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<MessageDto>("Message found.", message));
     }
 
     @PostMapping("/")
     public ResponseEntity<Apiresponse<MessageDto>> postMessage(@Valid @RequestBody CreateMessageDto message) {
-        try {
-            MessageDto messageSaved = this.messageService.create(message);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                .location(new URI("/api/message/" + messageSaved.getId()))
-                .body(new Apiresponse<MessageDto>("Message saved.", messageSaved));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("An error ocurred.", null));
-        }
+        MessageDto messageSaved = this.messageService.create(message);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            // URI.create() instead of new URI() because the last has a URISyntaxException that must be handled by
+            // try/catch oor throws URISyntaxException
+            .location(URI.create("/api/message/" + messageSaved.getId())) 
+            .body(new Apiresponse<MessageDto>("Message saved.", messageSaved));
     }
     
     @PutMapping("/{id}")
     public ResponseEntity<Apiresponse<MessageDto>> putMessage(@PathVariable UUID id, @Valid @RequestBody UpdateMessageDto message) {
-        try {
-            MessageDto updatedMessage = this.messageService.update(id, message);
-            return ResponseEntity.status(HttpStatus.OK)
-                .location(new URI("/api/message/" + updatedMessage.getId()))
-                .body(new Apiresponse<MessageDto>("Message updated.", updatedMessage));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Apiresponse<>("Message not found.", null));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("An error ocurred.", null));
-        }
+        MessageDto updatedMessage = this.messageService.update(id, message);
+        return ResponseEntity.status(HttpStatus.OK)
+            .location(URI.create("/api/message/" + updatedMessage.getId()))
+            .body(new Apiresponse<MessageDto>("Message updated.", updatedMessage));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Apiresponse<Void>> deleteMessage(UUID id) {
-        try {
-            boolean result = this.messageService.delete(id);
-            if(!result) {
-                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Service unavailable.", null));
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("Message deleted.", null));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Apiresponse<>("Message not found.", null));
+        boolean result = this.messageService.delete(id);
+        if(!result) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Service unavailable.", null));
         }
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("Message deleted.", null));
     }
 }

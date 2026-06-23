@@ -36,7 +36,7 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public MessageDto getById(UUID id) throws ResourceNotFoundException{
+    public MessageDto getById(UUID id){
         Message message = this.messageRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Message not found."));
 
@@ -51,7 +51,7 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public MessageDto update(UUID id, UpdateMessageDto message) throws ResourceNotFoundException {
+    public MessageDto update(UUID id, UpdateMessageDto message) {
         // Since we need a Message Entity, we use messageRepository instead of this class's getById method
         Message messageToUpdate = this.messageRepository.findById(id)
             .orElseThrow(()-> new ResourceNotFoundException("Message not found."));
@@ -66,7 +66,7 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public boolean delete(UUID id) throws ResourceNotFoundException {
+    public boolean delete(UUID id) {
         Message messageToDelete = this.messageRepository.findById(id)
             .orElseThrow(()-> new ResourceNotFoundException("Message not found."));
 
