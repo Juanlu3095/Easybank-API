@@ -17,6 +17,7 @@ import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 @RestControllerAdvice
 public class GlobalErrorHandler {
 
+    // 404 exception
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleResourceNotFoundException (ResourceNotFoundException exception) {
         // ProblemDetail follows RFC for showing errors
@@ -51,13 +52,13 @@ public class GlobalErrorHandler {
     // 500 exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleException (Exception exception) {
-        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE,
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
             "This service is not available right now. Please try later.");
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500"));
         problemDetails.setTitle("Service unavailable");
 
-        // See for loggin in production: https://www.baeldung.com/spring-boot-logging
+        // See for logs in production: https://www.baeldung.com/spring-boot-logging
 
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(problemDetails);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetails);
     }
 }
