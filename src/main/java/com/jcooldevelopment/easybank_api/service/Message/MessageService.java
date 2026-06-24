@@ -1,15 +1,17 @@
 package com.jcooldevelopment.easybank_api.service.Message;
 
-import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
+
+import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.Message.CreateMessageDto;
 import com.jcooldevelopment.easybank_api.dto.Message.MessageDto;
 import com.jcooldevelopment.easybank_api.dto.Message.UpdateMessageDto;
 
 public interface MessageService {
 
-    public List<MessageDto> getAll();
+    public PaginatedResponse<MessageDto> getAll(Pageable pageable);
 
     public MessageDto getById(UUID id);
 

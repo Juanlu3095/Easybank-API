@@ -48,6 +48,7 @@ public class Message {
     // Datetime
     // columnDefinition is the literal definition of the row, you cannot ignore "TIMESTAMP". This is necessary for DB to use default now()
     // This column can be null because is the BD who generates the timestamp
+    // https://www.baeldung.com/java-postgresql-store-date-time
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 }

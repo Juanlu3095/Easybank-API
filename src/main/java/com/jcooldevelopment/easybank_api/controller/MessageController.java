@@ -1,9 +1,11 @@
 package com.jcooldevelopment.easybank_api.controller;
 
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
+import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.service.Message.MessageService;
 
 import jakarta.validation.Valid;
@@ -35,9 +38,11 @@ public class MessageController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Apiresponse<List<MessageDto>>> getMessages() {
-        List<MessageDto> messages = this.messageService.getAll();
-        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<List<MessageDto>>("Messages were found.", messages));
+    public ResponseEntity<Apiresponse<PaginatedResponse<MessageDto>>> getMessages(
+        @PageableDefault(page = 0, size = 5, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        PaginatedResponse<MessageDto> messages = this.messageService.getAll(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<PaginatedResponse<MessageDto>>("Messages were found.", messages));
     }
 
     @GetMapping("/{id}")

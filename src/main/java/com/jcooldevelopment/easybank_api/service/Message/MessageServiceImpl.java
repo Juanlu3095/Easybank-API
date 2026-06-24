@@ -1,12 +1,14 @@
 package com.jcooldevelopment.easybank_api.service.Message;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.contracts.entity.Message;
 import com.jcooldevelopment.easybank_api.dto.Message.CreateMessageDto;
 import com.jcooldevelopment.easybank_api.dto.Message.MessageDto;
@@ -14,6 +16,7 @@ import com.jcooldevelopment.easybank_api.dto.Message.UpdateMessageDto;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.mapper.MessageMapper;
 import com.jcooldevelopment.easybank_api.repository.MessageRepository;
+import com.jcooldevelopment.easybank_api.utils.DataFormater;
 
 @Service
 public class MessageServiceImpl implements MessageService{
@@ -27,13 +30,14 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public List<MessageDto> getAll() {
-        List<Message> messages = this.messageRepository.findAll();
-        List<MessageDto> messagesToShow = new ArrayList<MessageDto>();
-        messagesToShow.addAll(messages.stream() // It adds all transformed messages to DTO
+    public PaginatedResponse<MessageDto> getAll(Pageable pageable) {
+        Page<Message> messages = this.messageRepository.findAll(pageable);
+        Page<MessageDto> messagesToShow = new PageImpl<MessageDto>(messages.getContent() // PageImpl is the implementation of interface Page
+            .stream()
             .map(message -> messageMapper.EntityToDto(message))
             .toList());
-        return messagesToShow;
+        PaginatedResponse<MessageDto> paginatedResult = DataFormater.paginate(messagesToShow);
+        return paginatedResult;
     }
 
     @Override
