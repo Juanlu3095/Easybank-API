@@ -34,11 +34,13 @@ public class GlobalErrorHandler {
     public ResponseEntity<ProblemDetail> handleMethodArgumentNotValidException (MethodArgumentNotValidException exception) {
 
         // Unordered list with key (name of field with error) and value (message of error)
+        // https://stackoverflow.com/questions/79301881/spring-problem-detail-response-how-to-add-custom-fields
         HashMap<String, String> errors = new HashMap<>();
         for (FieldError fieldError: exception.getFieldErrors()) {
             errors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
 
+        // https://howtodoinjava.com/spring-mvc/spring-problemdetail-errorresponse/
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT,
             "One or more fields have wrong format.");
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
@@ -48,6 +50,8 @@ public class GlobalErrorHandler {
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(problemDetails);
     }
+
+    // ERROR HANDLER WHEN A FIELD DATA IS REPEATED AND MUST BE UNIQUE
 
     // 500 exception
     @ExceptionHandler(Exception.class)

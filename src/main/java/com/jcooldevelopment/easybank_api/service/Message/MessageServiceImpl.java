@@ -1,5 +1,6 @@
 package com.jcooldevelopment.easybank_api.service.Message;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +47,8 @@ public class MessageServiceImpl implements MessageService{
     @Override
     public MessageDto create(CreateMessageDto message) {
         Message messageToSave = messageMapper.CreateMessageDtoToEntity(message);
+        // Since createdAt is null in API but gets Datetime in DB, we need to create it here for the user later
+        messageToSave.setCreatedAt(LocalDateTime.now());
         Message savedMessage = messageRepository.save(messageToSave);
         return messageMapper.EntityToDto(savedMessage);
     }
@@ -61,6 +64,7 @@ public class MessageServiceImpl implements MessageService{
         messageToUpdate.setEmail(message.getEmail());
         messageToUpdate.setPhone(message.getPhone());
         messageToUpdate.setMessage(message.getMessage());
+        // It actually returns the row in database, not the data from form because messageToUpdate has createdAt
         Message savedMessage = messageRepository.save(messageToUpdate);
         return messageMapper.EntityToDto(savedMessage);
     }

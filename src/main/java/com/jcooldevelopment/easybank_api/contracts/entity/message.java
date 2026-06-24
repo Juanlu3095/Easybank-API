@@ -1,5 +1,6 @@
 package com.jcooldevelopment.easybank_api.contracts.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -33,7 +34,7 @@ public class Message {
     private String surname;
 
     @Email(regexp="^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$", message="Email format is not correct.")
-    @Column(name="email", nullable=false, length=50, unique=true)
+    @Column(name="email", nullable=false, length=50)
     private String email;
 
     @NotBlank(message="Phone cannot be blank.")
@@ -43,4 +44,10 @@ public class Message {
     @NotBlank(message="Message cannot be blank.")
     @Column(name="message", nullable=false)
     private String message;
+
+    // Datetime
+    // columnDefinition is the literal definition of the row, you cannot ignore "TIMESTAMP". This is necessary for DB to use default now()
+    // This column can be null because is the BD who generates the timestamp
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false)
+    private LocalDateTime createdAt;
 }
