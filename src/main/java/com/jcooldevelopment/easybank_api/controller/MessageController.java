@@ -3,12 +3,11 @@ package com.jcooldevelopment.easybank_api.controller;
 import java.net.URI;
 import java.util.UUID;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +18,7 @@ import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.service.Message.MessageService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 
 import com.jcooldevelopment.easybank_api.dto.Message.CreateMessageDto;
 import com.jcooldevelopment.easybank_api.dto.Message.MessageDto;
@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/message")
+@Validated // Need this to use @Min for RequestParam: https://www.codejava.net/frameworks/spring-boot/rest-api-validate-query-parameters-examples
 public class MessageController {
 
     private final MessageService messageService;
@@ -37,11 +38,13 @@ public class MessageController {
         this.messageService = service;
     }
 
+    // For RequestParams validation: https://docs.hibernate.org/validator/5.1/reference/en-US/html/chapter-message-interpolation.html#section-interpolation-with-message-expressions
     @GetMapping("/")
     public ResponseEntity<Apiresponse<PaginatedResponse<MessageDto>>> getMessages(
-        @PageableDefault(page = 0, size = 5, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable
+        @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page, // The page to retrieve, the name of the variable is the same for the url
+        @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size // The size of data in page
     ) {
-        PaginatedResponse<MessageDto> messages = this.messageService.getAll(pageable);
+        PaginatedResponse<MessageDto> messages = this.messageService.getAll(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<PaginatedResponse<MessageDto>>("Messages were found.", messages));
     }
 

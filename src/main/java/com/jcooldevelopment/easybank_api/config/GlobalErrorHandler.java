@@ -3,6 +3,7 @@ package com.jcooldevelopment.easybank_api.config;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -13,6 +14,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalErrorHandler {
@@ -45,6 +49,24 @@ public class GlobalErrorHandler {
             "One or more fields have wrong format.");
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
         problemDetails.setTitle("Request body not valid");
+        problemDetails.setProperty("timestamp", LocalDateTime.now().toString());
+        problemDetails.setProperty("errors", errors);
+
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(problemDetails);
+    }
+
+    // Exception for RequestParams in controllers, which is a 422 error
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ProblemDetail> handleConstraintViolationException (ConstraintViolationException exception) {
+        HashSet<String> errors = new HashSet<>();
+        for (ConstraintViolation<?> error: exception.getConstraintViolations()) {
+            errors.add(error.getMessage());
+        }
+
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT,
+            "One or more params are wrong.");
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
+        problemDetails.setTitle("Request params not valid");
         problemDetails.setProperty("timestamp", LocalDateTime.now().toString());
         problemDetails.setProperty("errors", errors);
 
