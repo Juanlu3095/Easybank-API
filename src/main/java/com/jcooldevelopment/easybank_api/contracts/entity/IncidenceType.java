@@ -20,7 +20,7 @@ public class IncidenceType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Autoincremental id
     @Column(name = "id")
-    private int Id;
+    private int id;
 
     @Column(name = "name", length = 50, nullable = false)
     private String name;

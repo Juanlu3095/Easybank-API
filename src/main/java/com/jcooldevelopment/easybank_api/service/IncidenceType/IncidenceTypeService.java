@@ -11,9 +11,9 @@ public interface IncidenceTypeService {
 
     public IncidenceTypeDto getById(int id);
 
-    public IncidenceTypeDto create(CreateIncidenceTypeDto message);
+    public IncidenceTypeDto create(CreateIncidenceTypeDto createIncidenceTypeDto);
 
-    public IncidenceTypeDto update(int id, UpdateIncidenceTypeDto message);
+    public IncidenceTypeDto update(int id, UpdateIncidenceTypeDto updateIncidenceTypeDto);
 
     public boolean delete(int id);
 }
