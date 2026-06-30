@@ -26,7 +26,7 @@ public class GlobalErrorHandler {
     public ResponseEntity<ProblemDetail> handleResourceNotFoundException (ResourceNotFoundException exception) {
         // ProblemDetail follows RFC for showing errors
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND,
-            "The requested resource does not exists.");
+            exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404"));
         problemDetails.setTitle("Resource not found");
 

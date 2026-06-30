@@ -2,6 +2,7 @@ package com.jcooldevelopment.easybank_api.dto.Incidence;
 
 import java.util.UUID;
 
+import com.jcooldevelopment.easybank_api.anotations.EnumValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.IncidenceStatus;
 
 import jakarta.validation.constraints.NotBlank;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class UpdateIncidenceDto {
     
     @NotNull(message="There is no user selected.")
-    private UUID user_id;
+    private UUID user_id; // This must be in JWT, not here
 
     @NotNull(message="There is no incidence type selected.")
     private int incidence_type;
@@ -24,6 +25,6 @@ public class UpdateIncidenceDto {
     @NotBlank(message="Name cannot be blank.")
     private String message;
 
-    @NotBlank(message="Name cannot be blank.")
-    private IncidenceStatus status;
+    @EnumValidatorAnnotation(enumClass = IncidenceStatus.class, message = "Must be an incidence status valid value.")
+    private String status; // If user is ADMIN it can be updated, if is client no
 }

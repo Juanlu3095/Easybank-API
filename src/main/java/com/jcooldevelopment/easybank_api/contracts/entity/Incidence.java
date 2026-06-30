@@ -3,6 +3,8 @@ package com.jcooldevelopment.easybank_api.contracts.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import com.jcooldevelopment.easybank_api.contracts.enums.IncidenceStatus;
 
 import jakarta.persistence.Column;
@@ -42,9 +44,13 @@ public class Incidence {
     private String message;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
+    @ColumnDefault("'IN_PROCESS'")
     private IncidenceStatus status;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = true) // updatable true for updating in put requests
+    private LocalDateTime updatedAt;
 }

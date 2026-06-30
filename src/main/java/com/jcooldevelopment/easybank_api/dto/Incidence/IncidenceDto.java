@@ -32,4 +32,6 @@ public class IncidenceDto {
     private IncidenceStatus status;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }

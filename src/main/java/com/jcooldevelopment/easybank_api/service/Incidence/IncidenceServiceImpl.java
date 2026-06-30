@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.contracts.entity.Incidence;
 import com.jcooldevelopment.easybank_api.contracts.entity.IncidenceType;
+import com.jcooldevelopment.easybank_api.contracts.enums.IncidenceStatus;
 import com.jcooldevelopment.easybank_api.dto.Incidence.CreateIncidenceDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.IncidenceDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.UpdateIncidenceDto;
@@ -37,7 +38,7 @@ public class IncidenceServiceImpl implements IncidenceService{
 
     @Override
     public PaginatedResponse<IncidenceDto> getAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Incidence::getCreatedAt).descending());
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Incidence::getCreatedAt).descending());
         Page<Incidence> incidences = this.incidenceRepository.findAll(pageable);
         Page<IncidenceDto> incidencesToShow = new PageImpl<IncidenceDto>(incidences.getContent() // PageImpl is the implementation of interface Page
             .stream()
@@ -62,6 +63,7 @@ public class IncidenceServiceImpl implements IncidenceService{
 
         Incidence incidenceToSave = incidenceMapper.CreateIncidenceDtoToEntity(createIncidenceDtoDto);
         incidenceToSave.setCreatedAt(LocalDateTime.now());
+        incidenceToSave.setUpdatedAt(LocalDateTime.now());
         incidenceToSave.setIncidence_type(incidenceType);
         Incidence savedIncidence = incidenceRepository.save(incidenceToSave);
         return incidenceMapper.EntityToDto(savedIncidence);
@@ -78,7 +80,8 @@ public class IncidenceServiceImpl implements IncidenceService{
         incidenceToUpdate.setUser_id(updateIncidenceDto.getUser_id());
         incidenceToUpdate.setIncidence_type(incidenceType);
         incidenceToUpdate.setMessage(updateIncidenceDto.getMessage());
-        incidenceToUpdate.setStatus(updateIncidenceDto.getStatus());
+        incidenceToUpdate.setStatus(IncidenceStatus.valueOf(updateIncidenceDto.getStatus())); // Valueof to obtain contraint value in enum
+        incidenceToUpdate.setUpdatedAt(LocalDateTime.now());
 
         Incidence savedIncidence = incidenceRepository.save(incidenceToUpdate);
         return incidenceMapper.EntityToDto(savedIncidence);
