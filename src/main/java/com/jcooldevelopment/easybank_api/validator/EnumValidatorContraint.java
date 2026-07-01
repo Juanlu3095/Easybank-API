@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.jcooldevelopment.easybank_api.anotations.EnumValidatorAnnotation;
+import com.jcooldevelopment.easybank_api.annotations.EnumValidatorAnnotation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

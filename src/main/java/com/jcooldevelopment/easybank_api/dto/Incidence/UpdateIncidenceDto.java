@@ -2,7 +2,7 @@ package com.jcooldevelopment.easybank_api.dto.Incidence;
 
 import java.util.UUID;
 
-import com.jcooldevelopment.easybank_api.anotations.EnumValidatorAnnotation;
+import com.jcooldevelopment.easybank_api.annotations.EnumValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.IncidenceStatus;
 
 import jakarta.validation.constraints.NotBlank;
