@@ -1,5 +1,6 @@
 package com.jcooldevelopment.easybank_api.contracts.entity;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -52,7 +53,7 @@ public class User implements UserDetails{
     private String dni;
 
     @Email
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;
 
     @NotBlank(message = "Phone cannot be blank.")
@@ -71,9 +72,12 @@ public class User implements UserDetails{
     private String pin; // Secret code for safe transactions
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    @Column(name = "role", length = 100)
     @ColumnDefault("'CLIENT'")
     private UserRole role;
+
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

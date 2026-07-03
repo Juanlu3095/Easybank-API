@@ -62,7 +62,7 @@ public class GlobalErrorHandler {
         for (ConstraintViolation<?> error: exception.getConstraintViolations()) {
             errors.add(error.getMessage());
         }
-
+        
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT,
             "One or more params are wrong.");
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
@@ -76,7 +76,7 @@ public class GlobalErrorHandler {
     // ERROR HANDLER WHEN A FIELD DATA IS REPEATED AND MUST BE UNIQUE
 
     // 500 exception
-    @ExceptionHandler(Exception.class)
+    /* @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleException (Exception exception) {
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
             "This service is not available right now. Please try later.");
@@ -86,5 +86,5 @@ public class GlobalErrorHandler {
         // See for logs in production: https://www.baeldung.com/spring-boot-logging
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetails);
-    }
+    } */
 }
