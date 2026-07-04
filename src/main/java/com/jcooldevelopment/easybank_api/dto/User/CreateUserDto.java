@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.Length;
 import com.jcooldevelopment.easybank_api.annotations.DniValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.annotations.EnumValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.annotations.PasswordMatchAnnotation;
+import com.jcooldevelopment.easybank_api.annotations.UserDniUniqueAnnotation;
 import com.jcooldevelopment.easybank_api.annotations.UserEmailUniqueAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
 
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@PasswordMatchAnnotation(message = "Fields password and repeat password do not match.")
+@PasswordMatchAnnotation(message = "Fields password and repeat password do not match.") // https://stackoverflow.com/questions/65400172/validating-password-and-confirmed-password-spring-boot
 public class CreateUserDto {
 
     @NotBlank(message = "Name cannot be blank.")
@@ -34,6 +35,7 @@ public class CreateUserDto {
     @NotBlank(message = "DNI cannot be blank.")
     @Length(min = 9, max = 9, message = "DNI must have a length of {min} characters.")
     @DniValidatorAnnotation
+    @UserDniUniqueAnnotation
     private String dni;
 
     @Email(message = "Email format is not valid.")

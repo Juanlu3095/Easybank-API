@@ -21,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, UUID>{
     boolean updatePassword(UUID id, String password);
 
     boolean existsByEmail(String email);
+
+    boolean existsByDni(String dni);
 }

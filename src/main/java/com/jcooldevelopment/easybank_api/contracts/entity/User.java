@@ -62,7 +62,7 @@ public class User implements UserDetails{
 
     @NotBlank(message = "Usercode cannot be blank.")
     @Column(name = "usercode", nullable = false, unique = true)
-    private String usercode; // Must generate a random number of a given length as username in login form
+    private String usercode; // Must generate a random number of a given length as username in login form and must be UNIQUE
 
     @NotBlank(message = "Password cannot be blank.")
     @Column(name = "password", nullable = false)
@@ -72,7 +72,7 @@ public class User implements UserDetails{
     private String pin; // Secret code for safe transactions
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", length = 100)
+    @Column(name = "role", length = 100, nullable = false)
     @ColumnDefault("'CLIENT'")
     private UserRole role;
 

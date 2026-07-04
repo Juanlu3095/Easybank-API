@@ -25,8 +25,8 @@ public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch
         // Errors are global. With this we add the errors as field errors
         context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate("Fields password and repeat password do not match.")
-                .addPropertyNode("repeatPassword")
-                .addConstraintViolation();
+            .addPropertyNode("repeatPassword")
+            .addConstraintViolation();
 
         return false;
     }

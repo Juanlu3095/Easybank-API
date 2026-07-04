@@ -19,5 +19,4 @@ public class UserEmailUniqueConstraint implements ConstraintValidator<UserEmailU
         return !this.userRepository.existsByEmail(email);
     }
 
-    
 }

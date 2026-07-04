@@ -4,6 +4,7 @@ import org.hibernate.validator.constraints.Length;
 
 import com.jcooldevelopment.easybank_api.annotations.DniValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.annotations.EnumValidatorAnnotation;
+import com.jcooldevelopment.easybank_api.annotations.UserDniUniqueAnnotation;
 import com.jcooldevelopment.easybank_api.annotations.UserEmailUniqueAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
 
@@ -29,6 +30,7 @@ public class UpdateUserDto {
     @NotBlank(message = "DNI cannot be blank.")
     @Length(min = 9, max = 9, message = "DNI must have a length {min} characters.")
     @DniValidatorAnnotation
+    @UserDniUniqueAnnotation
     private String dni;
 
     @Email(message = "Email format is not valid.")
