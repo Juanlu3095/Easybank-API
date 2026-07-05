@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
@@ -29,10 +30,12 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl (UserRepository repository, UserMapper mapper) {
+    public UserServiceImpl (UserRepository repository, UserMapper mapper, PasswordEncoder passwordEncoder) {
         this.userRepository = repository;
         this.userMapper = mapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -72,6 +75,7 @@ public class UserServiceImpl implements UserService{
         }
 
         User userToSave = userMapper.CreateUserDtoToEntity(createUserDto);
+        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
         var usercode = "";
         boolean usercodeExists = true;
 
@@ -125,7 +129,7 @@ public class UserServiceImpl implements UserService{
         userToUpdate.setPhone(updateUserDto.getPhone());
         userToUpdate.setRole(UserRole.valueOf(updateUserDto.getRole()));
         userToUpdate.setUsercode(usercode);
-        userToUpdate.setPassword(updateUserDto.getPassword());
+        userToUpdate.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
         userToUpdate.setPin(updateUserDto.getPin());
         User savedUser = this.userRepository.save(userToUpdate);
 
