@@ -13,6 +13,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
+import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 
 import jakarta.validation.ConstraintViolation;
@@ -31,6 +33,28 @@ public class GlobalErrorHandler {
         problemDetails.setTitle("Resource not found");
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetails);
+    }
+
+    // 409 exception for email
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> handleEmailAlreadyExistsException (EmailAlreadyExistsException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
+        problemDetails.setTitle("Email already exists");
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
+    }
+
+    // 409 exception for DNI
+    @ExceptionHandler(DniAlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> handleDniAlreadyExistsException (DniAlreadyExistsException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
+        problemDetails.setTitle("DNI already exists");
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
     }
 
     // 422 exception with MethodArgumentNotValidException interception

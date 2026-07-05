@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -57,11 +58,12 @@ public class User implements UserDetails{
     private String email;
 
     @NotBlank(message = "Phone cannot be blank.")
-    @Column(name = "phone", unique = true, nullable = false, length = 45)
+    @Column(name = "phone", unique = false, nullable = false, length = 45)
     private String phone;
 
     @NotBlank(message = "Usercode cannot be blank.")
     @Column(name = "usercode", nullable = false, unique = true)
+    @Length(min = 10, max = 10, message = "Usercode length must have a minimum of {min} characters and a maximum of {max}.")
     private String usercode; // Must generate a random number of a given length as username in login form and must be UNIQUE
 
     @NotBlank(message = "Password cannot be blank.")

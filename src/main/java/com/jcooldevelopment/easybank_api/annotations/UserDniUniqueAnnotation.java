@@ -12,6 +12,9 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.NotNull;
 
+/**
+ * Since validations with database should not be done with DTO, this annotation will no be used.
+ */
 @Target({
     ElementType.FIELD
 })

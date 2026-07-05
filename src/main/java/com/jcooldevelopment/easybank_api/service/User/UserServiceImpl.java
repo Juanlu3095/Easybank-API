@@ -16,10 +16,13 @@ import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
 import com.jcooldevelopment.easybank_api.dto.User.CreateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UpdateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UserDto;
+import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
+import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.mapper.UserMapper;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
 import com.jcooldevelopment.easybank_api.utils.DataFormater;
+import com.jcooldevelopment.easybank_api.utils.EncryptUtils;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -56,8 +59,29 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserDto create(CreateUserDto createUserDto) {
+        createUserDto.setDni(createUserDto.getDni().toUpperCase());
+        // Validate if email and DNI already exist
+        int countEmail = this.userRepository.countByEmail(createUserDto.getEmail());
+        int countDni = this.userRepository.countByDni(createUserDto.getDni());
+        if (countDni > 0) {
+            throw new DniAlreadyExistsException("This DNI already exists.");
+        }
+
+        if (countEmail > 0) {
+            throw new EmailAlreadyExistsException("This email already exists.");
+        }
+
         User userToSave = userMapper.CreateUserDtoToEntity(createUserDto);
-        userToSave.setUsercode("12343");
+        var usercode = "";
+        boolean usercodeExists = true;
+
+        // Creates usercode
+        do {
+            usercode = EncryptUtils.generateUsercode();
+            usercodeExists = this.userRepository.existsByUsercode(usercode);
+        } while (usercodeExists == true);
+        
+        userToSave.setUsercode(usercode);
         userToSave.setCreatedAt(LocalDateTime.now());
         User savedUser = this.userRepository.save(userToSave);
         return userMapper.EntityToDto(savedUser);
@@ -65,8 +89,34 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public UserDto update(UUID id, UpdateUserDto updateUserDto) {
+        updateUserDto.setDni(updateUserDto.getDni().toUpperCase());
         User userToUpdate = this.userRepository.findById(id)
             .orElseThrow(()-> new ResourceNotFoundException("User not found."));
+
+        // Validates if email and DNI already exists
+        int countEmail = this.userRepository.countByEmail(updateUserDto.getEmail());
+        int countDni = this.userRepository.countByDni(updateUserDto.getDni());
+
+        if (userToUpdate.getEmail().equals(updateUserDto.getEmail())) {
+            if (countEmail > 1) throw new EmailAlreadyExistsException("Email already exists.");
+        } else {
+            if (countEmail > 0) throw new EmailAlreadyExistsException("Email already exists.");
+        }
+
+        if (userToUpdate.getDni().equals(updateUserDto.getDni())) {
+            if (countDni > 1) throw new DniAlreadyExistsException("DNI already exists.");
+        } else {
+            if (countDni > 0) throw new DniAlreadyExistsException("DNI already exists.");
+        }
+
+        // Create usercode
+        var usercode = "";
+        boolean usercodeExists = true;
+
+        do {
+            usercode = EncryptUtils.generateUsercode();
+            usercodeExists = this.userRepository.existsByUsercode(usercode);
+        } while (usercodeExists == true);
 
         userToUpdate.setName(updateUserDto.getName());
         userToUpdate.setSurname(updateUserDto.getSurname());
@@ -74,7 +124,7 @@ public class UserServiceImpl implements UserService{
         userToUpdate.setEmail(updateUserDto.getEmail());
         userToUpdate.setPhone(updateUserDto.getPhone());
         userToUpdate.setRole(UserRole.valueOf(updateUserDto.getRole()));
-        userToUpdate.setUsercode("1234"); // this should be updated with other class method since the app creates it
+        userToUpdate.setUsercode(usercode);
         userToUpdate.setPassword(updateUserDto.getPassword());
         userToUpdate.setPin(updateUserDto.getPin());
         User savedUser = this.userRepository.save(userToUpdate);

@@ -20,7 +20,9 @@ public interface UserRepository extends JpaRepository<User, UUID>{
     @Query("update User user SET user.password = ?2 WHERE user.id = ?1")
     boolean updatePassword(UUID id, String password);
 
-    boolean existsByEmail(String email);
+    int countByEmail(String email);
 
-    boolean existsByDni(String dni);
+    int countByDni(String dni);
+
+    boolean existsByUsercode(String usercode);
 }
