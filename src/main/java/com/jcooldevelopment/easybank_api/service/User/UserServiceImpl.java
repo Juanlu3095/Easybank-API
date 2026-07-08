@@ -92,10 +92,11 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserDto update(UUID id, UpdateUserDto updateUserDto) {
-        updateUserDto.setDni(updateUserDto.getDni().toUpperCase());
+    public UserDto update(UUID id, UpdateUserDto updateUserDto) { 
         User userToUpdate = this.userRepository.findById(id)
-            .orElseThrow(()-> new ResourceNotFoundException("User not found."));
+        .orElseThrow(()-> new ResourceNotFoundException("User not found."));
+        
+        updateUserDto.setDni(updateUserDto.getDni().toUpperCase());
 
         // Validates if email and DNI already exists
         int countEmail = this.userRepository.countByEmail(updateUserDto.getEmail());
@@ -114,13 +115,14 @@ public class UserServiceImpl implements UserService{
         }
 
         // Create usercode
-        var usercode = "";
+        var usercode = userToUpdate.getUsercode();
         boolean usercodeExists = true;
 
-        do {
+        // Do while does execute code at least one time, while with no 'do' does not. TRY IT TO VERIFY!!
+        while (usercodeExists == true && updateUserDto.isRequestUsercode()) {
             usercode = EncryptUtils.generateUsercode();
             usercodeExists = this.userRepository.existsByUsercode(usercode);
-        } while (usercodeExists == true);
+        }
 
         userToUpdate.setName(updateUserDto.getName());
         userToUpdate.setSurname(updateUserDto.getSurname());
@@ -128,7 +130,7 @@ public class UserServiceImpl implements UserService{
         userToUpdate.setEmail(updateUserDto.getEmail());
         userToUpdate.setPhone(updateUserDto.getPhone());
         userToUpdate.setRole(UserRole.valueOf(updateUserDto.getRole()));
-        userToUpdate.setUsercode(usercode);
+        userToUpdate.setUsercode(usercode); // Is best to include an if (usercode.equals(userToUpdate.getUsercode))
         userToUpdate.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
         userToUpdate.setPin(updateUserDto.getPin());
         User savedUser = this.userRepository.save(userToUpdate);

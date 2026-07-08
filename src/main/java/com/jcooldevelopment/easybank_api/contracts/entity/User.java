@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.jcooldevelopment.easybank_api.annotations.DniValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
+import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,7 +33,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Builder // Allows to create abstract methods to create objects of this class like interface for objects. It allows to implement Design patterns
 @Table(name = "Users")
 public class User implements UserDetails{
 
@@ -70,7 +71,7 @@ public class User implements UserDetails{
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "pin", nullable = true)
+    @Column(name = "pin", length = 50, nullable = true)
     private String pin; // Secret code for safe transactions
 
     @Enumerated(EnumType.STRING)
@@ -78,7 +79,12 @@ public class User implements UserDetails{
     @ColumnDefault("'CLIENT'")
     private UserRole role;
 
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 50, nullable = false)
+    @ColumnDefault("'NOT_ENABLED'")
+    private UserStatus status;
+
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
     @Override
@@ -94,5 +100,16 @@ public class User implements UserDetails{
     @Override
     public String getUsername() {
         return this.usercode;
+    }
+
+    // This method is not needed probably since isEnabled also uses UserStatus
+    @Override 
+    public boolean isAccountNonLocked() { // MIN33:42
+        return !this.status.equals(UserStatus.BLOCKED);
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.status.equals(UserStatus.ENABLED);
     }
 }

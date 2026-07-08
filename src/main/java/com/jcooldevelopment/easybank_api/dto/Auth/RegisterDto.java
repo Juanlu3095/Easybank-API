@@ -1,10 +1,9 @@
-package com.jcooldevelopment.easybank_api.dto.User;
+package com.jcooldevelopment.easybank_api.dto.Auth;
 
 import org.hibernate.validator.constraints.Length;
 
 import com.jcooldevelopment.easybank_api.annotations.DniValidatorAnnotation;
-import com.jcooldevelopment.easybank_api.annotations.EnumValidatorAnnotation;
-import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
+import com.jcooldevelopment.easybank_api.annotations.PasswordMatchAnnotation;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,10 +11,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * To create User without credentials
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateUserDto {
+@PasswordMatchAnnotation(message = "Fields password and repeat password do not match.")
+public class RegisterDto {
 
     @NotBlank(message = "Name cannot be blank.")
     @Length(min = 1, max = 50, message = "Name length must have a minimum of {min} characters and a maximum of {max}.")
@@ -26,7 +29,7 @@ public class UpdateUserDto {
     private String surname;
 
     @NotBlank(message = "DNI cannot be blank.")
-    @Length(min = 9, max = 9, message = "DNI must have a length {min} characters.")
+    @Length(min = 9, max = 9, message = "DNI must have a length of {min} characters.")
     @DniValidatorAnnotation
     private String dni;
 
@@ -38,15 +41,11 @@ public class UpdateUserDto {
     @Length(min = 1, max = 45, message = "Phone length must have a minimum of {min} characters and a maximum of {max}.")
     private String phone;
 
-    private boolean requestUsercode;
-    
-    @NotBlank(message = "Pin cannot be blank.")
-    private String pin;
-
     @NotBlank(message = "Password cannot be blank.")
     @Length(min = 8, max = 100, message = "Password length must have a minimum of {min} characters and a maximum of {max}.")
     private String password;
 
-    @EnumValidatorAnnotation(enumClass = UserRole.class, message = "Role is not a valid value.")
-    private String role;
+    @NotBlank(message = "Repeat password cannot be blank.")
+    @Length(min = 8, max = 100, message = "Password repeat length must have a minimum of {min} characters and a maximum of {max}.")
+    private String repeatPassword;
 }

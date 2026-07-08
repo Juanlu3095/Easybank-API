@@ -1,5 +1,6 @@
 package com.jcooldevelopment.easybank_api.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,6 @@ public interface UserRepository extends JpaRepository<User, UUID>{
     int countByDni(String dni);
 
     boolean existsByUsercode(String usercode);
+
+    Optional<User> findByUsercode(String usercode);
 }
