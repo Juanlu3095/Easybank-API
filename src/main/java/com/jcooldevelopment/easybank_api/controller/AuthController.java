@@ -27,7 +27,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Apiresponse<String>> login(@Valid @RequestBody LoginDto userLogin) {
-        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<String>("Login successful.", "1234"));
+        String token = this.authService.login(userLogin);
+        if (token.isBlank()) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<String>("There is a problem in our system. Please contact our support service.", null));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<String>("Login successful.", token));
     }
 
     @PostMapping("/register")

@@ -1,12 +1,11 @@
 package com.jcooldevelopment.easybank_api.service.Auth;
 
+import com.jcooldevelopment.easybank_api.dto.Auth.LoginDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.RegisterDto;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 public interface AuthService {
 
-    String login (HttpServletRequest request);
+    String login (LoginDto request);
 
     boolean register (RegisterDto userRegister);
 }
