@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.springframework.security.core.AuthenticationException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +18,8 @@ import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 
@@ -32,6 +33,27 @@ public class GlobalErrorHandler {
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
         problemDetails.setTitle("Credentials not valid.");
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
+    }
+
+    // JWT Exceptions for 401 errors
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<ProblemDetail> handleSignatureException (SignatureException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+            "Credentials not valid.");
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
+        problemDetails.setTitle("Credentials not valid.");
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ProblemDetail> handleExpiredJwtException (ExpiredJwtException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+            "Credentials expired.");
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
+        problemDetails.setTitle("Credentials expired.");
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
     }
