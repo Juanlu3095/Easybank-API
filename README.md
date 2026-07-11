@@ -11,6 +11,7 @@ git clone https://github.com/Juanlu3095/Easybank-API.git
 ```
 
 Make sure you use a PostgreSQL database. This project uses it.
+Create a secrets.properties file in src/main/resources with the environment variables using secrets.properties.example.
 
 ## Execution
 

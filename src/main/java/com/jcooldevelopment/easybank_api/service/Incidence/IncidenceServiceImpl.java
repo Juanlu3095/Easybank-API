@@ -70,6 +70,7 @@ public class IncidenceServiceImpl implements IncidenceService{
         IncidenceType incidenceType = incidenceTypeRepository.findById(createIncidenceDtoDto.getIncidence_type())
             .orElseThrow(() -> new ResourceNotFoundException("Incidence type not found."));
 
+        // Get usercode from SecurityContextHolder, which is updated in JwtAuthFilter
         String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = this.userRepository.findByUsercode(usercode)
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));

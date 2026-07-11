@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,13 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    private static final String SECRET_KEY = "586E3272357538782F413F4428472B4B6250655368566B597033733676397924";
+    // https://docs.spring.io/spring-boot/reference/features/external-config.html
+    // https://www.youtube.com/watch?v=rQV76dufxz4
+    private final Environment env;
+
+    public JwtServiceImpl(Environment environment) {
+        this.env = environment;
+    }
 
     public String getToken (UserDetails user) {
         return generateToken(new HashMap<>(), user); // HashMap for key-value pairs with claims (adicional info in token)
@@ -47,7 +54,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private SecretKey getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY); // Decodes Secret key
+        byte[] keyBytes = Decoders.BASE64.decode(env.getProperty("SECRET_KEY")); // Decodes Secret key
         return Keys.hmacShaKeyFor(keyBytes); // Creates new instance of Secret key
     }
 
