@@ -32,11 +32,12 @@ public class Incidence {
     @Column(name="id")
     private UUID id;
 
-    @Column(name="user_id") // Later must be notNullable
-    private UUID user_id;
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable = false) // Later must be notNullable
+    private User user_id;
 
     @ManyToOne
-    @JoinColumn(name = "incidence_type")
+    @JoinColumn(name = "incidence_type", nullable = false)
     private IncidenceType incidence_type;
 
     @NotBlank(message="Message cannot be blank.")

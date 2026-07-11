@@ -45,6 +45,10 @@ public class SecurityConfig {
                         "/swagger-ui.html"
                     ).permitAll()
 
+                    .requestMatchers(HttpMethod.GET,
+                        "/error"
+                    ).permitAll()
+
                     .anyRequest().authenticated() // The rest of requests must be authenticated
             )
             .sessionManagement(sessionManager ->

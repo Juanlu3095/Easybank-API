@@ -3,7 +3,9 @@ package com.jcooldevelopment.easybank_api.dto.Incidence;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jcooldevelopment.easybank_api.contracts.entity.IncidenceType;
+import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.IncidenceStatus;
 
 import jakarta.validation.constraints.NotBlank;
@@ -20,7 +22,8 @@ public class IncidenceDto {
     private UUID id;
 
     @NotNull(message="There is no user selected.")
-    private UUID user_id;
+    @JsonIgnoreProperties({ "password", "pin"}) // Makes columns "password" and "pin" not visible
+    private User user_id;
 
     @NotNull(message="There is no incidence type selected.")
     private IncidenceType incidence_type;

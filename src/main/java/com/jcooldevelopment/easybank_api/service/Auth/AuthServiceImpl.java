@@ -12,6 +12,8 @@ import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
 import com.jcooldevelopment.easybank_api.dto.Auth.LoginDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.RegisterDto;
+import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
+import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
 import com.jcooldevelopment.easybank_api.service.Jwt.JwtService;
@@ -43,8 +45,15 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public boolean register(RegisterDto userRegister) {
+        userRegister.setDni(userRegister.getDni().toUpperCase());
         var usercode = "";
         boolean usercodeExists = true;
+
+        int countByEmail = this.userRepository.countByEmail(userRegister.getEmail());
+        int countByDni = this.userRepository.countByDni(userRegister.getDni());
+
+        if (countByEmail > 0) throw new EmailAlreadyExistsException("This email already exists.");
+        if (countByDni > 0) throw new DniAlreadyExistsException("This DNI already exists.");
 
         // Creates usercode
         do {

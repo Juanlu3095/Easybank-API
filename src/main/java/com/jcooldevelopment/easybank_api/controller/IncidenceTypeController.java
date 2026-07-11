@@ -37,7 +37,7 @@ public class IncidenceTypeController {
     }
 
     // For RequestParams validation: https://docs.hibernate.org/validator/5.1/reference/en-US/html/chapter-message-interpolation.html#section-interpolation-with-message-expressions
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<Apiresponse<PaginatedResponse<IncidenceTypeDto>>> getIncidenceTypes(
         @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page, // The page to retrieve, the name of the variable is the same for the url
         @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size // The size of data in page
@@ -52,7 +52,7 @@ public class IncidenceTypeController {
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<IncidenceTypeDto>("Incidence type found.", incidenceTypeDto));
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<Apiresponse<IncidenceTypeDto>> postMessage(@Valid @RequestBody CreateIncidenceTypeDto createIncidenceTypeDto) {
         IncidenceTypeDto incidenceTypeSaved = this.incidenceTypeService.create(createIncidenceTypeDto);
         return ResponseEntity.status(HttpStatus.CREATED)

@@ -1,7 +1,5 @@
 package com.jcooldevelopment.easybank_api.dto.Incidence;
 
-import java.util.UUID;
-
 import com.jcooldevelopment.easybank_api.annotations.EnumValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.IncidenceStatus;
 
@@ -16,8 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateIncidenceDto {
     
-    @NotNull(message="There is no user selected.")
-    private UUID user_id; // This must be in JWT, not here
+    /* @NotNull(message="There is no user selected.")
+    private UUID user_id; // This must be in JWT, not here */
 
     @NotNull(message="There is no incidence type selected.")
     private int incidence_type;

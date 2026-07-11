@@ -37,7 +37,7 @@ public class UserController {
         this.userService = service;
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<Apiresponse<PaginatedResponse<UserDto>>> getUsers(
         @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page, // The page to retrieve, the name of the variable is the same for the url
         @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size // The size of data in page
@@ -52,7 +52,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<UserDto>("User found.", user));
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<Apiresponse<UserDto>> postUser(@Valid @RequestBody CreateUserDto createUserDto) {
         UserDto savedUser = this.userService.create(createUserDto);
         return ResponseEntity.status(HttpStatus.CREATED)
