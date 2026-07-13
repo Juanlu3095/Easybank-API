@@ -33,7 +33,7 @@ public class Incidence {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false) // Later must be notNullable
+    @JoinColumn(name="user_id", nullable = false)
     private User user_id;
 
     @ManyToOne

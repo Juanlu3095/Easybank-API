@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
+import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSend;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -146,4 +147,15 @@ public class GlobalErrorHandler {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetails);
     } */
+
+    // Message Exception from jakarta.mail
+    @ExceptionHandler(EmailCouldNotBeSend.class)
+    public ResponseEntity<ProblemDetail> handleMessagingException (EmailCouldNotBeSend exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/502"));
+        problemDetails.setTitle("Message could not be send.");
+
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(problemDetails);
+    }
 }

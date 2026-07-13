@@ -15,6 +15,8 @@ import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
+import com.jcooldevelopment.easybank_api.service.ActivationCode.ActivationCodeService;
+import com.jcooldevelopment.easybank_api.service.Email.EmailService;
 import com.jcooldevelopment.easybank_api.service.Jwt.JwtService;
 import com.jcooldevelopment.easybank_api.utils.EncryptUtils;
 
@@ -22,12 +24,22 @@ import com.jcooldevelopment.easybank_api.utils.EncryptUtils;
 public class AuthServiceImpl implements AuthService{
 
     private final UserRepository userRepository;
+    private final EmailService emailService;
+    private final ActivationCodeService activationCodeService;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    public AuthServiceImpl(UserRepository userRepository, JwtService jwtService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+    public AuthServiceImpl(UserRepository userRepository,
+        EmailService emailService,
+        ActivationCodeService activationCodeService,
+        JwtService jwtService,
+        PasswordEncoder passwordEncoder,
+        AuthenticationManager authenticationManager
+    ) {
         this.userRepository = userRepository;
+        this.emailService = emailService;
+        this.activationCodeService = activationCodeService;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -72,7 +84,9 @@ public class AuthServiceImpl implements AuthService{
             .status(UserStatus.NOT_ENABLED)
             .build();
         
-        this.userRepository.save(user);
+        User savedUser = this.userRepository.save(user);
+        String activationCode = this.activationCodeService.createCode(savedUser.getId(), usercode);
+        this.emailService.sendMailToEnableUser(usercode, activationCode, user.getEmail());
         return true;
     }
 

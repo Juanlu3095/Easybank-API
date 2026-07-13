@@ -20,4 +20,17 @@ public class EncryptUtils {
         // Transform usercode to String
         return usercode.toString();
     }
+
+    public static String generateActivationCode () {
+        String chars = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz0123456789";
+        StringBuilder code = new StringBuilder("");
+        SecureRandom intGenerator = new SecureRandom();
+
+        for(int i = 0; i<20; i++) {
+            var randomNumber = intGenerator.nextInt(0,chars.length());
+            code.insert(i, chars.charAt(randomNumber));
+        }
+
+        return code.toString();
+    }
 }
