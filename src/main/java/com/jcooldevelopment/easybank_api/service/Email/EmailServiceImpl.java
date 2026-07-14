@@ -4,6 +4,8 @@ import java.util.Properties;
 
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSend;
 
@@ -16,6 +18,9 @@ import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
+// https://mailtrap.io/blog/jakarta-mail-tutorial/
+// https://docs.oracle.com/es-ww/iaas/Content/Email/Reference/javamail.htm
+// https://github.com/DanielEspanadero/java-mail/blob/main/src/main/java/com/send/email/services/impl/EmailServiceImpl.java
 @Service
 public class EmailServiceImpl implements EmailService {
 
@@ -24,9 +29,12 @@ public class EmailServiceImpl implements EmailService {
     private final String from;
     private final String username;
     private final String password;
+    private final String domain;
+    private final TemplateEngine templateEngine;
 
-    public EmailServiceImpl (Environment environment) {
+    public EmailServiceImpl (Environment environment, TemplateEngine templateEngine) {
         this.env = environment;
+        this.templateEngine = templateEngine;
 
         props = new Properties();
         props.put("mail.smtp.auth", env.getProperty("MAIL.SMTP.AUTH"));
@@ -36,6 +44,7 @@ public class EmailServiceImpl implements EmailService {
         from = env.getProperty("MAIL.FROM");
         username = env.getProperty("MAIL.USERNAME");
         password = env.getProperty("MAIL.PASSWORD");
+        domain = env.getProperty("DOMAIN_URL");
     }
 
     private Session createSession() {
@@ -54,14 +63,22 @@ public class EmailServiceImpl implements EmailService {
         // Messaging Exception is a checked exception, try/catch or throw are required 
         try {
             Message message = new MimeMessage(createSession());
+            
             message.setFrom(new InternetAddress(from));
             message.setRecipient(Message.RecipientType.TO, new InternetAddress(destination));
             message.setSubject("Hello from the Mailtrap team");
-            message.setText("Hi there! This are your credentials:\n usercode: ${usercode}\n password: The one you set\n To activate your account: http:8080/api/activate/${usercode}");
+            
+            // Process Thymeleaf template
+            Context context = new Context();
+            context.setVariable("domain", domain);
+            context.setVariable("code", activationCode);
+            context.setVariable("usercode", usercode);
+            String html = templateEngine.process("activationEmail", context);
+            message.setContent(html, "text/html;charset=UTF-8");
 
             Transport.send(message);
         } catch (MessagingException exception) {
-            throw new EmailCouldNotBeSend("Email for user activation could not be send.");
+            throw new EmailCouldNotBeSend("Email for user activation could not be sent.");
         }
         
     }

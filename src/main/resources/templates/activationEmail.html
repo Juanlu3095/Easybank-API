@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activation Email</title>
+</head>
+<body style="background-color: #197a69">
+    <main>
+        <div id="message-body" style="
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                border: 1px solid;
+                border-radius: 0.5rem;
+                background-color: white;
+                padding: 2rem 0 3rem 0;
+                margin: 0 auto;
+                width: 100%;
+            ">
+            <img class="logo" src="https://raw.githubusercontent.com/Juanlu3095/Easybank-API/refs/heads/main/src/main/resources/logo/easybank_logo_no_background" alt="logo-easybank" style="width:30%">
+            <h1>We welcome you to our bank!</h1>
+            <div class="message" style="
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+            ">
+                <span>
+                    Your account has been registered and you only need to activate it by clicking 
+                    <a th:href="${domain + '/activate/' + code}">here</a>.
+                </span>
+                <span>Here are your credentials to access your account:</span>
+                <br>
+                <span th:text="${'Username: ' + usercode}"></span>
+                <span>Password: The one you set earlier</span>
+                <p>Best of regards,</p>
+                <p>The EasyBank's team</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

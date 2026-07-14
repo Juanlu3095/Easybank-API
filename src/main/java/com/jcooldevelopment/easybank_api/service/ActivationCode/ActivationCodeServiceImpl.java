@@ -39,7 +39,7 @@ public class ActivationCodeServiceImpl implements ActivationCodeService{
     }
 
     @Override
-    public boolean enableUser(String code) {
+    public boolean enableUser(String code) { // Should delete code from database and verify if isUsed is false to activate
         ActivationCode activationCode = this.activationCodeRepository.findByCode(code)
             .orElseThrow(() -> new ResourceNotFoundException("Code not found."));
 
