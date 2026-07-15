@@ -66,7 +66,7 @@ public class EmailServiceImpl implements EmailService {
             
             message.setFrom(new InternetAddress(from));
             message.setRecipient(Message.RecipientType.TO, new InternetAddress(destination));
-            message.setSubject("Hello from the Mailtrap team");
+            message.setSubject("Activate your EasyBank account");
             
             // Process Thymeleaf template
             Context context = new Context();
