@@ -35,8 +35,8 @@ public class ActivationCode {
     @JoinColumn(name="user_id", nullable = false)
     private User user_id;
 
-    @Column(name = "isUsed")
-    private boolean isUsed;
+    @Column(name = "expires_at", columnDefinition = "TIMESTAMP DEFAULT NOW() + INTERVAL '1 hour'", insertable = false, updatable = false)
+    private LocalDateTime expires_at;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false)
     private LocalDateTime created_at;

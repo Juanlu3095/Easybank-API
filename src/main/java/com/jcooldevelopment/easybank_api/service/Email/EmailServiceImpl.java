@@ -20,7 +20,8 @@ import jakarta.mail.internet.MimeMessage;
 
 // https://mailtrap.io/blog/jakarta-mail-tutorial/
 // https://docs.oracle.com/es-ww/iaas/Content/Email/Reference/javamail.htm
-// https://github.com/DanielEspanadero/java-mail/blob/main/src/main/java/com/send/email/services/impl/EmailServiceImpl.java
+// https://github.com/DanielEspanadero/java-mail/
+// https://www.baeldung.com/thymeleaf-in-spring-mvc
 @Service
 public class EmailServiceImpl implements EmailService {
 

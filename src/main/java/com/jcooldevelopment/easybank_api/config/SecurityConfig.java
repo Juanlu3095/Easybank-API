@@ -36,7 +36,8 @@ public class SecurityConfig {
                 authRequest
                     .requestMatchers(HttpMethod.POST, 
                         "/api/message",
-                        "/api/auth/**"
+                        "/api/auth/**",
+                        "/api/activate/**"
                     ).permitAll() // This routes will be public
                     
                     .requestMatchers(
