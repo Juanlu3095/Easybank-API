@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.jcooldevelopment.easybank_api.exception.ActivationCodeExpiredException;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
-import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSend;
+import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSendException;
+import com.jcooldevelopment.easybank_api.exception.EncryptionException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
+import com.jcooldevelopment.easybank_api.exception.UserAlreadyEnabledException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -105,6 +107,17 @@ public class GlobalErrorHandler {
         return ResponseEntity.status(HttpStatus.GONE).body(problemDetails);
     }
 
+    // Exception for an already enabled user. Code error 410
+    @ExceptionHandler(UserAlreadyEnabledException.class)
+    public ResponseEntity<ProblemDetail> handleUserAlreadyEnabled (UserAlreadyEnabledException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.GONE,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/410"));
+        problemDetails.setTitle("Account already enabled");
+
+        return ResponseEntity.status(HttpStatus.GONE).body(problemDetails);
+    }
+
     // 422 exception with MethodArgumentNotValidException interception
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ProblemDetail> handleMethodArgumentNotValidException (MethodArgumentNotValidException exception) {
@@ -160,9 +173,20 @@ public class GlobalErrorHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetails);
     } */
 
+    // Message exception for crypto errors
+    @ExceptionHandler(EncryptionException.class)
+    public ResponseEntity<ProblemDetail> handleEncryptionException (EncryptionException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500"));
+        problemDetails.setTitle("Service unavailable.");
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetails);
+    }
+
     // Message Exception from jakarta.mail
-    @ExceptionHandler(EmailCouldNotBeSend.class)
-    public ResponseEntity<ProblemDetail> handleMessagingException (EmailCouldNotBeSend exception) {
+    @ExceptionHandler(EmailCouldNotBeSendException.class)
+    public ResponseEntity<ProblemDetail> handleMessagingException (EmailCouldNotBeSendException exception) {
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY,
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/502"));

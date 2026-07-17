@@ -1,6 +1,7 @@
 package com.jcooldevelopment.easybank_api.service.ActivationCode;
 
 import java.time.LocalDateTime;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
 import com.jcooldevelopment.easybank_api.exception.ActivationCodeExpiredException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
+import com.jcooldevelopment.easybank_api.exception.UserAlreadyEnabledException;
 import com.jcooldevelopment.easybank_api.repository.ActivationCodeRepository;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
 import com.jcooldevelopment.easybank_api.utils.EncryptUtils;
@@ -27,7 +29,6 @@ public class ActivationCodeServiceImpl implements ActivationCodeService{
 
     /**
     * Creates code to activate user.
-    * @author Juanlu3095
     * @param id The id of the user
     * @param usercode The usercode from user
     * @return The generated activation code
@@ -38,18 +39,17 @@ public class ActivationCodeServiceImpl implements ActivationCodeService{
         User user = this.userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
-        String code = EncryptUtils.generateActivationCode();
+        TreeMap<String, String> code = EncryptUtils.generateActivationCode();
         
         ActivationCode activationCode = new ActivationCode();
-        activationCode.setCode(code);
+        activationCode.setCode(code.get("hash"));
         activationCode.setUser_id(user);
-        ActivationCode savedActivationCode = this.activationCodeRepository.save(activationCode);
-        return savedActivationCode.getCode();
+        this.activationCodeRepository.save(activationCode);
+        return code.get("activationCode");
     }
 
     /**
     * Enables user by code and deletes that activation code.
-    * @author Juanlu3095
     * @param code The code to enable an user
     * @return True if all is correct, false if not
     * @throws ResourceNotFoundException if code is not found
@@ -57,13 +57,17 @@ public class ActivationCodeServiceImpl implements ActivationCodeService{
     */
     @Override
     public boolean enableUser(String code) { // Should delete code from database and enable user
-        ActivationCode activationCode = this.activationCodeRepository.findByCode(code)
+        String hash = EncryptUtils.shaHash(code);
+
+        ActivationCode activationCode = this.activationCodeRepository.findByCode(hash)
             .orElseThrow(() -> new ResourceNotFoundException("Code not found."));
 
         if(activationCode.getExpires_at().isBefore(LocalDateTime.now())) throw new ActivationCodeExpiredException("This activation code has expired.");
 
         User user = this.userRepository.findById(activationCode.getUser_id().getId())
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+
+        if (user.isEnabled()) throw new UserAlreadyEnabledException("This account is already enabled.");
         
         user.setStatus(UserStatus.ENABLED);
         User updatedUser = this.userRepository.save(user);

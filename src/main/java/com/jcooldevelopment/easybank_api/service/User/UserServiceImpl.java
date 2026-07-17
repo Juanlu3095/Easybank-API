@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService{
         userToUpdate.setPhone(updateUserDto.getPhone());
         userToUpdate.setRole(UserRole.valueOf(updateUserDto.getRole()));
         userToUpdate.setUsercode(usercode); // Is best to include an if (usercode.equals(userToUpdate.getUsercode))
-        userToUpdate.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
+        userToUpdate.setPassword(passwordEncoder.encode(updateUserDto.getPassword())); // Validate if new password equals the one from before
         userToUpdate.setPin(updateUserDto.getPin());
         User savedUser = this.userRepository.save(userToUpdate);
 

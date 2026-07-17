@@ -1,36 +1,90 @@
 package com.jcooldevelopment.easybank_api.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import com.jcooldevelopment.easybank_api.exception.EncryptionException;
 
 public class EncryptUtils {
 
     // https://www.baeldung.com/java-secure-random
-    public static String generateUsercode() {
-        // Possible 64 chars for usercode
+    /**
+     * Generates a random string made of chars and int.
+     * @param n The length of the generated string
+     * @return The generated user code
+     */
+    private static String generateRandomString(int n) {
+        // Possible 64 chars for random string
         String chars = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz0123456789";
-        StringBuilder usercode = new StringBuilder("");
+        StringBuilder randomString = new StringBuilder("");
         SecureRandom intGenerator = new SecureRandom();
 
-        // For each of usercode, we get each char
-        for(int i = 0; i<10; i++) {
+        // For each of randomString, we get each char
+        for(int i = 0; i<n; i++) {
             var randomNumber = intGenerator.nextInt(0,chars.length());
-            usercode.insert(i, chars.charAt(randomNumber));
+            randomString.insert(i, chars.charAt(randomNumber));
         }
 
-        // Transform usercode to String
-        return usercode.toString();
+        // Transform StringBuilder to String
+        return randomString.toString();
     }
 
-    public static String generateActivationCode () {
-        String chars = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz0123456789";
-        StringBuilder code = new StringBuilder("");
-        SecureRandom intGenerator = new SecureRandom();
+    /**
+     * Generates an user code for login.
+     * @return The generated user code
+     */
+    public static String generateUsercode() {
+        return generateRandomString(10);
+    }
 
-        for(int i = 0; i<20; i++) {
-            var randomNumber = intGenerator.nextInt(0,chars.length());
-            code.insert(i, chars.charAt(randomNumber));
+    // https://javarevisited.blogspot.com/2013/03/generate-md5-hash-in-java-string-byte-array-example-tutorial.html
+    /**
+     * Generates SHA-256 hash.
+     * @param value The value to hash.
+     * @throws UnsupportedEncodingException
+     * @throws NoSuchAlgorithmException
+     * @return The SHA-256 hash.
+     */
+    public static String shaHash(String value) {
+        String digest = "";
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256"); // SHA-256 generates always the same hash with the same original value
+            byte[] hash = md.digest(value.getBytes("UTF-8"));
+
+            // Convert bytes to hexadecimal
+            StringBuilder sb = new StringBuilder(2*hash.length);
+            for(byte b : hash){
+                sb.append(String.format("%02x", b&0xff));
+            }
+          
+            digest = sb.toString();
+
+        } catch (UnsupportedEncodingException exception) {
+            Logger.getLogger("Unsupported Encoding").log(Level.SEVERE, null, exception);
+            throw new EncryptionException("There is a problem in our server. Please contact our technical support.");
+        } catch (NoSuchAlgorithmException exception) {
+            Logger.getLogger("No such algorithm").log(Level.SEVERE, null, exception);
+            throw new EncryptionException("There is a problem in our server. Please contact our technical support.");
         }
+        
+        return digest;
+    }
 
-        return code.toString();
+    /**
+     * Generates an activation code for new user.
+     * @return The generated activation code. Hash is accesible with key "hash" and code with no hash with "activationCode".
+     */
+    public static TreeMap<String, String> generateActivationCode () {
+        String random = generateRandomString(64);
+        String digest = shaHash(random);
+        TreeMap<String, String> activationCode = new TreeMap<>();
+        activationCode.put("activationCode", random);
+        activationCode.put("hash", digest);
+        return activationCode;
     }
 }

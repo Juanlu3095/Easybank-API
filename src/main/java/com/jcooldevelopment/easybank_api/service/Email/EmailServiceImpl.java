@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSend;
+import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSendException;
 
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
@@ -79,7 +79,7 @@ public class EmailServiceImpl implements EmailService {
 
             Transport.send(message);
         } catch (MessagingException exception) {
-            throw new EmailCouldNotBeSend("Email for user activation could not be sent.");
+            throw new EmailCouldNotBeSendException("Email for user activation could not be sent.");
         }
         
     }
