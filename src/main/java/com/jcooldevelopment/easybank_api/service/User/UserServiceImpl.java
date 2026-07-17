@@ -20,8 +20,11 @@ import com.jcooldevelopment.easybank_api.dto.User.UserDto;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
+import com.jcooldevelopment.easybank_api.exception.UserAlreadyEnabledException;
 import com.jcooldevelopment.easybank_api.mapper.UserMapper;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
+import com.jcooldevelopment.easybank_api.service.ActivationCode.ActivationCodeService;
+import com.jcooldevelopment.easybank_api.service.Email.EmailService;
 import com.jcooldevelopment.easybank_api.utils.DataFormater;
 import com.jcooldevelopment.easybank_api.utils.EncryptUtils;
 
@@ -31,11 +34,21 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final ActivationCodeService activationCodeService;
 
-    public UserServiceImpl (UserRepository repository, UserMapper mapper, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl (
+        UserRepository repository,
+        UserMapper mapper,
+        PasswordEncoder passwordEncoder,
+        EmailService emailService,
+        ActivationCodeService activationCodeService
+    ) {
         this.userRepository = repository;
         this.userMapper = mapper;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
+        this.activationCodeService = activationCodeService;
     }
 
     @Override
@@ -94,7 +107,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserDto update(UUID id, UpdateUserDto updateUserDto) { 
         User userToUpdate = this.userRepository.findById(id)
-        .orElseThrow(()-> new ResourceNotFoundException("User not found."));
+            .orElseThrow(()-> new ResourceNotFoundException("User not found."));
         
         updateUserDto.setDni(updateUserDto.getDni().toUpperCase());
 
@@ -130,8 +143,9 @@ public class UserServiceImpl implements UserService{
         userToUpdate.setEmail(updateUserDto.getEmail());
         userToUpdate.setPhone(updateUserDto.getPhone());
         userToUpdate.setRole(UserRole.valueOf(updateUserDto.getRole()));
-        userToUpdate.setUsercode(usercode); // Is best to include an if (usercode.equals(userToUpdate.getUsercode))
-        userToUpdate.setPassword(passwordEncoder.encode(updateUserDto.getPassword())); // Validate if new password equals the one from before
+        userToUpdate.setUsercode(usercode);
+        if(!passwordEncoder.matches(updateUserDto.getPassword(), userToUpdate.getPassword())) // Validates if new password equals the one from before
+            userToUpdate.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
         userToUpdate.setPin(updateUserDto.getPin());
         User savedUser = this.userRepository.save(userToUpdate);
 
@@ -144,6 +158,19 @@ public class UserServiceImpl implements UserService{
             .orElseThrow(() -> new ResourceNotFoundException("Incidence not found."));
         
         userRepository.delete(user);
+        return true;
+    }
+
+    @Override
+    public boolean resendEmail(UUID id) {
+        User user = this.userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+
+        if (user.isEnabled()) throw new UserAlreadyEnabledException("The user is already enabled.");
+        
+        String activationCode = this.activationCodeService.createCode(id);
+        this.emailService.sendMailToEnableUser(user.getUsercode(), activationCode, user.getEmail());
+
         return true;
     }
 

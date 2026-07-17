@@ -27,15 +27,8 @@ public class ActivationCodeServiceImpl implements ActivationCodeService{
         this.userRepository = userRepository;
     }
 
-    /**
-    * Creates code to activate user.
-    * @param id The id of the user
-    * @param usercode The usercode from user
-    * @return The generated activation code
-    * @throws ResourceNotFoundException if user is not found
-    */
     @Override
-    public String createCode(UUID id, String usercode) {
+    public String createCode(UUID id) {
         User user = this.userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
@@ -48,13 +41,6 @@ public class ActivationCodeServiceImpl implements ActivationCodeService{
         return code.get("activationCode");
     }
 
-    /**
-    * Enables user by code and deletes that activation code.
-    * @param code The code to enable an user
-    * @return True if all is correct, false if not
-    * @throws ResourceNotFoundException if code is not found
-    * @throws ActivationCodeExpiredException if code's expires_at is before than actual LocalDateTime
-    */
     @Override
     public boolean enableUser(String code) { // Should delete code from database and enable user
         String hash = EncryptUtils.shaHash(code);

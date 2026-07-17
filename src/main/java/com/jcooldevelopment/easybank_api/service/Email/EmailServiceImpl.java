@@ -58,7 +58,7 @@ public class EmailServiceImpl implements EmailService {
             }
         );
     }
-
+    
     @Override
     public void sendMailToEnableUser(String usercode, String activationCode, String destination) {
         // Messaging Exception is a checked exception, try/catch or throw are required 

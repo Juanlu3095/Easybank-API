@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService{
             .build();
         
         User savedUser = this.userRepository.save(user);
-        String activationCode = this.activationCodeService.createCode(savedUser.getId(), usercode);
+        String activationCode = this.activationCodeService.createCode(savedUser.getId());
         this.emailService.sendMailToEnableUser(usercode, activationCode, user.getEmail());
         return true;
     }
