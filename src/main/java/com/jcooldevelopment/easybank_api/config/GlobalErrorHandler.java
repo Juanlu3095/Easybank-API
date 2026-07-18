@@ -19,6 +19,7 @@ import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSendException;
 import com.jcooldevelopment.easybank_api.exception.EncryptionException;
+import com.jcooldevelopment.easybank_api.exception.IncorrectPasswordException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.exception.UserAlreadyEnabledException;
 
@@ -58,6 +59,17 @@ public class GlobalErrorHandler {
             "Credentials expired.");
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
         problemDetails.setTitle("Credentials expired.");
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
+    }
+
+    // Incorrect old password when trying to update password
+    @ExceptionHandler(IncorrectPasswordException.class)
+    public ResponseEntity<ProblemDetail> handlePasswordNotValidException (IncorrectPasswordException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
+        problemDetails.setTitle("Credentials not valid.");
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
     }

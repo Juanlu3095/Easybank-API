@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
+import com.jcooldevelopment.easybank_api.dto.Auth.ChangePasswordDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.LoginDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.RegisterDto;
 import com.jcooldevelopment.easybank_api.service.Auth.AuthService;
@@ -40,9 +41,28 @@ public class AuthController {
         if (result) {
             return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<>("Register successful.", null));
         } else {
-            return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<>("Register failed.", null));
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Register failed.", null));
         }
         
     }
-    
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Apiresponse<Void>> changePassword (@Valid @RequestBody ChangePasswordDto ChangePasswordDto) {
+        boolean result = this.authService.changePassword(ChangePasswordDto);
+        if(result) {
+            return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<>("Password updated.", null));
+        } else {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Password could not be changed.", null));
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Apiresponse<Void>> forgotPassword () {
+        return null;
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Apiresponse<Void>> resetPassword () {
+        return null;
+    }
 }

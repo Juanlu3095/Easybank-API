@@ -2,6 +2,7 @@ package com.jcooldevelopment.easybank_api.service.Auth;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,10 +10,12 @@ import org.springframework.stereotype.Service;
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
+import com.jcooldevelopment.easybank_api.dto.Auth.ChangePasswordDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.LoginDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.RegisterDto;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
+import com.jcooldevelopment.easybank_api.exception.IncorrectPasswordException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
 import com.jcooldevelopment.easybank_api.service.ActivationCode.ActivationCodeService;
@@ -88,6 +91,30 @@ public class AuthServiceImpl implements AuthService{
         String activationCode = this.activationCodeService.createCode(savedUser.getId());
         this.emailService.sendMailToEnableUser(usercode, activationCode, user.getEmail());
         return true;
+    }
+
+    @Override
+    public boolean changePassword(ChangePasswordDto passwordRequest) {
+        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = this.userRepository.findByUsercode(usercode)
+            .orElseThrow(() -> new ResourceNotFoundException("User does not exists."));
+
+        if (this.passwordEncoder.matches(user.getPassword(), passwordRequest.getOldPassword()))
+            throw new IncorrectPasswordException("Old password is incorrect.");
+        
+        user.setPassword(this.passwordEncoder.encode(passwordRequest.getPassword()));
+        this.userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public boolean forgotPassword() {
+        return false;
+    }
+
+    @Override
+    public boolean resetPassword(){
+        return false;
     }
 
 }

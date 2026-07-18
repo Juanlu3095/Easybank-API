@@ -18,8 +18,8 @@ public interface UserRepository extends JpaRepository<User, UUID>{
     boolean updatePin(UUID id, String pin);
 
     @Modifying // This is used only with @Query
-    @Query("update User user SET user.password = ?2 WHERE user.id = ?1")
-    boolean updatePassword(UUID id, String password);
+    @Query("update User user SET user.password = ?2 WHERE user.usercode = ?1")
+    boolean updatePassword(String usercode, String password);
 
     int countByEmail(String email);
 
