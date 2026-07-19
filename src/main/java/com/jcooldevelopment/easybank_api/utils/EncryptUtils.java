@@ -87,4 +87,17 @@ public class EncryptUtils {
         activationCode.put("hash", digest);
         return activationCode;
     }
+
+    /**
+     * Generates an token to reset password of user.
+     * @return The generated token. Hash is accesible with key "hash" and code with no hash with "token".
+     */
+    public static TreeMap<String, String> generateTokenToResetPassword () {
+        String random = generateRandomString(64);
+        String digest = shaHash(random);
+        TreeMap<String, String> tokenToResetPassword = new TreeMap<>();
+        tokenToResetPassword.put("token", random);
+        tokenToResetPassword.put("hash", digest);
+        return tokenToResetPassword;
+    }
 }

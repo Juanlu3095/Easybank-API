@@ -16,13 +16,13 @@ public interface AuthService {
      * @throws IncorrectPasswordException if old password is not correct.
      * @return True if successful, false if not.
     */
-   boolean changePassword(ChangePasswordDto passwordRequest);
+    boolean changePassword(ChangePasswordDto passwordRequest);
 
    /**
     * Allows to send an email to update password. Credentials are not needed.
-    * @return
+    * @param email The email address where the message will be sent.
     */
-   boolean forgotPassword();
+    void forgotPassword(String email);
 
-   boolean resetPassword();
+    boolean resetPassword();
 }

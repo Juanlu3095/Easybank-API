@@ -21,6 +21,7 @@ import com.jcooldevelopment.easybank_api.repository.UserRepository;
 import com.jcooldevelopment.easybank_api.service.ActivationCode.ActivationCodeService;
 import com.jcooldevelopment.easybank_api.service.Email.EmailService;
 import com.jcooldevelopment.easybank_api.service.Jwt.JwtService;
+import com.jcooldevelopment.easybank_api.service.ResetPasswordToken.ResetPasswordTokenService;
 import com.jcooldevelopment.easybank_api.utils.EncryptUtils;
 
 @Service
@@ -30,6 +31,7 @@ public class AuthServiceImpl implements AuthService{
     private final EmailService emailService;
     private final ActivationCodeService activationCodeService;
     private final JwtService jwtService;
+    private final ResetPasswordTokenService resetPasswordTokenService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
@@ -37,6 +39,7 @@ public class AuthServiceImpl implements AuthService{
         EmailService emailService,
         ActivationCodeService activationCodeService,
         JwtService jwtService,
+        ResetPasswordTokenService resetPasswordTokenService,
         PasswordEncoder passwordEncoder,
         AuthenticationManager authenticationManager
     ) {
@@ -44,6 +47,7 @@ public class AuthServiceImpl implements AuthService{
         this.emailService = emailService;
         this.activationCodeService = activationCodeService;
         this.jwtService = jwtService;
+        this.resetPasswordTokenService = resetPasswordTokenService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
     }
@@ -108,8 +112,12 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public boolean forgotPassword() {
-        return false;
+    public void forgotPassword(String email) {
+        User user = this.userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("This email does not exist."));
+
+        String token = this.resetPasswordTokenService.createToken(user);
+        this.emailService.sendMailToResetPassword(email, token);
     }
 
     @Override

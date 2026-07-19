@@ -28,4 +28,6 @@ public interface UserRepository extends JpaRepository<User, UUID>{
     boolean existsByUsercode(String usercode);
 
     Optional<User> findByUsercode(String usercode);
+
+    Optional<User> findByEmail(String email);
 }

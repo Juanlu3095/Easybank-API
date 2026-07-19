@@ -12,4 +12,12 @@ public interface EmailService {
      * @throws EmailCouldNotBeSendException if MessagingException
      */
     void sendMailToEnableUser(String usercode, String activationCode, String destination);
+
+    /**
+     * Sends message to a given email address with URL and token to reset password.
+     * @param email The email to where the message is sent.
+     * @param token The token used in URL to reset password.
+     * @throws EmailCouldNotBeSendException if MessagingException
+     */
+    void sendMailToResetPassword(String email, String token);
 }

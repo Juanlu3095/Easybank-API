@@ -84,4 +84,26 @@ public class EmailServiceImpl implements EmailService {
         
     }
 
+    @Override
+    public void sendMailToResetPassword(String email, String token) {
+        try {
+            Message message = new MimeMessage(createSession());
+            
+            message.setFrom(new InternetAddress(from));
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
+            message.setSubject("Reset your EasyBank account password");
+            
+            // Process Thymeleaf template
+            Context context = new Context();
+            context.setVariable("domain", domain);
+            context.setVariable("token", token);
+            String html = templateEngine.process("resetPasswordEmail", context);
+            message.setContent(html, "text/html;charset=UTF-8");
+
+            Transport.send(message);
+        } catch (MessagingException exception) {
+            throw new EmailCouldNotBeSendException("Email to reset password could not be sent.");
+        }
+    }
+
 }

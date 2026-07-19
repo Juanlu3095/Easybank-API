@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
 import com.jcooldevelopment.easybank_api.dto.Auth.ChangePasswordDto;
+import com.jcooldevelopment.easybank_api.dto.Auth.ForgotPasswordDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.LoginDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.RegisterDto;
 import com.jcooldevelopment.easybank_api.service.Auth.AuthService;
@@ -57,8 +58,9 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Apiresponse<Void>> forgotPassword () {
-        return null;
+    public ResponseEntity<Apiresponse<Void>> forgotPassword (@Valid @RequestBody ForgotPasswordDto forgotPasswordDto) {
+        this.authService.forgotPassword(forgotPasswordDto.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<>("Email to reset password has been sent.", null));
     }
 
     @PostMapping("/reset-password")
