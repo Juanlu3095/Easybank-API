@@ -3,6 +3,7 @@ package com.jcooldevelopment.easybank_api.service.Auth;
 import com.jcooldevelopment.easybank_api.dto.Auth.ChangePasswordDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.LoginDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.RegisterDto;
+import com.jcooldevelopment.easybank_api.dto.Auth.ResetPasswordDto;
 import com.jcooldevelopment.easybank_api.exception.IncorrectPasswordException;
 
 public interface AuthService {
@@ -24,5 +25,11 @@ public interface AuthService {
     */
     void forgotPassword(String email);
 
-    boolean resetPassword();
+    /**
+     * Updates user's password.
+     * @param token The token to find to verify if that user requested wants to reset password.
+     * @param resetPasswordDto It contains password and repeat password.
+     * @return
+     */
+    void resetPassword(String token, ResetPasswordDto resetPasswordDto);
 }

@@ -1,5 +1,7 @@
 package com.jcooldevelopment.easybank_api.service.Auth;
 
+import java.time.LocalDateTime;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -7,15 +9,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.jcooldevelopment.easybank_api.contracts.entity.ResetPasswordToken;
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
 import com.jcooldevelopment.easybank_api.dto.Auth.ChangePasswordDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.LoginDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.RegisterDto;
+import com.jcooldevelopment.easybank_api.dto.Auth.ResetPasswordDto;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.IncorrectPasswordException;
+import com.jcooldevelopment.easybank_api.exception.ResetPasswordExpiredException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
 import com.jcooldevelopment.easybank_api.service.ActivationCode.ActivationCodeService;
@@ -103,7 +108,7 @@ public class AuthServiceImpl implements AuthService{
         User user = this.userRepository.findByUsercode(usercode)
             .orElseThrow(() -> new ResourceNotFoundException("User does not exists."));
 
-        if (this.passwordEncoder.matches(user.getPassword(), passwordRequest.getOldPassword()))
+        if (!this.passwordEncoder.matches(passwordRequest.getOldPassword(), user.getPassword()))
             throw new IncorrectPasswordException("Old password is incorrect.");
         
         user.setPassword(this.passwordEncoder.encode(passwordRequest.getPassword()));
@@ -121,8 +126,19 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public boolean resetPassword(){
-        return false;
+    public void resetPassword(String token, ResetPasswordDto resetPasswordDto){
+        ResetPasswordToken resetToken = this.resetPasswordTokenService.findByToken(token);
+
+        if (resetToken.getExpires_at().isBefore(LocalDateTime.now())) throw new ResetPasswordExpiredException("Token expired.");
+
+        User userToUpdate = this.userRepository.findById(resetToken.getUser().getId())
+            .orElseThrow(()-> new ResourceNotFoundException("User not found."));
+
+        userToUpdate.setPassword(this.passwordEncoder.encode(resetPasswordDto.getPassword()));
+        this.userRepository.save(userToUpdate);
+
+        // Delete used token in database
+        this.resetPasswordTokenService.deleteByToken(resetToken.getToken()); // Here getToken returns the hash, don't forget!!!
     }
 
 }

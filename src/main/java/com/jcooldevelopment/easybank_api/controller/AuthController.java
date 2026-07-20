@@ -8,12 +8,14 @@ import com.jcooldevelopment.easybank_api.dto.Auth.ChangePasswordDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.ForgotPasswordDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.LoginDto;
 import com.jcooldevelopment.easybank_api.dto.Auth.RegisterDto;
+import com.jcooldevelopment.easybank_api.dto.Auth.ResetPasswordDto;
 import com.jcooldevelopment.easybank_api.service.Auth.AuthService;
 
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -63,8 +65,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<>("Email to reset password has been sent.", null));
     }
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<Apiresponse<Void>> resetPassword () {
-        return null;
+    @PostMapping("/reset-password/{token}")
+    public ResponseEntity<Apiresponse<Void>> resetPassword (
+        @Valid @RequestBody ResetPasswordDto resetPasswordDto,
+        @PathVariable String token
+    ) {
+        this.authService.resetPassword(token, resetPasswordDto);
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<>("Password updated.", null));
     }
 }

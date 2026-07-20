@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 
 import com.jcooldevelopment.easybank_api.validator.NewPasswordMatchValidator;
 import com.jcooldevelopment.easybank_api.validator.PasswordMatchAuthValidator;
+import com.jcooldevelopment.easybank_api.validator.PasswordMatchResetPasswordValidator;
 import com.jcooldevelopment.easybank_api.validator.PasswordMatchValidator;
 
 import jakarta.validation.Constraint;
@@ -21,7 +22,8 @@ import jakarta.validation.Payload;
 @Constraint(validatedBy = {
     PasswordMatchValidator.class,
     PasswordMatchAuthValidator.class,
-    NewPasswordMatchValidator.class
+    NewPasswordMatchValidator.class,
+    PasswordMatchResetPasswordValidator.class
 })
 public @interface PasswordMatchAnnotation {
     String message() default "Fields password and repeat password do not match.";

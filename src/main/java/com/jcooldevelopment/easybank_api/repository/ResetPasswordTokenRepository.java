@@ -1,5 +1,6 @@
 package com.jcooldevelopment.easybank_api.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,6 @@ public interface ResetPasswordTokenRepository extends JpaRepository<ResetPasswor
     // https://keepcoding.io/blog/que-es-transactional-en-spring-boot/
     @Transactional // It allows to run queries in a safe form. If an error occurs, it will not do any change in database
     void deleteByUser_id(UUID id);
+
+    Optional<ResetPasswordToken> findByToken(String token);
 }

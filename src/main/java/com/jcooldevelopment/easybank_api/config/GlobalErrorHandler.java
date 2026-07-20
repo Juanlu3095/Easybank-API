@@ -20,6 +20,7 @@ import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSendException;
 import com.jcooldevelopment.easybank_api.exception.EncryptionException;
 import com.jcooldevelopment.easybank_api.exception.IncorrectPasswordException;
+import com.jcooldevelopment.easybank_api.exception.ResetPasswordExpiredException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.exception.UserAlreadyEnabledException;
 
@@ -115,6 +116,17 @@ public class GlobalErrorHandler {
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/410"));
         problemDetails.setTitle("Activation code expired");
+
+        return ResponseEntity.status(HttpStatus.GONE).body(problemDetails);
+    }
+
+    // 410 exception for Expired Reset Password token
+    @ExceptionHandler(ResetPasswordExpiredException.class)
+    public ResponseEntity<ProblemDetail> handleResetPasswordExpiredException (ResetPasswordExpiredException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.GONE,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/410"));
+        problemDetails.setTitle("Expired token");
 
         return ResponseEntity.status(HttpStatus.GONE).body(problemDetails);
     }
