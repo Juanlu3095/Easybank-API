@@ -22,7 +22,7 @@
             <div class="message" style="text-align:left;padding: 0 3rem;">
                 <p>
                     Your account has been registered and you only need to activate it by clicking 
-                    <a th:href="${domain + '/activate' + code}">here</a>.
+                    <a th:href="${domain + '/activate/' + code}">here</a>.
                 </p>
                 <p>Here are your credentials to access your account:</p>
                 <p th:text="${'Username: ' + usercode}"></p>

@@ -9,16 +9,18 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
  * To create User without credentials
  */
 @Data
+@EqualsAndHashCode(callSuper=true)
 @AllArgsConstructor
 @NoArgsConstructor
 @PasswordMatchAnnotation(message = "Fields password and repeat password do not match.")
-public class RegisterDto {
+public class RegisterDto extends PasswordRepeatDto{
 
     @NotBlank(message = "Name cannot be blank.")
     @Length(min = 1, max = 50, message = "Name length must have a minimum of {min} characters and a maximum of {max}.")
@@ -40,12 +42,4 @@ public class RegisterDto {
     @NotBlank(message = "Phone cannot be blank.")
     @Length(min = 1, max = 45, message = "Phone length must have a minimum of {min} characters and a maximum of {max}.")
     private String phone;
-
-    @NotBlank(message = "Password cannot be blank.")
-    @Length(min = 8, max = 100, message = "Password length must have a minimum of {min} characters and a maximum of {max}.")
-    private String password;
-
-    @NotBlank(message = "Repeat password cannot be blank.")
-    @Length(min = 8, max = 100, message = "Password repeat length must have a minimum of {min} characters and a maximum of {max}.")
-    private String repeatPassword;
 }

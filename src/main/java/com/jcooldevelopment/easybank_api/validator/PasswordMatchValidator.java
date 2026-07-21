@@ -1,17 +1,17 @@
 package com.jcooldevelopment.easybank_api.validator;
 
 import com.jcooldevelopment.easybank_api.annotations.PasswordMatchAnnotation;
-import com.jcooldevelopment.easybank_api.dto.User.CreateUserDto;
+import com.jcooldevelopment.easybank_api.dto.Auth.PasswordRepeatDto;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class PasswordMatchValidator implements ConstraintValidator<PasswordMatchAnnotation, CreateUserDto> {
+public class PasswordMatchValidator implements ConstraintValidator<PasswordMatchAnnotation, PasswordRepeatDto> {
 
     @Override
-    public boolean isValid(CreateUserDto createUserDto, ConstraintValidatorContext context) {
-        var password = createUserDto.getPassword();
-        var repeatPassword = createUserDto.getRepeatPassword();
+    public boolean isValid(PasswordRepeatDto dto, ConstraintValidatorContext context) {
+        var password = dto.getPassword();
+        var repeatPassword = dto.getRepeatPassword();
 
         if (password == null || repeatPassword == null) {
             return false;

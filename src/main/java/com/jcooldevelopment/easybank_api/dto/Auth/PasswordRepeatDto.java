@@ -7,10 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// This DTO is used as abstract other DTOs to use only one Validator for matching password and its repeat password
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PasswordRepeatDto {
+public abstract class PasswordRepeatDto {
 
     @NotBlank(message = "New password cannot be blank.")
     @Length(min = 8, max = 100, message = "New password length must have a minimum of {min} characters and a maximum of {max}.")
