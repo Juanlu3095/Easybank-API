@@ -54,7 +54,7 @@ public class IncidenceController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Apiresponse<IncidenceDto>> postMessage(@Valid @RequestBody CreateIncidenceDto createIncidenceDto) {
+    public ResponseEntity<Apiresponse<IncidenceDto>> postIncidence(@Valid @RequestBody CreateIncidenceDto createIncidenceDto) {
         IncidenceDto incidenceSaved = this.incidenceService.create(createIncidenceDto);
         return ResponseEntity.status(HttpStatus.CREATED)
             .location(URI.create("/api/incidence/" + incidenceSaved.getId())) 
@@ -62,7 +62,7 @@ public class IncidenceController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Apiresponse<IncidenceDto>> putMessage(@PathVariable UUID id, @Valid @RequestBody UpdateIncidenceDto updateIncidenceDto) {
+    public ResponseEntity<Apiresponse<IncidenceDto>> putIncidence(@PathVariable UUID id, @Valid @RequestBody UpdateIncidenceDto updateIncidenceDto) {
         IncidenceDto updatedIncidence = this.incidenceService.update(id, updateIncidenceDto);
         return ResponseEntity.status(HttpStatus.OK)
             .location(URI.create("/api/incidence/" + updatedIncidence.getId()))
@@ -70,7 +70,7 @@ public class IncidenceController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Apiresponse<Void>> deleteMessage(UUID id) {
+    public ResponseEntity<Apiresponse<Void>> deleteIncidence(UUID id) {
         boolean result = this.incidenceService.delete(id);
         if(!result) {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Service unavailable.", null));

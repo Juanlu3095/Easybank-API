@@ -9,7 +9,7 @@ public class DniValidatorConstraint implements ConstraintValidator<DniValidatorA
 
     @Override
     public boolean isValid(String dni, ConstraintValidatorContext context) {
-         if (dni.length() != 9) { 
+        if (dni.length() != 9) { 
             return false;
         }
         
