@@ -25,7 +25,7 @@ public class CountryMapper {
        return modelMapper.map(updateCountryDto, Country.class);
     }
 
-    public CountryDto EntityToDto(Country Country) {
-        return modelMapper.map(Country, CountryDto.class);
+    public CountryDto EntityToDto(Country country) {
+        return modelMapper.map(country, CountryDto.class);
     }
 }

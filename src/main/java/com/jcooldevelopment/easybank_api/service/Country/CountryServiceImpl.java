@@ -8,7 +8,7 @@ import com.jcooldevelopment.easybank_api.contracts.entity.Country;
 import com.jcooldevelopment.easybank_api.dto.Country.CountryDto;
 import com.jcooldevelopment.easybank_api.dto.Country.CreateCountryDto;
 import com.jcooldevelopment.easybank_api.dto.Country.UpdateCountryDto;
-import com.jcooldevelopment.easybank_api.exception.CountryAlreadyExists;
+import com.jcooldevelopment.easybank_api.exception.ResourceAlreadyExists;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.mapper.CountryMapper;
 import com.jcooldevelopment.easybank_api.repository.CountryRepository;
@@ -43,7 +43,7 @@ public class CountryServiceImpl implements CountryService{
     @Override
     public CountryDto create(CreateCountryDto createCountryDto) {
         int repeatedCountry = this.countryRepository.countByCode(createCountryDto.getCode());
-        if(repeatedCountry > 0) throw new CountryAlreadyExists("This country already exists.");
+        if(repeatedCountry > 0) throw new ResourceAlreadyExists("This country already exists.");
 
         Country countryToSave = this.countryMapper.CreateCountryDtoToEntity(createCountryDto);
         Country savedCountry = this.countryRepository.save(countryToSave);
@@ -59,7 +59,7 @@ public class CountryServiceImpl implements CountryService{
 
         if(country.getCode().equals(updateCountryDto.getCode()) && repeatedCountry > 1 ||
             !country.getCode().equals(updateCountryDto.getCode()) && repeatedCountry > 0 ) {
-            throw new CountryAlreadyExists("This country already exists.");
+            throw new ResourceAlreadyExists("This country already exists.");
         }
         
         country.setName(updateCountryDto.getName());

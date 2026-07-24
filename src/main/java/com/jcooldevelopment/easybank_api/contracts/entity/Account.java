@@ -57,8 +57,8 @@ public class Account {
 
     @ManyToOne
     @JoinColumn(name="accountType", nullable = false)
-    private AccountType account_type;
+    private AccountType accountType;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.jcooldevelopment.easybank_api.exception.ActivationCodeExpiredException;
-import com.jcooldevelopment.easybank_api.exception.CountryAlreadyExists;
+import com.jcooldevelopment.easybank_api.exception.ResourceAlreadyExists;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSendException;
@@ -111,8 +111,8 @@ public class GlobalErrorHandler {
     }
 
     // 409 exception when country already exists
-    @ExceptionHandler(CountryAlreadyExists.class)
-    public ResponseEntity<ProblemDetail> handleCountryAlreadyExists (CountryAlreadyExists exception) {
+    @ExceptionHandler(ResourceAlreadyExists.class)
+    public ResponseEntity<ProblemDetail> handleCountryAlreadyExists (ResourceAlreadyExists exception) {
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));

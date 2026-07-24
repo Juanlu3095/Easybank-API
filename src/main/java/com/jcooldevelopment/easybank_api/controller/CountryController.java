@@ -48,7 +48,7 @@ public class CountryController {
     public ResponseEntity<Apiresponse<CountryDto>> postCountry(@Valid @RequestBody CreateCountryDto createCountryDto) {
         CountryDto countrySaved = this.countryService.create(createCountryDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-            .location(URI.create("/api/Country/" + countrySaved.getId())) 
+            .location(URI.create("/api/country/" + countrySaved.getId())) 
             .body(new Apiresponse<CountryDto>("Country saved.", countrySaved));
     }
     
@@ -56,7 +56,7 @@ public class CountryController {
     public ResponseEntity<Apiresponse<CountryDto>> putCountry(@PathVariable int id, @Valid @RequestBody UpdateCountryDto updateCountryDto) {
         CountryDto updatedCountry = this.countryService.update(id, updateCountryDto);
         return ResponseEntity.status(HttpStatus.OK)
-            .location(URI.create("/api/Country/" + updatedCountry.getId()))
+            .location(URI.create("/api/country/" + updatedCountry.getId()))
             .body(new Apiresponse<CountryDto>("Country updated.", updatedCountry));
     }
 
