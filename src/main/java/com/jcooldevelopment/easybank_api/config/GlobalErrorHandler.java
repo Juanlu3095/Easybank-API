@@ -116,7 +116,7 @@ public class GlobalErrorHandler {
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
-        problemDetails.setTitle("Country already exists");
+        problemDetails.setTitle("Resource already exists");
         
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
     }

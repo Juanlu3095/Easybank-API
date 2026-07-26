@@ -22,6 +22,9 @@ public class UpdateBranchDto {
     @Length(min = 3, max = 3, message = "BIC/SWIFT branch's length must be 3.")
     private String bicCode; // The BIC/SWIFT part which identifies the branch
 
+    @Length(min = 2, max = 2, message = "Localization code's length must be 2.")
+    private String localizationCode;
+
     @NotBlank(message = "Address cannot be blank.")
     private String address;
 

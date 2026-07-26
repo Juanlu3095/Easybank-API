@@ -1,7 +1,5 @@
 package com.jcooldevelopment.easybank_api.contracts.entity;
 
-import org.hibernate.validator.constraints.Length;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,13 +28,14 @@ public class Branch {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Length(min = 4, max = 4, message = "IBAN branch's length must be 4.")
     @Column(name = "iban_code", nullable = false, unique = true)
     private String ibanCode; // The IBAN part which identifies the branch
 
-    @Length(min = 3, max = 3, message = "BIC/SWIFT branch's length must be 3.")
-    @Column(name = "bic_code", nullable = false, unique = true)
+    @Column(name = "bic_code", nullable = true)
     private String bicCode; // The BIC/SWIFT part which identifies the branch
+
+    @Column(name = "localization_code", nullable = true, unique = true)
+    private String localizationCode;
 
     @Column(name = "address", nullable = false)
     private String address;

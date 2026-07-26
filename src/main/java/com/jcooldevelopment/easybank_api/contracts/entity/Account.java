@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.jcooldevelopment.easybank_api.annotations.BicAnnotation;
+import com.jcooldevelopment.easybank_api.annotations.IbanAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.AccountStatus;
 
 import jakarta.persistence.Column;
@@ -45,6 +47,14 @@ public class Account {
     @ManyToOne
     @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
+
+    @IbanAnnotation
+    @Column(name = "iban")
+    private String iban;
+
+    @BicAnnotation
+    @Column(name = "bic_swift")
+    private String bicSwift;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")

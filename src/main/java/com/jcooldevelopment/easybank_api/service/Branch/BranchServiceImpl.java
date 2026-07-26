@@ -51,9 +51,11 @@ public class BranchServiceImpl implements BranchService{
 
         int countByIban = this.branchRepository.countByIbanCode(createBranchDto.getIbanCode());
         int countByBic = this.branchRepository.countByBicCode(createBranchDto.getBicCode());
+        int countByLocalization = this.branchRepository.countByLocalizationCode(createBranchDto.getLocalizationCode());
 
         if(countByIban > 0) throw new ResourceAlreadyExists("A branch with this IBAN code already exists.");
         if(countByBic > 0) throw new ResourceAlreadyExists("A branch with this SWIFT/BIC code already exists.");
+        if(countByLocalization > 0) throw new ResourceAlreadyExists("A branch with this localization code already exists.");
 
         Branch branchToSave = this.branchMapper.CreateBranchDtoToEntity(createBranchDto);
         branchToSave.setCountry(country);
@@ -68,6 +70,7 @@ public class BranchServiceImpl implements BranchService{
 
         int countByIban = this.branchRepository.countByIbanCode(updateBranchDto.getIbanCode());
         int countByBic = this.branchRepository.countByBicCode(updateBranchDto.getBicCode());
+        int countByLocalization = this.branchRepository.countByLocalizationCode(updateBranchDto.getLocalizationCode());
 
         if(!updateBranchDto.getBicCode().equals(branch.getBicCode())) {
             if(countByBic > 0) throw new ResourceAlreadyExists("A branch with this SWIFT/BIC code already exists.");
@@ -81,11 +84,11 @@ public class BranchServiceImpl implements BranchService{
             if(countByIban > 1) throw new ResourceAlreadyExists("A branch with this IBAN code already exists.");
         }
 
-        branch.setAddress(updateBranchDto.getAddress());
-        branch.setBicCode(updateBranchDto.getBicCode());
-        branch.setCity(updateBranchDto.getCity());
-        branch.setIbanCode(updateBranchDto.getIbanCode());
-        branch.setName(updateBranchDto.getName());
+        if(!updateBranchDto.getLocalizationCode().equals(branch.getLocalizationCode())) {
+            if(countByLocalization > 0) throw new ResourceAlreadyExists("A branch with this localization code already exists.");
+        } else {
+            if(countByLocalization > 1) throw new ResourceAlreadyExists("A branch with this localization code already exists.");
+        }
 
         if(branch.getCountry().getId() != updateBranchDto.getCountryId()) {
             Country country = this.countryRepository.findById(updateBranchDto.getCountryId())
@@ -93,6 +96,13 @@ public class BranchServiceImpl implements BranchService{
 
             branch.setCountry(country);
         }
+
+        branch.setAddress(updateBranchDto.getAddress());
+        branch.setBicCode(updateBranchDto.getBicCode());
+        branch.setCity(updateBranchDto.getCity());
+        branch.setIbanCode(updateBranchDto.getIbanCode());
+        branch.setLocalizationCode(updateBranchDto.getLocalizationCode());
+        branch.setName(updateBranchDto.getName());
 
         Branch savedBranch = this.branchRepository.save(branch);
         return this.branchMapper.EntityToDto(savedBranch);

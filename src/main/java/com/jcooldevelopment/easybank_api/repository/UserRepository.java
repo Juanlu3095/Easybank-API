@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
 
-
 public interface UserRepository extends JpaRepository<User, UUID>{
 
     // https://stackoverflow.com/questions/29202277/update-single-field-using-spring-data-jpa

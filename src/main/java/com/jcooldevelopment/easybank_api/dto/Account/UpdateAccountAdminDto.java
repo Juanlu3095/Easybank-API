@@ -2,6 +2,8 @@ package com.jcooldevelopment.easybank_api.dto.Account;
 
 import java.util.UUID;
 
+import com.jcooldevelopment.easybank_api.contracts.enums.AccountStatus;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,10 +12,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateAccountDto {
+public class UpdateAccountAdminDto {
 
     @NotNull(message="There is no branch selected.")
     private Long branchId;
+
+    @NotNull(message="There is no status selected.")
+    private AccountStatus status;
 
     @NotNull(message="There is no account type selected.")
     private UUID accountTypeId;

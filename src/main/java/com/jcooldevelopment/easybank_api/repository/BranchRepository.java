@@ -9,4 +9,6 @@ public interface BranchRepository extends JpaRepository<Branch, Long>{
     int countByIbanCode (String ibanCode);
 
     int countByBicCode (String bicCode);
+
+    int countByLocalizationCode (String localizationCode);
 }
