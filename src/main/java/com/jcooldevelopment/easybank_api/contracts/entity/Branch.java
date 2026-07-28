@@ -34,7 +34,7 @@ public class Branch {
     @Column(name = "bic_code", nullable = true)
     private String bicCode; // The BIC/SWIFT part which identifies the branch
 
-    @Column(name = "localization_code", nullable = true, unique = true)
+    @Column(name = "localization_code", nullable = false, unique = false)
     private String localizationCode;
 
     @Column(name = "address", nullable = false)

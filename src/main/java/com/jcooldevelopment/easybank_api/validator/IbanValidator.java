@@ -19,6 +19,7 @@ public class IbanValidator implements ConstraintValidator<IbanAnnotation, String
             IbanUtil.validate(iban);
             return true;
         } catch (IbanFormatException | InvalidCheckDigitException | UnsupportedCountryException ex) {
+            ex.printStackTrace();
             return false;
         }
     } 

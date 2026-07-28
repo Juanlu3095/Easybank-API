@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
-import com.jcooldevelopment.easybank_api.dto.Branch.BranchDto;
+import com.jcooldevelopment.easybank_api.dto.Branch.BranchAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Branch.CreateBranchDto;
 import com.jcooldevelopment.easybank_api.dto.Branch.UpdateBranchDto;
 import com.jcooldevelopment.easybank_api.service.Branch.BranchService;
@@ -33,34 +33,34 @@ public class BranchController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Apiresponse<List<BranchDto>>> getBranches() {
-        List<BranchDto> branches = this.branchService.getAll();
-        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<List<BranchDto>>("Branches were found.", branches));
+    public ResponseEntity<Apiresponse<List<BranchAdminDto>>> getBranches() {
+        List<BranchAdminDto> branches = this.branchService.getAll();
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<List<BranchAdminDto>>("Branches were found.", branches));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Apiresponse<BranchDto>> getBranch(@PathVariable Long id){
-        BranchDto branch = this.branchService.getById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<BranchDto>("Branch found.", branch));
+    public ResponseEntity<Apiresponse<BranchAdminDto>> getBranch(@PathVariable Long id){
+        BranchAdminDto branch = this.branchService.getById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<BranchAdminDto>("Branch found.", branch));
     }
 
     @PostMapping("")
-    public ResponseEntity<Apiresponse<BranchDto>> postBranch(@Valid @RequestBody CreateBranchDto createBranchDto){
-        BranchDto savedBranch = this.branchService.create(createBranchDto);
+    public ResponseEntity<Apiresponse<BranchAdminDto>> postBranch(@Valid @RequestBody CreateBranchDto createBranchDto){
+        BranchAdminDto savedBranch = this.branchService.create(createBranchDto);
         return ResponseEntity.status(HttpStatus.CREATED)
             .location(URI.create("/api/branch/" + savedBranch.getId()))
-            .body(new Apiresponse<BranchDto>("Branch saved.", savedBranch));
+            .body(new Apiresponse<BranchAdminDto>("Branch saved.", savedBranch));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Apiresponse<BranchDto>> putBranch(
+    public ResponseEntity<Apiresponse<BranchAdminDto>> putBranch(
         @PathVariable Long id,
         @Valid @RequestBody UpdateBranchDto updateBranchDto
     ) {
-        BranchDto updatedBranch = this.branchService.update(id, updateBranchDto);
+        BranchAdminDto updatedBranch = this.branchService.update(id, updateBranchDto);
         return ResponseEntity.status(HttpStatus.OK)
             .location(URI.create("/api/branch/" + updatedBranch.getId()))
-            .body(new Apiresponse<BranchDto>("Branch updated.", updatedBranch));
+            .body(new Apiresponse<BranchAdminDto>("Branch updated.", updatedBranch));
     }
 
     @DeleteMapping("/{id}")

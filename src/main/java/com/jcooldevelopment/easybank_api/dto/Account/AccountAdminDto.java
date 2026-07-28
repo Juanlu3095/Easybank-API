@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.AccountType;
+import com.jcooldevelopment.easybank_api.contracts.entity.Branch;
 import com.jcooldevelopment.easybank_api.contracts.enums.AccountStatus;
-import com.jcooldevelopment.easybank_api.dto.Branch.BranchDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountDto {
+public class AccountAdminDto {
 
     private UUID id;
 
@@ -28,5 +28,5 @@ public class AccountDto {
 
     private AccountType accountType;
 
-    private BranchDto branch;
+    private Branch branch;
 }

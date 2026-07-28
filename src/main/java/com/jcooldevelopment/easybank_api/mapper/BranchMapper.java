@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.Branch;
 import com.jcooldevelopment.easybank_api.dto.Branch.CreateBranchDto;
+import com.jcooldevelopment.easybank_api.dto.Branch.BranchAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Branch.BranchDto;
 import com.jcooldevelopment.easybank_api.dto.Branch.UpdateBranchDto;
 
@@ -33,6 +34,10 @@ public class BranchMapper {
 
     public Branch UpdateBranchDtoToEntity(UpdateBranchDto updateBranchDto) {
        return modelMapper.map(updateBranchDto, Branch.class);
+    }
+
+    public BranchAdminDto AdminEntityToDto(Branch branch) {
+        return modelMapper.map(branch, BranchAdminDto.class);
     }
 
     public BranchDto EntityToDto(Branch branch) {

@@ -4,9 +4,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.Account;
+import com.jcooldevelopment.easybank_api.dto.Account.AccountAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Account.AccountDto;
 import com.jcooldevelopment.easybank_api.dto.Account.CreateAccountDto;
-import com.jcooldevelopment.easybank_api.dto.Account.UpdateAccountDto;
 
 @Component
 public class AccountMapper {
@@ -21,11 +21,11 @@ public class AccountMapper {
        return modelMapper.map(createAccountDto, Account.class);
     }
 
-    public Account UpdateAccountDtoToEntity(UpdateAccountDto updateAccountDto) {
-       return modelMapper.map(updateAccountDto, Account.class);
+    public AccountAdminDto AdminEntityToDto(Account account) {
+        return modelMapper.map(account, AccountAdminDto.class);
     }
 
-    public AccountDto EntityToDto(Account Account) {
-        return modelMapper.map(Account, AccountDto.class);
+    public AccountDto EntityToDto(Account account){
+        return modelMapper.map(account, AccountDto.class);
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.Branch;
 import com.jcooldevelopment.easybank_api.contracts.entity.Country;
-import com.jcooldevelopment.easybank_api.dto.Branch.BranchDto;
+import com.jcooldevelopment.easybank_api.dto.Branch.BranchAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Branch.CreateBranchDto;
 import com.jcooldevelopment.easybank_api.dto.Branch.UpdateBranchDto;
 import com.jcooldevelopment.easybank_api.exception.ResourceAlreadyExists;
@@ -29,48 +29,45 @@ public class BranchServiceImpl implements BranchService{
     }
 
     @Override
-    public List<BranchDto> getAll() {
+    public List<BranchAdminDto> getAll() {
         List<Branch> branches = this.branchRepository.findAll();
         return branches.stream()
-            .map(branch -> this.branchMapper.EntityToDto(branch))
+            .map(branch -> this.branchMapper.AdminEntityToDto(branch))
             .toList();
     }
 
     @Override
-    public BranchDto getById(Long id) {
+    public BranchAdminDto getById(Long id) {
         Branch branch = this.branchRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Branch not found"));
         
-        return this.branchMapper.EntityToDto(branch);
+        return this.branchMapper.AdminEntityToDto(branch);
     }
 
     @Override
-    public BranchDto create(CreateBranchDto createBranchDto) {
+    public BranchAdminDto create(CreateBranchDto createBranchDto) {
         Country country = this.countryRepository.findById(createBranchDto.getCountryId())
             .orElseThrow(() -> new ResourceNotFoundException("This country does not exist."));
 
         int countByIban = this.branchRepository.countByIbanCode(createBranchDto.getIbanCode());
         int countByBic = this.branchRepository.countByBicCode(createBranchDto.getBicCode());
-        int countByLocalization = this.branchRepository.countByLocalizationCode(createBranchDto.getLocalizationCode());
 
         if(countByIban > 0) throw new ResourceAlreadyExists("A branch with this IBAN code already exists.");
-        if(countByBic > 0) throw new ResourceAlreadyExists("A branch with this SWIFT/BIC code already exists.");
-        if(countByLocalization > 0) throw new ResourceAlreadyExists("A branch with this localization code already exists.");
+        if(countByBic > 0 && createBranchDto.getBicCode() != null) throw new ResourceAlreadyExists("A branch with this SWIFT/BIC code already exists.");
 
         Branch branchToSave = this.branchMapper.CreateBranchDtoToEntity(createBranchDto);
         branchToSave.setCountry(country);
         Branch savedBranch = this.branchRepository.save(branchToSave);
-        return this.branchMapper.EntityToDto(savedBranch);
+        return this.branchMapper.AdminEntityToDto(savedBranch);
     }
 
     @Override
-    public BranchDto update(Long id, UpdateBranchDto updateBranchDto) {
+    public BranchAdminDto update(Long id, UpdateBranchDto updateBranchDto) {
         Branch branch = this.branchRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Branch not found"));
 
         int countByIban = this.branchRepository.countByIbanCode(updateBranchDto.getIbanCode());
         int countByBic = this.branchRepository.countByBicCode(updateBranchDto.getBicCode());
-        int countByLocalization = this.branchRepository.countByLocalizationCode(updateBranchDto.getLocalizationCode());
 
         if(!updateBranchDto.getBicCode().equals(branch.getBicCode())) {
             if(countByBic > 0) throw new ResourceAlreadyExists("A branch with this SWIFT/BIC code already exists.");
@@ -82,12 +79,6 @@ public class BranchServiceImpl implements BranchService{
             if(countByIban > 0) throw new ResourceAlreadyExists("A branch with this IBAN code already exists.");
         } else {
             if(countByIban > 1) throw new ResourceAlreadyExists("A branch with this IBAN code already exists.");
-        }
-
-        if(!updateBranchDto.getLocalizationCode().equals(branch.getLocalizationCode())) {
-            if(countByLocalization > 0) throw new ResourceAlreadyExists("A branch with this localization code already exists.");
-        } else {
-            if(countByLocalization > 1) throw new ResourceAlreadyExists("A branch with this localization code already exists.");
         }
 
         if(branch.getCountry().getId() != updateBranchDto.getCountryId()) {
@@ -105,7 +96,7 @@ public class BranchServiceImpl implements BranchService{
         branch.setName(updateBranchDto.getName());
 
         Branch savedBranch = this.branchRepository.save(branch);
-        return this.branchMapper.EntityToDto(savedBranch);
+        return this.branchMapper.AdminEntityToDto(savedBranch);
     }
 
     @Override
