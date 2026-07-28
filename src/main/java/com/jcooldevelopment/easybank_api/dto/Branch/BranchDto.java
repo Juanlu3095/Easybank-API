@@ -1,11 +1,16 @@
 package com.jcooldevelopment.easybank_api.dto.Branch;
 
-public record BranchDto(
-    Long id,
-    String name,
-    String address,
-    String city,
-    String country
-) {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class BranchDto {
+    private Long id;
+    private String name;
+    private String address;
+    private String city;
+    private String country;
 }

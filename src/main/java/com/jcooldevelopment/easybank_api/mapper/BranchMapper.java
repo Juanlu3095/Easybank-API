@@ -25,7 +25,6 @@ public class BranchMapper {
             .addMappings(mapper -> {
                 mapper.skip(src -> src.getCountryId(), Branch::setId); // The library mistakes CreateBranchDto.countryId with Branch.id
             });
-            
     }
 
     public Branch CreateBranchDtoToEntity(CreateBranchDto createBranchDto) {

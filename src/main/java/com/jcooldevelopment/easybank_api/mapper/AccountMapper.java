@@ -11,10 +11,12 @@ import com.jcooldevelopment.easybank_api.dto.Account.CreateAccountDto;
 @Component
 public class AccountMapper {
 
+    private final BranchMapper branchMapper;
     private final ModelMapper modelMapper;
 
-    public AccountMapper (ModelMapper modelMapper) {
+    public AccountMapper (ModelMapper modelMapper, BranchMapper branchMapper) {
         this.modelMapper = modelMapper;
+        this.branchMapper = branchMapper;
     }
 
     public Account CreateAccountDtoToEntity(CreateAccountDto createAccountDto) {
@@ -26,6 +28,17 @@ public class AccountMapper {
     }
 
     public AccountDto EntityToDto(Account account){
-        return modelMapper.map(account, AccountDto.class);
+        AccountDto accountDto = new AccountDto();
+        accountDto.setAccountType(account.getAccountType());
+        accountDto.setBalance(account.getBalance());
+        accountDto.setBicSwift(account.getBicSwift());
+        accountDto.setIban(account.getIban());
+        accountDto.setId(account.getId());
+        accountDto.setStatus(account.getStatus());
+
+        accountDto.setBranch(
+            branchMapper.EntityToDto(account.getBranch()) // It allows to hide protected data like IBAN and BIC codes
+        );
+        return accountDto;
     }
 }
