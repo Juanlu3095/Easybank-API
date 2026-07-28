@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.jcooldevelopment.easybank_api.contracts.entity.AccountType;
 import com.jcooldevelopment.easybank_api.contracts.entity.Branch;
 import com.jcooldevelopment.easybank_api.contracts.enums.AccountStatus;
+import com.jcooldevelopment.easybank_api.dto.User.UserDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,4 +30,6 @@ public class AccountAdminDto {
     private AccountType accountType;
 
     private Branch branch;
+
+    private UserDto user;
 }

@@ -13,10 +13,12 @@ public class AccountMapper {
 
     private final BranchMapper branchMapper;
     private final ModelMapper modelMapper;
+    private final UserMapper userMapper;
 
-    public AccountMapper (ModelMapper modelMapper, BranchMapper branchMapper) {
+    public AccountMapper (ModelMapper modelMapper, BranchMapper branchMapper, UserMapper userMapper) {
         this.modelMapper = modelMapper;
         this.branchMapper = branchMapper;
+        this.userMapper = userMapper;
     }
 
     public Account CreateAccountDtoToEntity(CreateAccountDto createAccountDto) {
@@ -24,7 +26,20 @@ public class AccountMapper {
     }
 
     public AccountAdminDto AdminEntityToDto(Account account) {
-        return modelMapper.map(account, AccountAdminDto.class);
+        AccountAdminDto accountAdminDto = new AccountAdminDto();
+        accountAdminDto.setAccountType(account.getAccountType());
+        accountAdminDto.setBalance(account.getBalance());
+        accountAdminDto.setBicSwift(account.getBicSwift());
+        accountAdminDto.setBranch(account.getBranch());
+        accountAdminDto.setIban(account.getIban());
+        accountAdminDto.setId(account.getId());
+        accountAdminDto.setStatus(account.getStatus());
+
+        accountAdminDto.setUser(
+            this.userMapper.EntityToDto(account.getUser())
+        );
+
+        return accountAdminDto;
     }
 
     public AccountDto EntityToDto(Account account){

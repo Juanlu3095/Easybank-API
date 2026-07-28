@@ -164,8 +164,8 @@ public class AccountServiceImpl implements AccountService{
         accountToCreate.setBalance(new BigDecimal(0.00));
         accountToCreate.setBicSwift(bic);
         accountToCreate.setBranch(branch);
-        accountToCreate.setIban(iban.toFormattedString());
-        accountToCreate.setStatus(AccountStatus.ACTIVATED);
+        accountToCreate.setIban(iban.toString());
+        accountToCreate.setStatus(AccountStatus.valueOf(createAccountAdminDto.getStatus().toString()));
         accountToCreate.setUser(user);
 
         Account savedAccount = this.accountRepository.save(accountToCreate);
