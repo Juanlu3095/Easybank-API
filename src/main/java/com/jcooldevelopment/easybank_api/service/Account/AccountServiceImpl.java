@@ -31,6 +31,7 @@ import com.jcooldevelopment.easybank_api.repository.AccountRepository;
 import com.jcooldevelopment.easybank_api.repository.AccountTypeRepository;
 import com.jcooldevelopment.easybank_api.repository.BranchRepository;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
+import com.jcooldevelopment.easybank_api.service.Email.EmailService;
 import com.jcooldevelopment.easybank_api.utils.DataFormater;
 
 @Service
@@ -42,6 +43,7 @@ public class AccountServiceImpl implements AccountService{
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
     private final AccountMapper accountMapper;
+    private final EmailService emailService;
 
     public AccountServiceImpl(
         Environment environment,
@@ -49,7 +51,8 @@ public class AccountServiceImpl implements AccountService{
         AccountTypeRepository accountTypeRepository,
         UserRepository userRepository,
         BranchRepository branchRepository,
-        AccountMapper accountMapper
+        AccountMapper accountMapper,
+        EmailService emailService
     ) {
         this.env = environment;
         this.accountRepository = accountRepository;
@@ -57,6 +60,7 @@ public class AccountServiceImpl implements AccountService{
         this.userRepository = userRepository;
         this.branchRepository = branchRepository;
         this.accountMapper = accountMapper;
+        this.emailService = emailService;
     }
 
     @Override
@@ -134,6 +138,13 @@ public class AccountServiceImpl implements AccountService{
         accountToCreate.setUser(user);
 
         Account savedAccount = this.accountRepository.save(accountToCreate);
+
+        this.emailService.sendMailToNotifyNewAccount(
+            savedAccount.getUser().getEmail(),
+            savedAccount.getAccountType().getName(),
+            savedAccount.getUser().getName()
+        );
+        
         return this.accountMapper.EntityToDto(savedAccount); // This should be more secure
     }
 
@@ -169,6 +180,13 @@ public class AccountServiceImpl implements AccountService{
         accountToCreate.setUser(user);
 
         Account savedAccount = this.accountRepository.save(accountToCreate);
+
+        this.emailService.sendMailToNotifyNewAccount(
+            savedAccount.getUser().getEmail(),
+            savedAccount.getAccountType().getName(),
+            savedAccount.getUser().getName()
+        );
+
         return this.accountMapper.AdminEntityToDto(savedAccount); // This should be more secure
     }
 

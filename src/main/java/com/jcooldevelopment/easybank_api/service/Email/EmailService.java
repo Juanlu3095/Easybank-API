@@ -20,4 +20,13 @@ public interface EmailService {
      * @throws EmailCouldNotBeSendException if MessagingException
      */
     void sendMailToResetPassword(String email, String token);
+
+    /**
+     * Sends message to notify a new account has been created.
+     * @param email The email to where the message is sent.
+     * @param accountName The account type's name.
+     * @param user The name of user who owns the account.
+     * @throws EmailCouldNotBeSendException if MessagingException
+     */
+    void sendMailToNotifyNewAccount(String email, String accountName, String user);
 }

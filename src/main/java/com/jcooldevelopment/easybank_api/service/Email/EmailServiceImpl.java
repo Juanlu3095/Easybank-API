@@ -106,4 +106,26 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Override
+    public void sendMailToNotifyNewAccount(String email, String accountName, String user){
+        try {
+            Message message = new MimeMessage(createSession());
+            
+            message.setFrom(new InternetAddress(from));
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
+            message.setSubject("Your new account has been created!");
+            
+            // Process Thymeleaf template
+            Context context = new Context();
+            context.setVariable("account", accountName);
+            context.setVariable("user", user);
+            String html = templateEngine.process("newAccountNotification", context);
+            message.setContent(html, "text/html;charset=UTF-8");
+
+            Transport.send(message);
+        } catch (MessagingException exception) {
+            throw new EmailCouldNotBeSendException("Email to notify for new account could not be sent.");
+        }
+    }
+
 }
