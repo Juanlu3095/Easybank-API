@@ -23,24 +23,24 @@ import com.jcooldevelopment.easybank_api.service.Branch.BranchService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/branch")
-public class BranchController {
+@RequestMapping("/api/admin/branch")
+public class BranchAdminController {
 
     private final BranchService branchService;
 
-    public BranchController(BranchService branchService) {
+    public BranchAdminController(BranchService branchService) {
         this.branchService = branchService;
     }
 
     @GetMapping("")
     public ResponseEntity<Apiresponse<List<BranchAdminDto>>> getBranches() {
-        List<BranchAdminDto> branches = this.branchService.getAll();
+        List<BranchAdminDto> branches = this.branchService.getAllForAdmin();
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<List<BranchAdminDto>>("Branches were found.", branches));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Apiresponse<BranchAdminDto>> getBranch(@PathVariable Long id){
-        BranchAdminDto branch = this.branchService.getById(id);
+        BranchAdminDto branch = this.branchService.getByIdForAdmin(id);
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<BranchAdminDto>("Branch found.", branch));
     }
 

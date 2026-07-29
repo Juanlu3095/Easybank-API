@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.jcooldevelopment.easybank_api.contracts.entity.Branch;
 import com.jcooldevelopment.easybank_api.contracts.entity.Country;
 import com.jcooldevelopment.easybank_api.dto.Branch.BranchAdminDto;
+import com.jcooldevelopment.easybank_api.dto.Branch.BranchDto;
 import com.jcooldevelopment.easybank_api.dto.Branch.CreateBranchDto;
 import com.jcooldevelopment.easybank_api.dto.Branch.UpdateBranchDto;
 import com.jcooldevelopment.easybank_api.exception.ResourceAlreadyExists;
@@ -29,7 +30,15 @@ public class BranchServiceImpl implements BranchService{
     }
 
     @Override
-    public List<BranchAdminDto> getAll() {
+    public List<BranchDto> getAll() {
+        List<Branch> branches = this.branchRepository.findAll();
+        return branches.stream()
+            .map(branch -> this.branchMapper.EntityToDto(branch))
+            .toList();
+    }
+
+    @Override
+    public List<BranchAdminDto> getAllForAdmin() {
         List<Branch> branches = this.branchRepository.findAll();
         return branches.stream()
             .map(branch -> this.branchMapper.AdminEntityToDto(branch))
@@ -37,7 +46,15 @@ public class BranchServiceImpl implements BranchService{
     }
 
     @Override
-    public BranchAdminDto getById(Long id) {
+    public BranchDto getById(Long id) {
+        Branch branch = this.branchRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Branch not found"));
+        
+        return this.branchMapper.EntityToDto(branch);
+    }
+
+    @Override
+    public BranchAdminDto getByIdForAdmin(Long id) {
         Branch branch = this.branchRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Branch not found"));
         
@@ -100,12 +117,11 @@ public class BranchServiceImpl implements BranchService{
     }
 
     @Override
-    public boolean delete(Long id) {
+    public void delete(Long id) {
         Branch branch = this.branchRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Branch not found"));
 
         this.branchRepository.delete(branch);
-        return true;
     }
     
 }
