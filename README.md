@@ -22,9 +22,11 @@ Run this command to download dependencies in pom.xml if not and the app will sta
 mvnw spring-boot:run
 ```
 
+"mvnw" is used for the wrapper in case you don´t hace Maven installed in your machine.
+
 ## Testing
 
-Must create a different PostgreSQL database than the one used for production or development. Then create a file test/resources/application-test.properties with database
+Must create a different PostgreSQL database than the one used for production or development. Once is done, create a file test/resources/application-test.properties with database
 config the same way as in main folder. The name of the database to create for testing is given here. Then, in each test class must add the annotation @ActiveProfiles("test")
 for telling Spring which environment to use. Use the next command to run all tests:
 
@@ -38,7 +40,7 @@ For running a specific test class:
 mvnw test -Dtest=MessageTest
 ```
 
-where MessageTest is the name of the class where the individual tests are.
+where "MessageTest" is the name of the class where the individual tests are.
 
 To run a specific test in a class:
 
@@ -46,7 +48,7 @@ To run a specific test in a class:
 mvnw test -Dtest=MessageTest#createMessage
 ```
 
-where MessageTest is the class name and createMessage is the method with @Test annotation to run.
+where "MessageTest" is the class name and "createMessage" is the method with @Test annotation to run.
 
 ## EER Diagram
 

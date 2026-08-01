@@ -21,7 +21,7 @@ public class CreateMessageDto {
     @Length(max=100, message="Surname cannot have more than 100 characters.")
     private String surname;
 
-    @Email(regexp="^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$", message="Email format is not correct.")
+    @Email(message="Email format is not correct.")
     @Length(max=50, message="Email cannot have more than 50 characters.")
     private String email;
 

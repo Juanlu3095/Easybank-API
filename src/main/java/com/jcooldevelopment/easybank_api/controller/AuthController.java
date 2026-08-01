@@ -42,7 +42,7 @@ public class AuthController {
     public ResponseEntity<Apiresponse<Void>> register(@Valid @RequestBody RegisterDto userRegister) {
         boolean result = this.authService.register(userRegister);
         if (result) {
-            return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<>("Register successful.", null));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new Apiresponse<>("Register successful.", null));
         } else {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Register failed.", null));
         }
