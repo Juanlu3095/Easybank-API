@@ -3,11 +3,13 @@ package com.jcooldevelopment.easybank_api.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.jcooldevelopment.easybank_api.filter.JwtAuthFilter;
@@ -32,6 +34,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()); // By default, if not disabled, API will return 403 status code if there is no CSRF token in requests
 
         return http
+        // https://stackoverflow.com/questions/30643029/spring-security-anonymous-401-instead-of-403
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)) // 401 instead of 403
+            )
+
             .authorizeHttpRequests(authRequest -> // Lambda expression for more than one configuration for authorize requests
                 authRequest
                     .requestMatchers(HttpMethod.POST, 

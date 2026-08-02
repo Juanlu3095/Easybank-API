@@ -2,6 +2,7 @@ package com.jcooldevelopment.easybank_api.feature;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
 
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +31,7 @@ import com.jcooldevelopment.easybank_api.controller.MessageController;
 import com.jcooldevelopment.easybank_api.dto.Message.CreateMessageDto;
 import com.jcooldevelopment.easybank_api.dto.Message.MessageDto;
 import com.jcooldevelopment.easybank_api.dto.Message.UpdateMessageDto;
+import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.repository.MessageRepository;
 
 @SpringBootTest
@@ -135,6 +138,8 @@ public class MessageTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(newMessage))
         )
+        // https://stackoverflow.com/questions/16605811/mockmvc-how-to-test-exception-and-response-code-in-the-same-test-case
+        .andExpect(response -> assertTrue(response.getResolvedException() instanceof MethodArgumentNotValidException))
         .andExpect(MockMvcResultMatchers.status().isUnprocessableContent());
     }
 
@@ -162,7 +167,7 @@ public class MessageTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/message/")
             .contentType(MediaType.APPLICATION_JSON)
         )
-        .andExpect(MockMvcResultMatchers.status().isForbidden());
+        .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
     @Test
@@ -199,7 +204,7 @@ public class MessageTest {
         )
         .andReturn();
 
-        assertEquals(403, result.getResponse().getStatus());
+        assertEquals(401, result.getResponse().getStatus());
     }
 
     @Test
@@ -208,6 +213,7 @@ public class MessageTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/message/1ba94857-7215-46f9-b9e8-bd81e3d98e31")
             .contentType(MediaType.APPLICATION_JSON)
         )
+        .andExpect(response -> assertTrue(response.getResolvedException() instanceof ResourceNotFoundException))
         .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
@@ -224,7 +230,7 @@ public class MessageTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updatedMessage))
         )
-        .andExpect(MockMvcResultMatchers.status().isForbidden());
+        .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
     @Test
@@ -240,6 +246,7 @@ public class MessageTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updatedMessage))
         )
+        .andExpect(response -> assertTrue(response.getResolvedException() instanceof ResourceNotFoundException))
         .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
@@ -258,6 +265,7 @@ public class MessageTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updatedMessage))
         )
+        .andExpect(response -> assertTrue(response.getResolvedException() instanceof MethodArgumentNotValidException))
         .andExpect(MockMvcResultMatchers.status().isUnprocessableContent());
     }
 
@@ -292,7 +300,7 @@ public class MessageTest {
         )
         .andReturn();
     
-        assertEquals(403, result.getResponse().getStatus());
+        assertEquals(401, result.getResponse().getStatus());
     }
 
     @Test
@@ -301,6 +309,7 @@ public class MessageTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/message/1ba94857-7215-46f9-b9e8-bd81e3d98e31")
             .contentType(MediaType.APPLICATION_JSON)
         )
+        .andExpect(response -> assertTrue(response.getResolvedException() instanceof ResourceNotFoundException))
         .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 

@@ -22,7 +22,7 @@ Run this command to download dependencies in pom.xml if not and the app will sta
 mvnw spring-boot:run
 ```
 
-"mvnw" is used for the wrapper in case you don´t hace Maven installed in your machine.
+"mvnw" is used for the wrapper in case you don´t have Maven installed in your machine.
 
 ## Testing
 
