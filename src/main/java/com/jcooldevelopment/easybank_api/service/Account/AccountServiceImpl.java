@@ -236,6 +236,17 @@ public class AccountServiceImpl implements AccountService{
             account.setStatus(updateAccountAdminDto.getStatus());
         }
 
+        if(!updateAccountAdminDto.getUserIds().isEmpty()) { // Check if userIds from Form is empty
+            for(UUID userId : updateAccountAdminDto.getUserIds()) {
+                User user = this.getUserById(userId);
+                if(!account.getUsers().contains(user)) { // Check if the new user exists in account
+                    account.getUsers().add(user);
+                    user.addAccount(account);
+                    this.userRepository.save(user);
+                }
+            }
+        }
+
         Account accountToSave = this.accountRepository.save(account);
         return this.accountMapper.AdminEntityToDto(accountToSave);
     }

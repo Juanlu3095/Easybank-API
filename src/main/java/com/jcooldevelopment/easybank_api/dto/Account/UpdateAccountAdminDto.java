@@ -1,5 +1,6 @@
 package com.jcooldevelopment.easybank_api.dto.Account;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.contracts.enums.AccountStatus;
@@ -22,4 +23,6 @@ public class UpdateAccountAdminDto {
 
     @NotNull(message="There is no account type selected.")
     private UUID accountTypeId;
+
+    private List<UUID> userIds;
 }
