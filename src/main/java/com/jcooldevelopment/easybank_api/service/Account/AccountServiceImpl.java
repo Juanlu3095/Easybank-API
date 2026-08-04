@@ -201,7 +201,6 @@ public class AccountServiceImpl implements AccountService{
             this.userRepository.save(user);
         }
 
-        // https://es.stackoverflow.com/questions/2464/c%C3%B3mo-iterar-a-trav%C3%A9s-de-un-hashmap
         savedAccount.getUsers().forEach((savedUser) ->
             this.emailService.sendMailToNotifyNewAccount(
                 savedUser.getEmail(),

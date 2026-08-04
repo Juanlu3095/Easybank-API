@@ -50,6 +50,26 @@ mvnw test -Dtest=MessageTest#createMessage
 
 where "MessageTest" is the class name and "createMessage" is the method with @Test annotation to run.
 
+## Deploy
+
+You can compile this project with the maven command:
+
+```bash
+mvnw package
+```
+
+If you need to clean the target directory, this command will delete every file in that folder and compile:
+
+```bash
+mvnw clean package
+```
+
+With this, the tests will be executed and if successful, the compiled .jar file will be available in target folder. To execute it:
+
+```bash
+java -jar target/easybank_api-0.0.1-SNAPSHOT.jar
+```
+
 ## EER Diagram
 
 This diagram shows database tables and their relationships:
