@@ -259,4 +259,25 @@ public class AccountServiceImpl implements AccountService{
         this.accountRepository.delete(account);
     }
 
+    @Override
+    public AccountAdminDto deleteUserFromAccount(UUID accountId, List<UUID> userIds){
+        Account account = this.accountRepository.findById(accountId)
+            .orElseThrow(() -> new ResourceNotFoundException("Account not found."));
+
+        for(UUID userIdsToDelete : userIds) {
+            User user = this.getUserById(userIdsToDelete);
+            if(account.getUsers().contains(user)) {
+                account.deleteUser(user);
+    
+                user.deleteFromAccount(account);
+                this.userRepository.save(user);
+
+            } else {
+                throw new ResourceNotFoundException(String.format("The user %1$s %2$s is not associated to the given account.", user.getName(), user.getSurname()));
+            }
+        }
+        this.accountRepository.save(account);
+        return this.accountMapper.AdminEntityToDto(account);
+    }
+
 }

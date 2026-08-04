@@ -97,7 +97,7 @@ public class User implements UserDetails{
     // https://adictosaltrabajo.com/2020/04/02/hibernate-onetoone-onetomany-manytoone-y-manytomany/
     @ManyToMany(
         targetEntity = Account.class,
-        cascade = CascadeType.PERSIST,
+        cascade = CascadeType.PERSIST, // https://stackoverflow.com/questions/58054915/hibernate-when-should-i-use-cascade-all-and-when-should-i-specify-them-separate
         fetch = FetchType.LAZY // It shows accounts only if specifically required
     ) 
     @JoinTable( // Owner side has @JoinTable
@@ -113,6 +113,12 @@ public class User implements UserDetails{
         }
         
         this.accounts.add(account);
+    }
+
+    public void deleteFromAccount(Account accountToDelete){
+        if(this.accounts.contains(accountToDelete)){
+            this.accounts.remove(accountToDelete);
+        }
     }
 
     @Override

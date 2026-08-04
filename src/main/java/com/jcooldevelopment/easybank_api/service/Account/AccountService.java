@@ -1,5 +1,6 @@
 package com.jcooldevelopment.easybank_api.service.Account;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
@@ -67,4 +68,12 @@ public interface AccountService {
      * @param id The account's id to delete.
      */
     void delete(UUID id);
+
+    /**
+     * Removes users from an account.
+     * @param accountId The account UUID to delete users from.
+     * @param userIds List of users's UUID to remove from account.
+     * @return The updated account.
+     */
+    AccountAdminDto deleteUserFromAccount(UUID accountId, List<UUID> userIds);
 }

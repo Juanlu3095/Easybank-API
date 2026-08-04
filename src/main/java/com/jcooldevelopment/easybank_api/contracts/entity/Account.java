@@ -89,4 +89,10 @@ public class Account {
         
         this.users.add(user);
     }
+
+    public void deleteUser(User userToDelete) {
+        if(this.users.contains(userToDelete)){
+            this.users.remove(userToDelete);
+        }
+    }
 }

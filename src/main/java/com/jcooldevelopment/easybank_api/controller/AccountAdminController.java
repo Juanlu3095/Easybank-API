@@ -20,6 +20,7 @@ import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.Account.AccountAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Account.CreateAccountAdminDto;
+import com.jcooldevelopment.easybank_api.dto.Account.DeleteUsersFromAccountDto;
 import com.jcooldevelopment.easybank_api.dto.Account.UpdateAccountAdminDto;
 import com.jcooldevelopment.easybank_api.service.Account.AccountService;
 
@@ -80,5 +81,14 @@ public class AccountAdminController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(new Apiresponse<>("Account deleted.", null));
+    }
+
+    @DeleteMapping("/{id}/user")
+    public ResponseEntity<Apiresponse<AccountAdminDto>> deleteUsersFromAccount(@PathVariable UUID id, @Valid @RequestBody DeleteUsersFromAccountDto userIds) {
+        AccountAdminDto updatedAccount = this.accountService.deleteUserFromAccount(id, userIds.getIds());
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .location(URI.create("/api/admin/account/" + updatedAccount.getId()))
+            .body(new Apiresponse<>("Users delete from account succesfully.", updatedAccount));
     }
 }
