@@ -11,5 +11,5 @@ import com.jcooldevelopment.easybank_api.contracts.entity.User;
 
 public interface AccountRepository extends JpaRepository<Account, UUID>{
 
-    Page<Account> findByUser(Pageable pageable, User user);
+    Page<Account> findByUsers(Pageable pageable, User user);
 }

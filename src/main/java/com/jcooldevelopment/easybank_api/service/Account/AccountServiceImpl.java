@@ -1,6 +1,8 @@
 package com.jcooldevelopment.easybank_api.service.Account;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.iban4j.CountryCode;
@@ -82,7 +84,7 @@ public class AccountServiceImpl implements AccountService{
         System.out.println("Username: " + usercode);
         User user = this.userRepository.findByUsercode(usercode)
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));
-        Page<Account> accounts = this.accountRepository.findByUser(pageable, user);
+        Page<Account> accounts = this.accountRepository.findByUsers(pageable, user);
         Page<AccountDto> accountsToShow = new PageImpl<AccountDto>(accounts.getContent()
             .stream()
             .map(account -> accountMapper.EntityToDto(account))
@@ -135,17 +137,26 @@ public class AccountServiceImpl implements AccountService{
         accountToCreate.setBranch(branch);
         accountToCreate.setIban(iban.toString()); // Careful with iban.toFormattedString(), it gives wrong length because spaces
         accountToCreate.setStatus(AccountStatus.ACTIVATED);
-        accountToCreate.setUser(user);
+        accountToCreate.addUser(user);
 
         Account savedAccount = this.accountRepository.save(accountToCreate);
 
+        // Must use this for saving data in auxiliar table. The persistence must be done in both sides
+        user.addAccount(savedAccount);
+        this.userRepository.save(user);
+
         this.emailService.sendMailToNotifyNewAccount(
-            savedAccount.getUser().getEmail(),
+            savedAccount.getUsers().get(0).getEmail(),
             savedAccount.getAccountType().getName(),
-            savedAccount.getUser().getName()
+            savedAccount.getUsers().get(0).getName()
         );
         
         return this.accountMapper.EntityToDto(savedAccount); // This should be more secure
+    }
+
+    private User getUserById(UUID id){
+        return this.userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
     }
 
     @Override
@@ -156,8 +167,11 @@ public class AccountServiceImpl implements AccountService{
         Branch branch = this.branchRepository.findById(createAccountAdminDto.getBranchId())
             .orElseThrow(() -> new ResourceNotFoundException("Branch not found."));
 
-        User user = this.userRepository.findById(createAccountAdminDto.getUserId())
-            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+        List<User> users = new ArrayList<>();
+        for (UUID id : createAccountAdminDto.getUserIds()) {
+            User user = this.getUserById(id);
+            users.add(user);
+        }
 
         Iban iban = new Iban.Builder()
             .countryCode(CountryCode.getByCode(branch.getCountry().getCode()))
@@ -177,14 +191,23 @@ public class AccountServiceImpl implements AccountService{
         accountToCreate.setBranch(branch);
         accountToCreate.setIban(iban.toString());
         accountToCreate.setStatus(AccountStatus.valueOf(createAccountAdminDto.getStatus().toString()));
-        accountToCreate.setUser(user);
+        accountToCreate.setUsers(users);
 
         Account savedAccount = this.accountRepository.save(accountToCreate);
 
-        this.emailService.sendMailToNotifyNewAccount(
-            savedAccount.getUser().getEmail(),
-            savedAccount.getAccountType().getName(),
-            savedAccount.getUser().getName()
+        // Save data in auxiliar table
+        for (User user : users) {
+            user.addAccount(savedAccount);
+            this.userRepository.save(user);
+        }
+
+        // https://es.stackoverflow.com/questions/2464/c%C3%B3mo-iterar-a-trav%C3%A9s-de-un-hashmap
+        savedAccount.getUsers().forEach((savedUser) ->
+            this.emailService.sendMailToNotifyNewAccount(
+                savedUser.getEmail(),
+                savedAccount.getAccountType().getName(),
+                savedUser.getName()
+            )
         );
 
         return this.accountMapper.AdminEntityToDto(savedAccount); // This should be more secure

@@ -1,5 +1,8 @@
 package com.jcooldevelopment.easybank_api.mapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -7,6 +10,7 @@ import com.jcooldevelopment.easybank_api.contracts.entity.Account;
 import com.jcooldevelopment.easybank_api.dto.Account.AccountAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Account.AccountDto;
 import com.jcooldevelopment.easybank_api.dto.Account.CreateAccountDto;
+import com.jcooldevelopment.easybank_api.dto.User.UserDto;
 
 @Component
 public class AccountMapper {
@@ -35,9 +39,10 @@ public class AccountMapper {
         accountAdminDto.setId(account.getId());
         accountAdminDto.setStatus(account.getStatus());
 
-        accountAdminDto.setUser(
-            this.userMapper.EntityToDto(account.getUser())
-        );
+        List<UserDto> users = new ArrayList<UserDto>();
+
+        account.getUsers().forEach((user) -> users.add(this.userMapper.EntityToDto(user)));
+        accountAdminDto.setUsers(users);
 
         return accountAdminDto;
     }
@@ -50,10 +55,12 @@ public class AccountMapper {
         accountDto.setIban(account.getIban());
         accountDto.setId(account.getId());
         accountDto.setStatus(account.getStatus());
+        accountDto.setBranch(this.branchMapper.EntityToDto(account.getBranch()));
 
-        accountDto.setBranch(
-            branchMapper.EntityToDto(account.getBranch()) // It allows to hide protected data like IBAN and BIC codes
-        );
+        List<UserDto> users = new ArrayList<UserDto>();
+
+        account.getUsers().forEach((user) -> users.add(this.userMapper.EntityToDto(user)));
+        accountDto.setUsers(users);
         return accountDto;
     }
 }

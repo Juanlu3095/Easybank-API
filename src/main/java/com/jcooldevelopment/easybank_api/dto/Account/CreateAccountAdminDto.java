@@ -1,5 +1,6 @@
 package com.jcooldevelopment.easybank_api.dto.Account;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.contracts.enums.AccountStatus;
@@ -21,7 +22,7 @@ public class CreateAccountAdminDto {
     private AccountStatus status;
 
     @NotNull(message="There is no user selected.")
-    private UUID userId;
+    private List<UUID> userIds;
 
     @NotNull(message="There is no account type selected.")
     private UUID accountTypeId;

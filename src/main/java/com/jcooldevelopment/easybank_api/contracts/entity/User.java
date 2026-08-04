@@ -1,6 +1,7 @@
 package com.jcooldevelopment.easybank_api.contracts.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -15,12 +16,17 @@ import com.jcooldevelopment.easybank_api.annotations.DniValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -86,6 +92,28 @@ public class User implements UserDetails{
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false, nullable = false)
     private LocalDateTime createdAt;
+
+    // User owns accounts that's why the JoinTable is here
+    // https://adictosaltrabajo.com/2020/04/02/hibernate-onetoone-onetomany-manytoone-y-manytomany/
+    @ManyToMany(
+        targetEntity = Account.class,
+        cascade = CascadeType.PERSIST,
+        fetch = FetchType.LAZY // It shows accounts only if specifically required
+    ) 
+    @JoinTable( // Owner side has @JoinTable
+        name = "user_account", // name of auxiliar table
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "account_id")
+    ) // Hibernate does not recognize ArrayList, since it implements its own, PersistenceList. List is the interface
+    private List<Account> accounts;
+
+    public void addAccount(Account account){
+        if(this.accounts == null){
+            this.accounts = new ArrayList<>();
+        }
+        
+        this.accounts.add(account);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

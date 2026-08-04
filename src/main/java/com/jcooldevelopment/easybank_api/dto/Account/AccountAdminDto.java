@@ -1,6 +1,7 @@
 package com.jcooldevelopment.easybank_api.dto.Account;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.AccountType;
@@ -31,5 +32,5 @@ public class AccountAdminDto {
 
     private Branch branch;
 
-    private UserDto user;
+    private List<UserDto> users;
 }
