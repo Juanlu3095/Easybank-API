@@ -64,7 +64,7 @@ If you need to clean the target directory, this command will delete every file i
 mvnw clean package
 ```
 
-With this, the tests will be executed and if successful, the compiled .jar file will be available in target folder. To execute it:
+With this, tests will be executed and if successful, the compiled .jar file will be available in target folder. To execute it:
 
 ```bash
 java -jar target/easybank_api-0.0.1-SNAPSHOT.jar
