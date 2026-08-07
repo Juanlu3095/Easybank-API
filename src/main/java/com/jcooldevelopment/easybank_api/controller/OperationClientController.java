@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -50,10 +51,22 @@ public class OperationClientController {
             .body(new Apiresponse<OperationDto>("Operation found.", operation));
     }
 
+    @GetMapping("/account/{id}")
+    public ResponseEntity<Apiresponse<PaginatedResponse<OperationDto>>> getOperationsByAccount(
+        @PathVariable UUID accountId,
+        @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page,
+        @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size
+    ){
+        PaginatedResponse<OperationDto> operations = this.operationService.getByAccount(accountId, page, size);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(new Apiresponse<PaginatedResponse<OperationDto>>("Operations found.", operations));
+    }
+
+    @PostMapping("")
     public ResponseEntity<Apiresponse<OperationDto>> createOperation(@Valid @RequestBody CreateOperationDto createOperationDto){
         OperationDto createdOperation = this.operationService.create(createOperationDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(new Apiresponse<OperationDto>("Operation found.", createdOperation));
+            .body(new Apiresponse<OperationDto>("Operation created.", createdOperation));
     }
     
 }

@@ -1,5 +1,6 @@
 package com.jcooldevelopment.easybank_api.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -12,4 +13,6 @@ import com.jcooldevelopment.easybank_api.contracts.entity.User;
 public interface AccountRepository extends JpaRepository<Account, UUID>{
 
     Page<Account> findByUsers(Pageable pageable, User user);
+
+    Optional<Account> findByIban(String iban);
 }

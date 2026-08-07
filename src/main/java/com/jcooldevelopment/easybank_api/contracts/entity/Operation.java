@@ -1,6 +1,7 @@
 package com.jcooldevelopment.easybank_api.contracts.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,22 +35,35 @@ public class Operation {
     private OperationType type;
 
     @ManyToOne
-    @JoinColumn(name = "orderer_account_id")
-    private Account ordererAccountId;
+    @JoinColumn(name = "orderer_account_id", nullable = false)
+    private Account ordererAccount;
 
     @ManyToOne
-    @JoinColumn(name = "counterpart_account_id")
-    private Account counterpartAccountId;
+    @JoinColumn(name = "counterpart_account_id", nullable = true)
+    private Account counterpartAccount;
 
-    @Column(name = "concept")
+    @Column(name = "counterpart_external_account_iban", nullable = true)
+    private String counterpartExternalAccount;
+
+    @Column(name = "concept", nullable = false)
     private String concept;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private OperationStatus status;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = true) // updatable true for updating in put requests
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "operation")
     private List<Movement> movements;
+
+    public void addMovement(Movement movement){
+        if (this.movements == null) {
+            this.movements = new ArrayList<>();
+        }
+        this.movements.add(movement);
+    }
 }

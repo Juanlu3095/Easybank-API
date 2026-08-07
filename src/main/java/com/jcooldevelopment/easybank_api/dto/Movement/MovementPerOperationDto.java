@@ -10,10 +10,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// Movement with no info about operation when it is returned with operation entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MovementDto {
+public class MovementPerOperationDto {
 
     private UUID id;
 
@@ -21,11 +22,10 @@ public class MovementDto {
 
     private String externalAccount;
 
-    private UUID operationId;
-
     private BigDecimal amount;
     
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
 }

@@ -8,6 +8,7 @@ import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,10 +18,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateOperationDto {
 
-    @NotBlank(message = "There is no account selected.")
+    @NotBlank(message = "Concept cannot be blank.")
+    private String concept;
+
+    @NotNull(message = "There is no account selected.")
     private UUID accountId;
 
-    @NotBlank(message = "Must indicate the operation type.")
+    @NotNull(message = "Must indicate the operation type.")
     private OperationType operationType;
 
     @IbanAnnotation(message = "IBAN not valid.")

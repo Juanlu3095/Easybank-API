@@ -81,7 +81,6 @@ public class AccountServiceImpl implements AccountService{
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Account::getCreatedAt).descending());
         // Get user from JWT
         String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("Username: " + usercode);
         User user = this.userRepository.findByUsercode(usercode)
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         Page<Account> accounts = this.accountRepository.findByUsers(pageable, user);
