@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.jcooldevelopment.easybank_api.dto.Account.AccountDto;
+import com.jcooldevelopment.easybank_api.dto.Account.AccountDtoNoUsers;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +18,7 @@ public class MovementPerOperationDto {
 
     private UUID id;
 
-    private AccountDto account;
+    private AccountDtoNoUsers account;
 
     private String externalAccount;
 

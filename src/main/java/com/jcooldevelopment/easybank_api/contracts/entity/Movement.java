@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,9 +45,11 @@ public class Movement {
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false)
+    @CreationTimestamp
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = true) // updatable true for updating in put requests
+    @UpdateTimestamp
+    @Column(name = "updated_at", insertable = false, updatable = true) // updatable true for updating in put requests
     private LocalDateTime updatedAt;
 }

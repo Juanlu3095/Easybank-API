@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
 import com.jcooldevelopment.easybank_api.exception.ActivationCodeExpiredException;
 import com.jcooldevelopment.easybank_api.exception.ResourceAlreadyExists;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
@@ -21,6 +22,7 @@ import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSendException;
 import com.jcooldevelopment.easybank_api.exception.EncryptionException;
 import com.jcooldevelopment.easybank_api.exception.IncorrectPasswordException;
+import com.jcooldevelopment.easybank_api.exception.NotEnoughBalanceException;
 import com.jcooldevelopment.easybank_api.exception.ResetPasswordExpiredException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.exception.UserAlreadyEnabledException;
@@ -117,6 +119,28 @@ public class GlobalErrorHandler {
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
         problemDetails.setTitle("Resource already exists");
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
+    }
+
+    // 409 exception when account balance is not enough for an operation
+    @ExceptionHandler(NotEnoughBalanceException.class)
+    public ResponseEntity<ProblemDetail> handleNotEnoughBalance (NotEnoughBalanceException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
+        problemDetails.setTitle("The account's balance is not enough for this operation");
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
+    }
+
+    // 409 exception when bank account is not activated
+    @ExceptionHandler(AccountNotActivatedException.class)
+    public ResponseEntity<ProblemDetail> handleAccountNotActivated (AccountNotActivatedException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
+        problemDetails.setTitle("Account not activated");
         
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
     }

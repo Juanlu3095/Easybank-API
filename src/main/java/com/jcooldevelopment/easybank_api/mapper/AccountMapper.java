@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.jcooldevelopment.easybank_api.contracts.entity.Account;
 import com.jcooldevelopment.easybank_api.dto.Account.AccountAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Account.AccountDto;
+import com.jcooldevelopment.easybank_api.dto.Account.AccountDtoNoUsers;
 import com.jcooldevelopment.easybank_api.dto.Account.CreateAccountDto;
 import com.jcooldevelopment.easybank_api.dto.User.UserDto;
 
@@ -61,6 +62,15 @@ public class AccountMapper {
 
         account.getUsers().forEach((user) -> users.add(this.userMapper.EntityToDto(user)));
         accountDto.setUsers(users);
+        return accountDto;
+    }
+
+    public AccountDtoNoUsers EntityToDtoNoUsers(Account account){
+        AccountDtoNoUsers accountDto = new AccountDtoNoUsers();
+        accountDto.setId(account.getId());
+        accountDto.setIban(account.getIban());
+        accountDto.setBicSwift(account.getBicSwift());
+        accountDto.setPlace(account.getBranch().getName());
         return accountDto;
     }
 }

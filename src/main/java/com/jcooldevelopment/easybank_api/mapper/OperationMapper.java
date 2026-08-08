@@ -1,13 +1,10 @@
 package com.jcooldevelopment.easybank_api.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
-import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationDto;
+import com.jcooldevelopment.easybank_api.dto.Account.AccountDtoNoUsers;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
@@ -32,22 +29,39 @@ public class OperationMapper {
     }
 
     public OperationDto EntityToDto(Operation operation) {
+        AccountDtoNoUsers ordererAccount = new AccountDtoNoUsers();
+        ordererAccount.setId(operation.getOrdererAccount().getId());
+        ordererAccount.setIban(operation.getOrdererAccount().getIban());
+        ordererAccount.setBicSwift(operation.getOrdererAccount().getBicSwift());
+        ordererAccount.setPlace(operation.getOrdererAccount().getBranch().getName());
+
+        AccountDtoNoUsers beneficiaryAccount = null;
+        String externalBeneficiaryAccount = null;
+
+        if(operation.getCounterpartAccount() != null) {
+            beneficiaryAccount = new AccountDtoNoUsers();
+            beneficiaryAccount.setId(operation.getCounterpartAccount().getId());
+            beneficiaryAccount.setIban(operation.getCounterpartAccount().getIban());
+            beneficiaryAccount.setBicSwift(operation.getCounterpartAccount().getBicSwift());
+            beneficiaryAccount.setPlace(operation.getCounterpartAccount().getBranch().getName());
+        } else {
+            externalBeneficiaryAccount = operation.getCounterpartExternalAccount();
+        }
+
         OperationDto operationDto = new OperationDto();
         operationDto.setId(operation.getId());
         operationDto.setConcept(operation.getConcept());
         operationDto.setStatus(operation.getStatus());
         operationDto.setType(operation.getType());
-        operationDto.setOrdererAccount(operation.getOrdererAccount());
-        operationDto.setCounterpartAccount(operation.getCounterpartAccount());
-        operationDto.setCounterpartExternalAccount(operation.getCounterpartExternalAccount());
+        operationDto.setOrdererAccount(ordererAccount);
+        operationDto.setCounterpartAccount(beneficiaryAccount);
+        operationDto.setCounterpartExternalAccount(externalBeneficiaryAccount);
         operationDto.setCreatedAt(operation.getCreatedAt());
         operationDto.setUpdatedAt(operation.getUpdatedAt());
 
-        List<MovementPerOperationDto> movementDtos = new ArrayList<>();
         operation.getMovements().forEach(movement -> {
             operationDto.addMovement(this.movementMapper.EntityToMovementPerOperationDto(movement));
         });
-        operationDto.setMovements(movementDtos);
 
         return operationDto;
     }

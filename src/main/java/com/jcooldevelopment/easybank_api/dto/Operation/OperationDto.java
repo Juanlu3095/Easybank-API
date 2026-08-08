@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.jcooldevelopment.easybank_api.contracts.entity.Account;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
+import com.jcooldevelopment.easybank_api.dto.Account.AccountDtoNoUsers;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationDto;
 
 import lombok.AllArgsConstructor;
@@ -27,11 +27,11 @@ public class OperationDto {
 
     private OperationType type;
 
-    private Account counterpartAccount;
+    private AccountDtoNoUsers counterpartAccount;
 
     private String counterpartExternalAccount;
 
-    private Account ordererAccount;
+    private AccountDtoNoUsers ordererAccount;
 
     private LocalDateTime createdAt;
 

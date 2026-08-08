@@ -38,7 +38,7 @@ public class MovementMapper {
     public MovementPerOperationDto EntityToMovementPerOperationDto(Movement movement){
         MovementPerOperationDto movementDto = new MovementPerOperationDto();
         movementDto.setId(movement.getId());
-        if (movement.getAccount() != null) movementDto.setAccount(this.accountMapper.EntityToDto(movement.getAccount()));
+        if (movement.getAccount() != null) movementDto.setAccount(this.accountMapper.EntityToDtoNoUsers(movement.getAccount()));
         if (movement.getExternalAccount() != null) movementDto.setExternalAccount(movement.getExternalAccount());
         movementDto.setAmount(movement.getAmount());
         movementDto.setCreatedAt(movement.getCreatedAt());

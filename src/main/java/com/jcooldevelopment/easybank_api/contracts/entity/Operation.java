@@ -5,11 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -31,6 +36,7 @@ public class Operation {
     @Column(name = "id")
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private OperationType type;
 
@@ -48,13 +54,16 @@ public class Operation {
     @Column(name = "concept", nullable = false)
     private String concept;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private OperationStatus status;
 
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false)
+    @CreationTimestamp // Put this here because even with columnDefinition, it does not create this dateTime in app to return it
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = true) // updatable true for updating in put requests
+    @UpdateTimestamp
+    @Column(name = "updated_at", insertable = false, updatable = true) // updatable true for updating in put requests
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "operation")
