@@ -1,7 +1,6 @@
 package com.jcooldevelopment.easybank_api.service.IncidenceType;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,11 +30,10 @@ public class IncidenceTypeServiceImpl implements IncidenceTypeService{
     @Override
     public PaginatedResponse<IncidenceTypeDto> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(IncidenceType::getName).descending());
-        Page<IncidenceType> IncidenceTypes = this.repository.findAll(pageable);
-        Page<IncidenceTypeDto> IncidenceTypesToShow = new PageImpl<IncidenceTypeDto>(IncidenceTypes.getContent() // PageImpl is the implementation of interface Page
-            .stream()
-            .map(IncidenceType -> mapper.EntityToDto(IncidenceType))
-            .toList());
+        Page<IncidenceType> incidenceTypes = this.repository.findAll(pageable);
+        Page<IncidenceTypeDto> IncidenceTypesToShow = incidenceTypes.map(incidenceType ->
+            this.mapper.EntityToDto(incidenceType)
+        );
         PaginatedResponse<IncidenceTypeDto> paginatedResult = DataFormater.paginate(IncidenceTypesToShow);
         return paginatedResult;
     }

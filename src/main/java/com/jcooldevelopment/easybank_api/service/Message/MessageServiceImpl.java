@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,10 +34,9 @@ public class MessageServiceImpl implements MessageService{
     public PaginatedResponse<MessageDto> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Message::getCreatedAt).descending());
         Page<Message> messages = this.messageRepository.findAll(pageable);
-        Page<MessageDto> messagesToShow = new PageImpl<MessageDto>(messages.getContent() // PageImpl is the implementation of interface Page
-            .stream()
-            .map(message -> messageMapper.EntityToDto(message))
-            .toList());
+        Page<MessageDto> messagesToShow = messages.map(message ->
+            this.messageMapper.EntityToDto(message)
+        );
         PaginatedResponse<MessageDto> paginatedResult = DataFormater.paginate(messagesToShow);
         return paginatedResult;
     }

@@ -9,7 +9,6 @@ import org.iban4j.CountryCode;
 import org.iban4j.Iban;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -69,10 +68,9 @@ public class AccountServiceImpl implements AccountService{
     public PaginatedResponse<AccountAdminDto> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Account::getCreatedAt).descending());
         Page<Account> accounts = this.accountRepository.findAll(pageable);
-        Page<AccountAdminDto> accountsToShow = new PageImpl<AccountAdminDto>(accounts.getContent()
-            .stream()
-            .map(account -> accountMapper.AdminEntityToDto(account))
-            .toList());
+        Page<AccountAdminDto> accountsToShow = accounts.map(account ->
+            this.accountMapper.AdminEntityToDto(account)
+        );
         return DataFormater.paginate(accountsToShow);
     }
 
@@ -84,10 +82,9 @@ public class AccountServiceImpl implements AccountService{
         User user = this.userRepository.findByUsercode(usercode)
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         Page<Account> accounts = this.accountRepository.findByUsers(pageable, user);
-        Page<AccountDto> accountsToShow = new PageImpl<AccountDto>(accounts.getContent()
-            .stream()
-            .map(account -> accountMapper.EntityToDto(account))
-            .toList());
+        Page<AccountDto> accountsToShow = accounts.map(account ->
+            this.accountMapper.EntityToDto(account)
+        );
         return DataFormater.paginate(accountsToShow);
     }
 

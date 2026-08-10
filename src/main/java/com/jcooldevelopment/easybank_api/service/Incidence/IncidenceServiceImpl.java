@@ -8,7 +8,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
@@ -49,10 +48,9 @@ public class IncidenceServiceImpl implements IncidenceService{
     public PaginatedResponse<IncidenceDto> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Incidence::getCreatedAt).descending());
         Page<Incidence> incidences = this.incidenceRepository.findAll(pageable);
-        Page<IncidenceDto> incidencesToShow = new PageImpl<IncidenceDto>(incidences.getContent() // PageImpl is the implementation of interface Page
-            .stream()
-            .map(incidence -> incidenceMapper.EntityToDto(incidence))
-            .toList());
+        Page<IncidenceDto> incidencesToShow = incidences.map(incidence ->
+            this.incidenceMapper.EntityToDto(incidence)
+        );
         PaginatedResponse<IncidenceDto> paginatedResult = DataFormater.paginate(incidencesToShow);
         return paginatedResult;
     }

@@ -95,4 +95,8 @@ public class Account {
             this.users.remove(userToDelete);
         }
     }
+
+    public boolean isActivated(){
+        return this.status.equals(AccountStatus.ACTIVATED);
+    }
 }

@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,7 +15,6 @@ import com.jcooldevelopment.easybank_api.contracts.entity.Account;
 import com.jcooldevelopment.easybank_api.contracts.entity.Movement;
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
-import com.jcooldevelopment.easybank_api.contracts.enums.AccountStatus;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
@@ -61,10 +59,8 @@ public class OperationServiceImpl implements OperationService{
     public PaginatedResponse<OperationDto> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
         Page<Operation> operations = this.operationRepository.findAll(pageable);
-        Page<OperationDto> operationsToShow = new PageImpl<OperationDto>(operations.getContent()
-            .stream()
-            .map(operation -> this.operationMapper.EntityToDto(operation))
-            .toList()
+        Page<OperationDto> operationsToShow = operations.map(operation ->
+            this.operationMapper.EntityToDto(operation)
         );
         return DataFormater.paginate(operationsToShow);
     }
@@ -73,10 +69,8 @@ public class OperationServiceImpl implements OperationService{
     public PaginatedResponse<OperationDto> getByAccount(UUID accountId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
         Page<Operation> operations = this.operationRepository.findByOrdererAccountId(accountId, pageable);
-        Page<OperationDto> operationsToShow = new PageImpl<OperationDto>(operations.getContent()
-            .stream()
-            .map(operation -> this.operationMapper.EntityToDto(operation))
-            .toList()
+        Page<OperationDto> operationsToShow = operations.map(operation ->
+            this.operationMapper.EntityToDto(operation)
         );
         return DataFormater.paginate(operationsToShow);
     }
@@ -87,12 +81,10 @@ public class OperationServiceImpl implements OperationService{
         User user = this.userRepository.findByUsercode(usercode)
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
+        Pageable pageable = PageRequest.of(page - 1, size); // Sort in custom sql query not here, it creates problems
         Page<Operation> operations = this.operationRepository.findByUser(user.getId(), pageable);
-        Page<OperationDto> operationsToShow = new PageImpl<OperationDto>(operations.getContent()
-            .stream()
-            .map(operation -> this.operationMapper.EntityToDto(operation))
-            .toList()
+        Page<OperationDto> operationsToShow = operations.map(operation -> // If used new PageImpl pageable is lost 
+            this.operationMapper.EntityToDto(operation)
         );
         return DataFormater.paginate(operationsToShow);
 
@@ -114,7 +106,7 @@ public class OperationServiceImpl implements OperationService{
     public OperationDto create(CreateOperationDto createOperationDto) {
         Account userAccount = this.getAccountById(createOperationDto.getAccountId());
         // Check if that account is activated
-        if(userAccount.getStatus().equals(AccountStatus.NOT_ACTIVATED)) throw new AccountNotActivatedException("This account is not activated yet.");
+        if(!userAccount.isActivated()) throw new AccountNotActivatedException("This account is not activated yet.");
         // Check if that account has enough money
         if(userAccount.getBalance().compareTo(createOperationDto.getAmount()) == -1){
             throw new NotEnoughBalanceException("There is not enough money in your account to proceed.");
@@ -125,7 +117,7 @@ public class OperationServiceImpl implements OperationService{
         if(createOperationDto.getBeneficiaryAccount().substring(4, 8).equals(this.env.getProperty("BANK.CODE"))){
             beneficiaryAccount = this.getAccountByIban(createOperationDto.getBeneficiaryAccount());
             // Check if that account is activated
-            if(beneficiaryAccount.getStatus().equals(AccountStatus.NOT_ACTIVATED)){
+            if(!beneficiaryAccount.isActivated()){
                 throw new AccountNotActivatedException("This account is not activated yet."); 
             }
         } else {
