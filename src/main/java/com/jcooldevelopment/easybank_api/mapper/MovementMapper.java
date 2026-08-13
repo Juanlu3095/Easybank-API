@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import com.jcooldevelopment.easybank_api.contracts.entity.Movement;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementDto;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationDto;
+import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationOnlyIban;
+import com.jcooldevelopment.easybank_api.projections.movement.MovementProjection;
 
 @Component
 public class MovementMapper {
@@ -44,6 +46,21 @@ public class MovementMapper {
         movementDto.setCreatedAt(movement.getCreatedAt());
         movementDto.setUpdatedAt(movement.getUpdatedAt());
         return movementDto;
+    }
+
+    public MovementPerOperationOnlyIban MovementProjectionToMovementOnlyIban(MovementProjection movementProjection){
+        MovementPerOperationOnlyIban movementOnlyIban = new MovementPerOperationOnlyIban();
+        movementOnlyIban.setId(movementProjection.id());
+        movementOnlyIban.setAmount(movementProjection.amount());
+        movementOnlyIban.setOperationId(movementProjection.operationId());
+
+        if(!movementProjection.accountIban().isBlank()) {
+            movementOnlyIban.setAccountIban(movementProjection.accountIban());
+        } else {
+            movementOnlyIban.setAccountIban(movementProjection.externalAccountIban());
+        }
+
+        return movementOnlyIban;
     }
 
 }

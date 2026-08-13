@@ -2,22 +2,22 @@ package com.jcooldevelopment.easybank_api.dto.Operation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
-import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationOnlyIban;
+import com.jcooldevelopment.easybank_api.dto.Account.AccountDtoNoUsers;
+import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// DTO used for client role, only info needed.
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OperationDto {
+public class OperationAdminDto {
 
     private UUID id;
 
@@ -27,17 +27,19 @@ public class OperationDto {
 
     private OperationType type;
 
-    private String counterpartAccountIban;
+    private AccountDtoNoUsers counterpartAccount;
 
-    private String ordererAccountIban;
+    private String counterpartExternalAccount;
+
+    private AccountDtoNoUsers ordererAccount;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
-    private List<MovementPerOperationOnlyIban> movements;
+    private List<MovementPerOperationDto> movements;
 
-    public void addMovement(MovementPerOperationOnlyIban movement){
+    public void addMovement(MovementPerOperationDto movement){
         if (this.movements == null) {
             this.movements = new ArrayList<>();
         }

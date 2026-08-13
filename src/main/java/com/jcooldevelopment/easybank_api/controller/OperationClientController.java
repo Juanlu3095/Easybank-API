@@ -3,6 +3,7 @@ package com.jcooldevelopment.easybank_api.controller;
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.service.Operation.OperationService;
 
@@ -45,28 +46,28 @@ public class OperationClientController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Apiresponse<OperationDto>> getOperation(@PathVariable UUID id){
-        OperationDto operation = this.operationService.getById(id);
+    public ResponseEntity<Apiresponse<OperationAdminDto>> getOperation(@PathVariable UUID id){
+        OperationAdminDto operation = this.operationService.getById(id);
         return ResponseEntity.status(HttpStatus.OK)
-            .body(new Apiresponse<OperationDto>("Operation found.", operation));
+            .body(new Apiresponse<OperationAdminDto>("Operation found.", operation));
     }
 
     @GetMapping("/account/{id}")
-    public ResponseEntity<Apiresponse<PaginatedResponse<OperationDto>>> getOperationsByAccount(
+    public ResponseEntity<Apiresponse<PaginatedResponse<OperationAdminDto>>> getOperationsByAccount(
         @PathVariable UUID accountId,
         @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page,
         @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size
     ){
-        PaginatedResponse<OperationDto> operations = this.operationService.getByAccount(accountId, page, size);
+        PaginatedResponse<OperationAdminDto> operations = this.operationService.getByAccount(accountId, page, size);
         return ResponseEntity.status(HttpStatus.OK)
-            .body(new Apiresponse<PaginatedResponse<OperationDto>>("Operations found.", operations));
+            .body(new Apiresponse<PaginatedResponse<OperationAdminDto>>("Operations found.", operations));
     }
 
     @PostMapping("")
-    public ResponseEntity<Apiresponse<OperationDto>> createOperation(@Valid @RequestBody CreateOperationDto createOperationDto){
-        OperationDto createdOperation = this.operationService.create(createOperationDto);
+    public ResponseEntity<Apiresponse<OperationAdminDto>> createOperation(@Valid @RequestBody CreateOperationDto createOperationDto){
+        OperationAdminDto createdOperation = this.operationService.create(createOperationDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(new Apiresponse<OperationDto>("Operation created.", createdOperation));
+            .body(new Apiresponse<OperationAdminDto>("Operation created.", createdOperation));
     }
     
 }

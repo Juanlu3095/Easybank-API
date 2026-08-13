@@ -4,10 +4,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
+import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
+import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
 import com.jcooldevelopment.easybank_api.dto.Account.AccountDtoNoUsers;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
+import com.jcooldevelopment.easybank_api.projections.operation.OperationProjection;
 
 @Component
 public class OperationMapper {
@@ -28,7 +32,7 @@ public class OperationMapper {
        return modelMapper.map(updateOperationDto, Operation.class);
     }
 
-    public OperationDto EntityToDto(Operation operation) {
+    public OperationAdminDto EntityToDto(Operation operation) {
         AccountDtoNoUsers ordererAccount = new AccountDtoNoUsers();
         ordererAccount.setId(operation.getOrdererAccount().getId());
         ordererAccount.setIban(operation.getOrdererAccount().getIban());
@@ -48,7 +52,7 @@ public class OperationMapper {
             externalBeneficiaryAccount = operation.getCounterpartExternalAccount();
         }
 
-        OperationDto operationDto = new OperationDto();
+        OperationAdminDto operationDto = new OperationAdminDto();
         operationDto.setId(operation.getId());
         operationDto.setConcept(operation.getConcept());
         operationDto.setStatus(operation.getStatus());
@@ -62,6 +66,39 @@ public class OperationMapper {
         operation.getMovements().forEach(movement -> {
             operationDto.addMovement(this.movementMapper.EntityToMovementPerOperationDto(movement));
         });
+
+        return operationDto;
+    }
+
+    public OperationAdminDto projectionToAdminDto(OperationProjection operationProjection){
+        OperationAdminDto operationDto = new OperationAdminDto();
+        operationDto.setId(operationProjection.id());
+        operationDto.setConcept(operationProjection.concept());
+        operationDto.setStatus(OperationStatus.valueOf(operationProjection.status()));
+        operationDto.setType(OperationType.valueOf(operationProjection.type()));
+        operationDto.setCounterpartExternalAccount(operationProjection.counterpartExternalAccountIban());
+        operationDto.setCreatedAt(operationProjection.createdAt());
+        operationDto.setUpdatedAt(operationProjection.updatedAt());
+
+        return operationDto;
+    }
+
+    public OperationDto projectionToDto(OperationProjection operationProjection){
+        OperationDto operationDto = new OperationDto();
+        operationDto.setId(operationProjection.id());
+        operationDto.setConcept(operationProjection.concept());
+        operationDto.setStatus(OperationStatus.valueOf(operationProjection.status()));
+        operationDto.setType(OperationType.valueOf(operationProjection.type()));
+        operationDto.setOrdererAccountIban(operationProjection.ordererAccountIban());
+
+        if(operationProjection.counterpartAccountIban() != null){
+            operationDto.setCounterpartAccountIban(operationProjection.counterpartAccountIban());
+        } else {
+            operationDto.setCounterpartAccountIban(operationProjection.counterpartExternalAccountIban());
+        }
+
+        operationDto.setCreatedAt(operationProjection.createdAt());
+        operationDto.setUpdatedAt(operationProjection.updatedAt());
 
         return operationDto;
     }

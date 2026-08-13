@@ -1,6 +1,10 @@
 package com.jcooldevelopment.easybank_api.service.Operation;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
@@ -16,13 +20,17 @@ import com.jcooldevelopment.easybank_api.contracts.entity.Movement;
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
+import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationOnlyIban;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
 import com.jcooldevelopment.easybank_api.exception.NotEnoughBalanceException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
+import com.jcooldevelopment.easybank_api.mapper.MovementMapper;
 import com.jcooldevelopment.easybank_api.mapper.OperationMapper;
+import com.jcooldevelopment.easybank_api.projections.operation.OperationProjection;
 import com.jcooldevelopment.easybank_api.repository.AccountRepository;
 import com.jcooldevelopment.easybank_api.repository.MovementRepository;
 import com.jcooldevelopment.easybank_api.repository.OperationRepository;
@@ -37,6 +45,7 @@ public class OperationServiceImpl implements OperationService{
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final OperationMapper operationMapper;
+    private final MovementMapper movementMapper;
     private final Environment env;
 
     public OperationServiceImpl(
@@ -45,6 +54,7 @@ public class OperationServiceImpl implements OperationService{
         AccountRepository accountRepository,
         UserRepository userRepository,
         OperationMapper operationMapper,
+        MovementMapper movementMapper,
         Environment env
     ) {
         this.operationRepository = operationRepository;
@@ -52,24 +62,25 @@ public class OperationServiceImpl implements OperationService{
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.operationMapper = operationMapper;
+        this.movementMapper = movementMapper;
         this.env = env;
     }
 
     @Override
-    public PaginatedResponse<OperationDto> getAll(int page, int size) {
+    public PaginatedResponse<OperationAdminDto> getAll(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
         Page<Operation> operations = this.operationRepository.findAll(pageable);
-        Page<OperationDto> operationsToShow = operations.map(operation ->
+        Page<OperationAdminDto> operationsToShow = operations.map(operation ->
             this.operationMapper.EntityToDto(operation)
         );
         return DataFormater.paginate(operationsToShow);
     }
 
     @Override
-    public PaginatedResponse<OperationDto> getByAccount(UUID accountId, int page, int size) {
+    public PaginatedResponse<OperationAdminDto> getByAccount(UUID accountId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
         Page<Operation> operations = this.operationRepository.findByOrdererAccountId(accountId, pageable);
-        Page<OperationDto> operationsToShow = operations.map(operation ->
+        Page<OperationAdminDto> operationsToShow = operations.map(operation ->
             this.operationMapper.EntityToDto(operation)
         );
         return DataFormater.paginate(operationsToShow);
@@ -82,28 +93,48 @@ public class OperationServiceImpl implements OperationService{
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         
         Pageable pageable = PageRequest.of(page - 1, size); // Sort in custom sql query not here, it creates problems
-        Page<Operation> operations = this.operationRepository.findByUser(user.getId(), pageable);
-        Page<OperationDto> operationsToShow = operations.map(operation -> // If used new PageImpl pageable is lost 
-            this.operationMapper.EntityToDto(operation)
-        );
-        return DataFormater.paginate(operationsToShow);
+        Page<OperationProjection> operations = this.operationRepository.findByUserWithProjection(user.getId(), pageable);
+
+        List<UUID> uuids = new ArrayList<>();
+        for (OperationProjection operation : operations.getContent()) {
+            uuids.add(operation.id());
+        }
+        
+        List<MovementPerOperationOnlyIban> movements = this.movementRepository.findByOperationId(uuids)
+            .stream()
+            .map(movement -> this.movementMapper.MovementProjectionToMovementOnlyIban(movement))
+            .toList();
+        
+        // Create a map of movements and then group by operationId
+        // https://www.arquitecturajava.com/java-list-to-map-y-collectors/
+        Map<UUID, List<MovementPerOperationOnlyIban>> movementsByOperation = movements.stream()
+            .collect(Collectors.groupingBy(movement -> movement.getOperationId()));
+
+        Page<OperationDto> operationsDto = operations.map(operation -> {
+            OperationDto operationDto = this.operationMapper.projectionToDto(operation);
+            List<MovementPerOperationOnlyIban> movementsToAdd = movementsByOperation.get(operationDto.getId());
+            movementsToAdd.forEach(movement -> operationDto.addMovement(movement));
+            return operationDto;
+        });
+
+        return DataFormater.paginate(operationsDto);
 
     }
 
     @Override
-    public PaginatedResponse<OperationDto> getByUser(UUID userId, int page, int size) {
+    public PaginatedResponse<OperationAdminDto> getByUser(UUID userId, int page, int size) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getByUser'");
     }
 
     @Override
-    public OperationDto getById(UUID operationId) {
+    public OperationAdminDto getById(UUID operationId) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getById'");
     }
 
     @Override
-    public OperationDto create(CreateOperationDto createOperationDto) {
+    public OperationAdminDto create(CreateOperationDto createOperationDto) {
         Account userAccount = this.getAccountById(createOperationDto.getAccountId());
         // Check if that account is activated
         if(!userAccount.isActivated()) throw new AccountNotActivatedException("This account is not activated yet.");
@@ -172,7 +203,7 @@ public class OperationServiceImpl implements OperationService{
     }
 
     @Override
-    public OperationDto update(UUID operationId, UpdateOperationDto updateOperationDto) {
+    public OperationAdminDto update(UUID operationId, UpdateOperationDto updateOperationDto) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }

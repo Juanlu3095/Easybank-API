@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 
@@ -15,7 +16,7 @@ public interface OperationService {
      * @param size The number of results in each page.
      * @return Paginated response with operation DTOs for admin role.
      */
-    PaginatedResponse<OperationDto> getAll(int page, int size);
+    PaginatedResponse<OperationAdminDto> getAll(int page, int size);
 
     /**
      * Obtains all operations for the given account in database.
@@ -23,7 +24,7 @@ public interface OperationService {
      * @param size The number of results in each page.
      * @return Paginated response with operation DTOs.
      */
-    PaginatedResponse<OperationDto> getByAccount(UUID accountId, int page, int size);
+    PaginatedResponse<OperationAdminDto> getByAccount(UUID accountId, int page, int size);
 
     /**
      * Obtains all operations for the given user by JWT in database.
@@ -40,7 +41,7 @@ public interface OperationService {
      * @param size The number of results in each page.
      * @return Paginated response with operation DTOs for admin role.
      */
-    PaginatedResponse<OperationDto> getByUser(UUID userId, int page, int size);
+    PaginatedResponse<OperationAdminDto> getByUser(UUID userId, int page, int size);
 
     /**
      * Obtains an operation for the given operation's id.
@@ -48,14 +49,14 @@ public interface OperationService {
      * @param operationId The operation's id.
      * @return Operation DTO.
      */
-    OperationDto getById(UUID operationId);
+    OperationAdminDto getById(UUID operationId);
 
     /**
      * Creates a new operation in database.
      * @param createOperationDto The DTO to create an operation, usually from a form.
      * @return The operation created.
      */
-    OperationDto create(CreateOperationDto createOperationDto);
+    OperationAdminDto create(CreateOperationDto createOperationDto);
 
     /**
      * Updates an operation by id.
@@ -63,7 +64,7 @@ public interface OperationService {
      * @param updateOperationDto The DTO to update an operation, usually from a form.
      * @return The operation created.
      */
-    OperationDto update(UUID operationId, UpdateOperationDto updateOperationDto);
+    OperationAdminDto update(UUID operationId, UpdateOperationDto updateOperationDto);
 
     /**
      * Deletes an operation by id in database.
