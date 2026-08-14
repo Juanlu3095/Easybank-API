@@ -28,6 +28,7 @@ import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
 import com.jcooldevelopment.easybank_api.exception.NotEnoughBalanceException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
+import com.jcooldevelopment.easybank_api.exception.UserNotAuthorizedException;
 import com.jcooldevelopment.easybank_api.mapper.MovementMapper;
 import com.jcooldevelopment.easybank_api.mapper.OperationMapper;
 import com.jcooldevelopment.easybank_api.projections.operation.OperationProjection;
@@ -100,7 +101,7 @@ public class OperationServiceImpl implements OperationService{
             uuids.add(operation.id());
         }
         
-        List<MovementPerOperationOnlyIban> movements = this.movementRepository.findByOperationId(uuids)
+        List<MovementPerOperationOnlyIban> movements = this.movementRepository.findByOperationIds(uuids)
             .stream()
             .map(movement -> this.movementMapper.MovementProjectionToMovementOnlyIban(movement))
             .toList();
@@ -128,9 +129,29 @@ public class OperationServiceImpl implements OperationService{
     }
 
     @Override
-    public OperationAdminDto getById(UUID operationId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
+    public OperationDto getById(UUID operationId) {
+        // Check if operation belongs to authenticated user
+        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
+        int operationBelongsToUser = this.operationRepository.operationBelongsToUser(operationId, usercode);
+
+        if (operationBelongsToUser < 1){
+            throw new UserNotAuthorizedException("User has no authorization to access this operation.");
+        }
+
+        // Find operation by UUID
+        OperationProjection operationProjection = this.operationRepository.findByIdAsProjection(operationId)
+            .orElseThrow(()-> new ResourceNotFoundException("Operation not found."));
+        
+        // Search the movements by operationId, creating a List with only one uuid
+        List<MovementPerOperationOnlyIban> movements = this.movementRepository.findByOperationIds(List.of(operationId))
+            .stream()
+            .map(movement -> this.movementMapper.MovementProjectionToMovementOnlyIban(movement))
+            .toList();
+
+        // Transforms operation projection to DTO and adds its movements
+        OperationDto operation = this.operationMapper.projectionToDto(operationProjection);
+        movements.forEach(movement -> operation.addMovement(movement));
+        return operation;
     }
 
     @Override

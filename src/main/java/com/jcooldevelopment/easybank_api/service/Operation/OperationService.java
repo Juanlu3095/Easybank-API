@@ -49,7 +49,7 @@ public interface OperationService {
      * @param operationId The operation's id.
      * @return Operation DTO.
      */
-    OperationAdminDto getById(UUID operationId);
+    OperationDto getById(UUID operationId);
 
     /**
      * Creates a new operation in database.

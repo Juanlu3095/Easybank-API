@@ -46,10 +46,10 @@ public class OperationClientController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Apiresponse<OperationAdminDto>> getOperation(@PathVariable UUID id){
-        OperationAdminDto operation = this.operationService.getById(id);
+    public ResponseEntity<Apiresponse<OperationDto>> getOperation(@PathVariable UUID id){
+        OperationDto operation = this.operationService.getById(id);
         return ResponseEntity.status(HttpStatus.OK)
-            .body(new Apiresponse<OperationAdminDto>("Operation found.", operation));
+            .body(new Apiresponse<OperationDto>("Operation found.", operation));
     }
 
     @GetMapping("/account/{id}")

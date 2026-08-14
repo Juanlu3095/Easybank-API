@@ -26,6 +26,7 @@ import com.jcooldevelopment.easybank_api.exception.NotEnoughBalanceException;
 import com.jcooldevelopment.easybank_api.exception.ResetPasswordExpiredException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.exception.UserAlreadyEnabledException;
+import com.jcooldevelopment.easybank_api.exception.UserNotAuthorizedException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -76,6 +77,17 @@ public class GlobalErrorHandler {
         problemDetails.setTitle("Credentials not valid.");
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
+    }
+
+    // 403 exception when user is not authorized for certain resources
+    @ExceptionHandler(UserNotAuthorizedException.class)
+    public ResponseEntity<ProblemDetail> handleUserNotAuthorizedException (UserNotAuthorizedException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403"));
+        problemDetails.setTitle("User not authorized.");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetails);
     }
 
     // 404 exception
