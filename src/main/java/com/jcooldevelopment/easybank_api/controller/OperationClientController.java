@@ -52,15 +52,15 @@ public class OperationClientController {
             .body(new Apiresponse<OperationDto>("Operation found.", operation));
     }
 
-    @GetMapping("/account/{id}")
-    public ResponseEntity<Apiresponse<PaginatedResponse<OperationAdminDto>>> getOperationsByAccount(
+    @GetMapping("/account/{accountId}")
+    public ResponseEntity<Apiresponse<PaginatedResponse<OperationDto>>> getOperationsByAccount(
         @PathVariable UUID accountId,
         @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page,
         @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size
     ){
-        PaginatedResponse<OperationAdminDto> operations = this.operationService.getByAccount(accountId, page, size);
+        PaginatedResponse<OperationDto> operations = this.operationService.getByAccount(accountId, page, size);
         return ResponseEntity.status(HttpStatus.OK)
-            .body(new Apiresponse<PaginatedResponse<OperationAdminDto>>("Operations found.", operations));
+            .body(new Apiresponse<PaginatedResponse<OperationDto>>("Operations found.", operations));
     }
 
     @PostMapping("")

@@ -78,25 +78,7 @@ public class OperationServiceImpl implements OperationService{
         return DataFormater.paginate(operationsToShow);
     }
 
-    @Override
-    public PaginatedResponse<OperationAdminDto> getByAccount(UUID accountId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
-        Page<Operation> operations = this.operationRepository.findByOrdererAccountId(accountId, pageable);
-        Page<OperationAdminDto> operationsToShow = operations.map(operation ->
-            this.operationMapper.EntityToDto(operation)
-        );
-        return DataFormater.paginate(operationsToShow);
-    }
-
-    @Override
-    public PaginatedResponse<OperationDto> getByAuth(int page, int size) {
-        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = this.userRepository.findByUsercode(usercode)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
-        
-        Pageable pageable = PageRequest.of(page - 1, size); // Sort in custom sql query not here, it creates problems
-        Page<OperationProjection> operations = this.operationRepository.findByUserWithProjection(user.getId(), pageable);
-
+    private Map<UUID, List<MovementPerOperationOnlyIban>> getMovementsByOperations (Page<OperationProjection> operations){
         List<UUID> uuids = new ArrayList<>();
         for (OperationProjection operation : operations.getContent()) {
             uuids.add(operation.id());
@@ -109,8 +91,45 @@ public class OperationServiceImpl implements OperationService{
         
         // Create a map of movements and then group by operationId
         // https://www.arquitecturajava.com/java-list-to-map-y-collectors/
-        Map<UUID, List<MovementPerOperationOnlyIban>> movementsByOperation = movements.stream()
+        return movements.stream()
             .collect(Collectors.groupingBy(movement -> movement.getOperationId()));
+    }
+
+    @Override
+    public PaginatedResponse<OperationDto> getByAccount(UUID accountId, int page, int size) {
+        // Check if account belongs to authenticated user
+        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(this.accountRepository.accountBelongsToUser(accountId, usercode) < 1){
+            throw new UserNotAuthorizedException("User has no authorization to access the account data");
+        }
+
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
+        Page<OperationProjection> operations = this.operationRepository.findByAccountIdWithProjection(accountId, pageable);
+
+        // Create a map of movements and then group by operationId
+        Map<UUID, List<MovementPerOperationOnlyIban>> movementsByOperation = this.getMovementsByOperations(operations);
+        
+        Page<OperationDto> operationsDto = operations.map(operation -> {
+            OperationDto operationDto = this.operationMapper.projectionToDto(operation);
+            List<MovementPerOperationOnlyIban> movementsToAdd = movementsByOperation.get(operationDto.getId());
+            movementsToAdd.forEach(movement -> operationDto.addMovement(movement));
+            return operationDto;
+        });
+
+        return DataFormater.paginate(operationsDto);
+    }
+
+    @Override
+    public PaginatedResponse<OperationDto> getByAuth(int page, int size) {
+        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = this.userRepository.findByUsercode(usercode)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+        
+        Pageable pageable = PageRequest.of(page - 1, size); // Sort in custom sql query not here, it creates problems
+        Page<OperationProjection> operations = this.operationRepository.findByUserWithProjection(user.getId(), pageable);
+
+        // Create a map of movements and then group by operationId
+        Map<UUID, List<MovementPerOperationOnlyIban>> movementsByOperation = this.getMovementsByOperations(operations);
 
         Page<OperationDto> operationsDto = operations.map(operation -> {
             OperationDto operationDto = this.operationMapper.projectionToDto(operation);

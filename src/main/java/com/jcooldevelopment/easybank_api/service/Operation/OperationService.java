@@ -24,7 +24,7 @@ public interface OperationService {
      * @param size The number of results in each page.
      * @return Paginated response with operation DTOs.
      */
-    PaginatedResponse<OperationAdminDto> getByAccount(UUID accountId, int page, int size);
+    PaginatedResponse<OperationDto> getByAccount(UUID accountId, int page, int size);
 
     /**
      * Obtains all operations for the given user by JWT in database.

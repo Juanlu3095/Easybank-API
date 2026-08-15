@@ -54,7 +54,7 @@ public class MovementMapper {
         movementOnlyIban.setAmount(movementProjection.amount());
         movementOnlyIban.setOperationId(movementProjection.operationId());
 
-        if(!movementProjection.accountIban().isBlank()) {
+        if(movementProjection.accountIban() != null) {
             movementOnlyIban.setAccountIban(movementProjection.accountIban());
         } else {
             movementOnlyIban.setAccountIban(movementProjection.externalAccountIban());

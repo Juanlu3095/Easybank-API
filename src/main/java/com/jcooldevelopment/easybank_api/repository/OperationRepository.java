@@ -83,7 +83,7 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>{
         operation.updated_at as updatedAt,
         (SELECT account.iban FROM account WHERE account.id = operation.orderer_account_id) as ordererAccountIban
         FROM operation
-        WHERE operation.id = ?1  
+        WHERE operation.id = ?1 
         """,
         nativeQuery = true
     )
@@ -111,4 +111,36 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>{
     int operationBelongsToUser(UUID operationId, String usercode);
 
     Page<Operation> findByOrdererAccountId(UUID accountId, Pageable pageable);
+
+    @Query(
+        value = """
+        SELECT operation.id,
+        operation.concept,
+        operation.counterpart_external_account_iban as counterpartExternalAccountIban,
+        (SELECT account.iban FROM account WHERE account.id = operation.counterpart_account_id) as counterpartAccountIban,
+        operation.created_at as createdAt,
+        operation.status,
+        operation.type,
+        operation.updated_at as updatedAt,
+        (SELECT account.iban FROM account WHERE account.id = operation.orderer_account_id) as ordererAccountIban
+        FROM operation
+        INNER JOIN account ON 
+            operation.orderer_account_id = account.id
+            OR operation.counterpart_account_id = account.id
+        INNER JOIN user_account ON account.id = user_account.account_id
+        INNER JOIN users ON user_account.user_id = users.id
+        WHERE account.id = ?1
+        ORDER BY operation.created_at DESC
+        """,
+        nativeQuery = true,
+        countQuery = """
+        SELECT COUNT(*)
+        FROM operation
+        INNER JOIN account ON operation.orderer_account_id = account.id
+        INNER JOIN user_account ON account.id = user_account.account_id
+        INNER JOIN users ON user_account.user_id = users.id
+        WHERE account.id = ?1
+        """
+    )
+    Page<OperationProjection> findByAccountIdWithProjection(UUID accountId, Pageable pageable);
 }

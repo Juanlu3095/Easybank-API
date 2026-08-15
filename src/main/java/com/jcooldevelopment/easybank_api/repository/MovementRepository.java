@@ -11,6 +11,8 @@ import com.jcooldevelopment.easybank_api.projections.movement.MovementProjection
 
 public interface MovementRepository extends JpaRepository<Movement, UUID>{
 
+    // Left join instead of inner join because the later only returns those movements
+    // related to the account
     @Query(
         value = """
         SELECT movement.id,
@@ -21,7 +23,7 @@ public interface MovementRepository extends JpaRepository<Movement, UUID>{
         account.iban as accountIban,
         movement.operation_id as operationId
         FROM movement
-        INNER JOIN account
+        LEFT JOIN account
         ON movement.account_id = account.id
         WHERE movement.operation_id IN ?1
         """,
@@ -39,7 +41,7 @@ public interface MovementRepository extends JpaRepository<Movement, UUID>{
         account.iban as accountIban,
         movement.operation_id as operationId
         FROM movement
-        INNER JOIN account
+        LEFT JOIN account
         ON movement.account_id = account.id
         WHERE movement.operation_id = ?1
         """,
