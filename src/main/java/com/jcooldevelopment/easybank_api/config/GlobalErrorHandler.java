@@ -23,6 +23,7 @@ import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSendException;
 import com.jcooldevelopment.easybank_api.exception.EncryptionException;
 import com.jcooldevelopment.easybank_api.exception.IncorrectPasswordException;
 import com.jcooldevelopment.easybank_api.exception.NotEnoughBalanceException;
+import com.jcooldevelopment.easybank_api.exception.OrdererAndBeneficiaryCannotBeSameException;
 import com.jcooldevelopment.easybank_api.exception.ResetPasswordExpiredException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.exception.UserAlreadyEnabledException;
@@ -153,6 +154,17 @@ public class GlobalErrorHandler {
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
         problemDetails.setTitle("Account not activated");
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
+    }
+
+    // 409 exception when orderer and beneficiary accounts are the same for creating an operation
+    @ExceptionHandler(OrdererAndBeneficiaryCannotBeSameException.class)
+    public ResponseEntity<ProblemDetail> handleOrdererAndBeneficiaryCannotBeSame (OrdererAndBeneficiaryCannotBeSameException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
+        problemDetails.setTitle("Orderer and beneficiary cannot be the same");
         
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
     }

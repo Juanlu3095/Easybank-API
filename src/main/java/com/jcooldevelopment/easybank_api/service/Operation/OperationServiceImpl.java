@@ -27,6 +27,7 @@ import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
 import com.jcooldevelopment.easybank_api.exception.NotEnoughBalanceException;
+import com.jcooldevelopment.easybank_api.exception.OrdererAndBeneficiaryCannotBeSameException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.exception.UserNotAuthorizedException;
 import com.jcooldevelopment.easybank_api.mapper.MovementMapper;
@@ -162,6 +163,10 @@ public class OperationServiceImpl implements OperationService{
         // Check if that account has enough money
         if(userAccount.getBalance().compareTo(createOperationDto.getAmount()) == -1){
             throw new NotEnoughBalanceException("There is not enough money in your account to proceed.");
+        }
+        // Check if orderer and beneficiary accounts are not the same
+        if(userAccount.getIban().equals(createOperationDto.getBeneficiaryAccount())){
+            throw new OrdererAndBeneficiaryCannotBeSameException("Orderer and beneficiary IBAN accounts cannot be the same.");
         }
 
         Account beneficiaryAccount = null;
