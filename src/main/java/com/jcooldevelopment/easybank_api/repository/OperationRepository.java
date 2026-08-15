@@ -70,6 +70,7 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>{
     )
     Page<OperationProjection> findByUserWithProjection(UUID id, Pageable pageable);
 
+    // No need for join if account.iban is obtained by sub-query
     @Query(
         value = """
         SELECT operation.id,
@@ -82,9 +83,6 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>{
         operation.updated_at as updatedAt,
         (SELECT account.iban FROM account WHERE account.id = operation.orderer_account_id) as ordererAccountIban
         FROM operation
-        INNER JOIN account ON operation.orderer_account_id = account.id
-        INNER JOIN user_account ON account.id = user_account.account_id
-        INNER JOIN users ON user_account.user_id = users.id
         WHERE operation.id = ?1  
         """,
         nativeQuery = true

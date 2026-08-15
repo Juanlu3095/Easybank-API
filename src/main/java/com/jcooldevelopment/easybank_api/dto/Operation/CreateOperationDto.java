@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.jcooldevelopment.easybank_api.annotations.IbanAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
 
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -31,5 +32,6 @@ public class CreateOperationDto {
     private String beneficiaryAccount;
 
     @Digits(integer = 17, fraction = 2, message = "The amount must have a maximum of 17 integers and 2 decimals.")
+    @DecimalMin(value = "0.01", message = "Amount must be at least 0.01")
     private BigDecimal amount;
 }
