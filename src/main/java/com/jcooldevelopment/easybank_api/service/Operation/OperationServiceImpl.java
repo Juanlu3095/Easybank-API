@@ -18,7 +18,6 @@ import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.contracts.entity.Account;
 import com.jcooldevelopment.easybank_api.contracts.entity.Movement;
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
-import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationOnlyIban;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
@@ -45,7 +44,6 @@ public class OperationServiceImpl implements OperationService{
     private final OperationRepository operationRepository;
     private final MovementRepository movementRepository;
     private final AccountRepository accountRepository;
-    private final UserRepository userRepository;
     private final OperationMapper operationMapper;
     private final MovementMapper movementMapper;
     private final Environment env;
@@ -62,7 +60,6 @@ public class OperationServiceImpl implements OperationService{
         this.operationRepository = operationRepository;
         this.movementRepository = movementRepository;
         this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
         this.operationMapper = operationMapper;
         this.movementMapper = movementMapper;
         this.env = env;
@@ -73,7 +70,7 @@ public class OperationServiceImpl implements OperationService{
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
         Page<Operation> operations = this.operationRepository.findAll(pageable);
         Page<OperationAdminDto> operationsToShow = operations.map(operation ->
-            this.operationMapper.EntityToDto(operation)
+            this.operationMapper.EntityToAdminDto(operation)
         );
         return DataFormater.paginate(operationsToShow);
     }
@@ -173,7 +170,7 @@ public class OperationServiceImpl implements OperationService{
     }
 
     @Override
-    public OperationAdminDto create(CreateOperationDto createOperationDto) {
+    public OperationDto create(CreateOperationDto createOperationDto) {
         Account userAccount = this.getAccountById(createOperationDto.getAccountId());
         // Check if that account is activated
         if(!userAccount.isActivated()) throw new AccountNotActivatedException("This account is not activated yet.");
@@ -219,18 +216,20 @@ public class OperationServiceImpl implements OperationService{
         if(!beneficiaryExternalAccount.isBlank()) movToBeneficiary.setExternalAccount(beneficiaryExternalAccount);
         movToBeneficiary.setAmount(createOperationDto.getAmount());
         movToBeneficiary.setOperation(savedOperation);
-        Movement savedMovToBeneficiary = this.movementRepository.save(movToBeneficiary);
 
         // Creates movement to extract money from Account. This always be an account from our bank.
         Movement movExtractFromAccount = new Movement();
         movExtractFromAccount.setAccount(userAccount);
         movExtractFromAccount.setAmount(createOperationDto.getAmount().negate());
         movExtractFromAccount.setOperation(savedOperation);
-        Movement savedMovExtractFromAccount = this.movementRepository.save(movExtractFromAccount);
+
+        List<Movement> movements = new ArrayList<>();
+        movements.add(movToBeneficiary);
+        movements.add(movExtractFromAccount);
+        List<Movement> savedMovements = this.movementRepository.saveAll(movements);
 
         // Adds movements to operation for getting them when asking for operation
-        savedOperation.addMovement(savedMovToBeneficiary);
-        savedOperation.addMovement(savedMovExtractFromAccount);
+        savedMovements.forEach(movement -> savedOperation.addMovement(movement));
 
         // Update balance for orderer account
         userAccount.setBalance(userAccount.getBalance().subtract(createOperationDto.getAmount()));

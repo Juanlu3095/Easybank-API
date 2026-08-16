@@ -32,7 +32,25 @@ public class OperationMapper {
        return modelMapper.map(updateOperationDto, Operation.class);
     }
 
-    public OperationAdminDto EntityToDto(Operation operation) {
+    public OperationDto EntityToDto(Operation operation){
+        OperationDto operationDto = new OperationDto();
+        operationDto.setId(operation.getId());
+        operationDto.setConcept(operation.getConcept());
+        operationDto.setCounterpartAccountIban(operation.getCounterpartExternalAccount());
+        operationDto.setOrdererAccountIban(operation.getCounterpartAccount().getIban());
+        operationDto.setStatus(operation.getStatus());
+        operationDto.setType(operation.getType());
+        operationDto.setCreatedAt(operation.getCreatedAt());
+        operationDto.setUpdatedAt(operation.getUpdatedAt());
+
+        operation.getMovements().forEach(movement -> {
+            operationDto.addMovement(movementMapper.EntityToMovementOnlyIban(movement));
+        });
+
+        return operationDto;
+    }
+
+    public OperationAdminDto EntityToAdminDto(Operation operation) {
         AccountDtoNoUsers ordererAccount = new AccountDtoNoUsers();
         ordererAccount.setId(operation.getOrdererAccount().getId());
         ordererAccount.setIban(operation.getOrdererAccount().getIban());

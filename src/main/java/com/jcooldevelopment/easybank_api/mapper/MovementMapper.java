@@ -48,6 +48,21 @@ public class MovementMapper {
         return movementDto;
     }
 
+    public MovementPerOperationOnlyIban EntityToMovementOnlyIban(Movement movement){
+        MovementPerOperationOnlyIban movementOnlyIban = new MovementPerOperationOnlyIban();
+        movementOnlyIban.setId(movement.getId());
+        movementOnlyIban.setAmount(movement.getAmount());
+        movementOnlyIban.setOperationId(movement.getOperation().getId());
+
+        if(movement.getAccount().getIban() != null) {
+            movementOnlyIban.setAccountIban(movement.getAccount().getIban());
+        } else {
+            movementOnlyIban.setAccountIban(movement.getExternalAccount());
+        }
+
+        return movementOnlyIban;
+    }
+
     public MovementPerOperationOnlyIban MovementProjectionToMovementOnlyIban(MovementProjection movementProjection){
         MovementPerOperationOnlyIban movementOnlyIban = new MovementPerOperationOnlyIban();
         movementOnlyIban.setId(movementProjection.id());

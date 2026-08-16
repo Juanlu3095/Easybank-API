@@ -3,7 +3,6 @@ package com.jcooldevelopment.easybank_api.controller;
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
-import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.service.Operation.OperationService;
 
@@ -63,10 +62,10 @@ public class OperationClientController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Apiresponse<OperationAdminDto>> createOperation(@Valid @RequestBody CreateOperationDto createOperationDto){
-        OperationAdminDto createdOperation = this.operationService.create(createOperationDto);
+    public ResponseEntity<Apiresponse<OperationDto>> createOperation(@Valid @RequestBody CreateOperationDto createOperationDto){
+        OperationDto createdOperation = this.operationService.create(createOperationDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(new Apiresponse<OperationAdminDto>("Operation created.", createdOperation));
+            .body(new Apiresponse<OperationDto>("Operation created.", createdOperation));
     }
     
 }

@@ -52,11 +52,11 @@ public interface OperationService {
     OperationDto getById(UUID operationId);
 
     /**
-     * Creates a new operation in database.
+     * Creates a new operation in database by client.
      * @param createOperationDto The DTO to create an operation, usually from a form.
      * @return The operation created.
      */
-    OperationAdminDto create(CreateOperationDto createOperationDto);
+    OperationDto create(CreateOperationDto createOperationDto);
 
     /**
      * Updates an operation by id.
