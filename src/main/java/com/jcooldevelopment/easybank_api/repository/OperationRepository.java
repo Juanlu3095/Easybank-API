@@ -54,7 +54,7 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>{
         INNER JOIN account ON operation.orderer_account_id = account.id
         INNER JOIN user_account ON account.id = user_account.account_id
         INNER JOIN users ON user_account.user_id = users.id
-        WHERE users.id = ?1
+        WHERE users.usercode = ?1
         ORDER BY operation.created_at DESC
         """,
         // CountQuery to tell JPA about info for pagination
@@ -64,11 +64,11 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>{
         INNER JOIN account ON operation.orderer_account_id = account.id
         INNER JOIN user_account ON account.id = user_account.account_id
         INNER JOIN users ON user_account.user_id = users.id
-        WHERE users.id = ?1 
+        WHERE users.usercode = ?1 
         """,
         nativeQuery = true
     )
-    Page<OperationProjection> findByUserWithProjection(UUID id, Pageable pageable);
+    Page<OperationProjection> findByUserWithProjection(String usercode, Pageable pageable);
 
     // No need for join if account.iban is obtained by sub-query
     @Query(
