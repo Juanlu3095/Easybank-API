@@ -28,4 +28,23 @@ public interface AccountRepository extends JpaRepository<Account, UUID>{
         nativeQuery = true
     )
     int accountBelongsToUser(UUID accounId, String usercode);
+
+    /**
+     * Counts accounts which belong to an user by usercode.
+     * @param iban The account's IBAN.
+     * @param usercode The usercode in user table.
+     * @return The number of coincidences in user_account table.
+     */
+    @Query(
+        value = """
+        SELECT COUNT(*)
+        FROM user_account
+        WHERE user_account.account_id = 
+            (SELECT account.id FROM account WHERE account.iban = ?1)
+        AND user_account.user_id =
+            (SELECT users.id FROM users WHERE users.usercode = ?2)
+        """,
+        nativeQuery = true
+    )
+    int accountBelongsToUserByIban(String iban, String usercode);
 }

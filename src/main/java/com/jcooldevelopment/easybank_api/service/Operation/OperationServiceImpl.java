@@ -19,6 +19,7 @@ import com.jcooldevelopment.easybank_api.contracts.entity.Account;
 import com.jcooldevelopment.easybank_api.contracts.entity.Movement;
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
+import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationOnlyIban;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
@@ -169,19 +170,35 @@ public class OperationServiceImpl implements OperationService{
         return operation;
     }
 
+    /**
+     * Validates activation, if enough amount in account, if it belongs to user and if beneficiary and orderer of an
+     * operation are not the same.
+     * @param account The entity account from DB
+     * @param createOperationDto The DTO from the HTTP request
+     * @param usercode Usercode in users table
+     */
+    private void validateAccountToUse(Account account, CreateOperationDto createOperationDto, String usercode){
+        // Checks if that account is activated
+        if(!account.isActivated()) throw new AccountNotActivatedException("This account is not activated yet.");
+        // Checks if that account has enough money
+        if(account.getBalance().compareTo(createOperationDto.getAmount()) == -1){
+            throw new NotEnoughBalanceException("There is not enough money in your account to proceed.");
+        }
+        // Checks if orderer and beneficiary accounts are not the same
+        if(account.getIban().equals(createOperationDto.getBeneficiaryAccount())){
+            throw new OrdererAndBeneficiaryCannotBeSameException("Orderer and beneficiary IBAN accounts cannot be the same.");
+        }
+        // Checks if account belongs to user;
+        if(this.accountRepository.accountBelongsToUser(account.getId(), usercode) < 1){
+            throw new UserNotAuthorizedException("User has no authorization to access the account data");
+        }
+    }
+
     @Override
     public OperationDto create(CreateOperationDto createOperationDto) {
         Account userAccount = this.getAccountById(createOperationDto.getAccountId());
-        // Check if that account is activated
-        if(!userAccount.isActivated()) throw new AccountNotActivatedException("This account is not activated yet.");
-        // Check if that account has enough money
-        if(userAccount.getBalance().compareTo(createOperationDto.getAmount()) == -1){
-            throw new NotEnoughBalanceException("There is not enough money in your account to proceed.");
-        }
-        // Check if orderer and beneficiary accounts are not the same
-        if(userAccount.getIban().equals(createOperationDto.getBeneficiaryAccount())){
-            throw new OrdererAndBeneficiaryCannotBeSameException("Orderer and beneficiary IBAN accounts cannot be the same.");
-        }
+        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
+        this.validateAccountToUse(userAccount, createOperationDto, usercode);
 
         Account beneficiaryAccount = null;
         String beneficiaryExternalAccount = "";
@@ -206,7 +223,19 @@ public class OperationServiceImpl implements OperationService{
             operation.setCounterpartExternalAccount(beneficiaryExternalAccount);
             operation.setStatus(OperationStatus.PENDING);
         }
-        operation.setType(createOperationDto.getOperationType());
+
+        // Checks operation type: if both accounts belongs to user, it is a transfer.
+        // The orderer account is obviously one which belongs to user.
+        if(this.accountRepository.accountBelongsToUserByIban(
+            createOperationDto.getBeneficiaryAccount(),
+            usercode
+        ) == 1) {
+            operation.setType(OperationType.TRANSFER);
+        } else if (createOperationDto.getOperationType().equals(OperationType.PAYMENT)){
+            operation.setType(OperationType.PAYMENT);
+        } else {
+            operation.setType(OperationType.MONEY_TRANSFER);
+        }
 
         Operation savedOperation = this.operationRepository.save(operation);
 
