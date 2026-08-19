@@ -52,6 +52,14 @@ public interface OperationService {
     OperationDto getById(UUID operationId);
 
     /**
+     * Obtains an operation for the given operation's id.
+     * NO checking of user owning.
+     * @param operationId The operation's id.
+     * @return Operation DTO for admin role.
+     */
+    OperationAdminDto getByIdForAdmin(UUID operationId);
+
+    /**
      * Creates a new operation in database by client.
      * @param createOperationDto The DTO to create an operation, usually from a form.
      * @return The operation created.

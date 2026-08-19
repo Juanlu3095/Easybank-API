@@ -24,6 +24,12 @@ mvnw spring-boot:run
 
 "mvnw" is used for the wrapper in case you don´t have Maven installed in your machine.
 
+For Linux/Bash (Careful with chmod permissions!):
+
+```bash
+./mvnw spring-boot:run
+```
+
 ## Testing
 
 Must create a different PostgreSQL database than the one used for production or development. Once is done, create a file test/resources/application-test.properties with database

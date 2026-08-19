@@ -170,6 +170,13 @@ public class OperationServiceImpl implements OperationService{
         return operation;
     }
 
+    public OperationAdminDto getByIdForAdmin(UUID id){
+        Operation operation = this.operationRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Operation not found."));
+        
+        return this.operationMapper.EntityToAdminDto(operation);
+    }
+
     /**
      * Validates activation, if enough amount in account, if it belongs to user and if beneficiary and orderer of an
      * operation are not the same.

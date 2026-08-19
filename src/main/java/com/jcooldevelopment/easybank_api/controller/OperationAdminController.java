@@ -7,10 +7,13 @@ import com.jcooldevelopment.easybank_api.service.Operation.OperationService;
 
 import jakarta.validation.constraints.Min;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,5 +37,12 @@ public class OperationAdminController {
         PaginatedResponse<OperationAdminDto> operations = this.operationService.getAll(page, size);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<PaginatedResponse<OperationAdminDto>>("Operations found.", operations));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Apiresponse<OperationAdminDto>> getOperation(@PathVariable UUID id){
+        OperationAdminDto operation = this.operationService.getByIdForAdmin(id);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(new Apiresponse<OperationAdminDto>("Operation found.", operation));
     }
 }
