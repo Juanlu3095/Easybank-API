@@ -282,14 +282,23 @@ public class OperationServiceImpl implements OperationService{
 
     @Override
     public OperationAdminDto update(UUID operationId, UpdateOperationDto updateOperationDto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        Operation operation = this.operationRepository.findById(operationId)
+            .orElseThrow(() -> new ResourceNotFoundException("Operation not found."));
+
+        operation.setType(updateOperationDto.getOperationType());
+        operation.setStatus(updateOperationDto.getStatus());
+        Operation updatedOperation = this.operationRepository.save(operation);
+        return this.operationMapper.EntityToAdminDto(updatedOperation);
     }
 
     @Override
     public void delete(UUID operationId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        Operation operation = this.operationRepository.findById(operationId)
+            .orElseThrow(() -> new ResourceNotFoundException("Operation not found."));
+
+        this.movementRepository.deleteAll(operation.getMovements());
+        
+        this.operationRepository.delete(operation);
     }
 
     private Account getAccountById(UUID id) {

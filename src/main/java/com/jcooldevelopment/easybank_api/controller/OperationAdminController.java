@@ -3,8 +3,10 @@ package com.jcooldevelopment.easybank_api.controller;
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 import com.jcooldevelopment.easybank_api.service.Operation.OperationService;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 
 import java.util.UUID;
@@ -12,8 +14,11 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,5 +49,22 @@ public class OperationAdminController {
         OperationAdminDto operation = this.operationService.getByIdForAdmin(id);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<OperationAdminDto>("Operation found.", operation));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Apiresponse<OperationAdminDto>> patchOperation(
+        @PathVariable UUID id,
+        @Valid @RequestBody UpdateOperationDto updateOperationDto
+    ){
+        OperationAdminDto updatedOperation = this.operationService.update(id, updateOperationDto);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(new Apiresponse<OperationAdminDto>("Operation updated.", updatedOperation));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Apiresponse<Void>> deleteOPeration(@PathVariable UUID id){
+        this.operationService.delete(id);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(new Apiresponse<>("Operation deleted.", null));
     }
 }

@@ -67,7 +67,7 @@ public interface OperationService {
     OperationDto create(CreateOperationDto createOperationDto);
 
     /**
-     * Updates an operation by id.
+     * Updates an operation by id with PATCH request.
      * @param operationId The operation to update's id.
      * @param updateOperationDto The DTO to update an operation, usually from a form.
      * @return The operation created.
