@@ -2,6 +2,7 @@ package com.jcooldevelopment.easybank_api.controller;
 
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
+import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 import com.jcooldevelopment.easybank_api.service.Operation.OperationService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -49,6 +51,15 @@ public class OperationAdminController {
         OperationAdminDto operation = this.operationService.getByIdForAdmin(id);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<OperationAdminDto>("Operation found.", operation));
+    }
+
+    @PostMapping("")
+    public ResponseEntity<Apiresponse<OperationAdminDto>> postOperation(
+        @Valid @RequestBody CreateOperationAdminDto createOperationAdminDto
+    ){
+        OperationAdminDto operation = this.operationService.createByAdmin(createOperationAdminDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new Apiresponse<OperationAdminDto>("Operation created.", operation));
     }
 
     @PatchMapping("/{id}")

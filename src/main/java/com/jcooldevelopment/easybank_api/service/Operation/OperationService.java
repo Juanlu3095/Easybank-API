@@ -3,6 +3,7 @@ package com.jcooldevelopment.easybank_api.service.Operation;
 import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
+import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
@@ -65,6 +66,14 @@ public interface OperationService {
      * @return The operation created.
      */
     OperationDto create(CreateOperationDto createOperationDto);
+
+    /**
+     * Creates a new operation by admin, mainly for operation adjustment, for example
+     * when an error occurs.
+     * @param createOperationDto DTO to create operation by admin.
+     * @return The created operation by admin
+     */
+    OperationAdminDto createByAdmin(CreateOperationAdminDto createOperationDto);
 
     /**
      * Updates an operation by id with PATCH request.

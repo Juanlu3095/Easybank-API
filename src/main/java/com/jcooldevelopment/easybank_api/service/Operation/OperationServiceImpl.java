@@ -21,6 +21,7 @@ import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationOnlyIban;
+import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
@@ -278,6 +279,11 @@ public class OperationServiceImpl implements OperationService{
         }
 
         return this.operationMapper.EntityToDto(savedOperation);
+    }
+
+    @Override
+    public OperationAdminDto createByAdmin(CreateOperationAdminDto createOperationDto){
+        return null;
     }
 
     @Override

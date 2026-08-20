@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.annotations.IbanAnnotation;
-import com.jcooldevelopment.easybank_api.annotations.NotEnumValueAnnotation;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -17,19 +16,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateOperationDto {
+public class CreateOperationAdminDto {
 
     @NotBlank(message = "Concept cannot be blank.")
     private String concept;
 
     @NotNull(message = "There is no account selected.")
     private UUID accountId;
-
-    @NotEnumValueAnnotation(
-        forbiddenValue = "BALANCE_ADJUSTMENT",
-        message = "Operation type is not valid."
-    )
-    private String operationType;
 
     @IbanAnnotation(message = "IBAN not valid.")
     private String beneficiaryAccount;
