@@ -20,6 +20,7 @@ import com.jcooldevelopment.easybank_api.contracts.entity.Account;
 import com.jcooldevelopment.easybank_api.contracts.entity.AccountType;
 import com.jcooldevelopment.easybank_api.contracts.entity.Branch;
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
+import com.jcooldevelopment.easybank_api.contracts.enums.AccountPurpose;
 import com.jcooldevelopment.easybank_api.contracts.enums.AccountStatus;
 import com.jcooldevelopment.easybank_api.dto.Account.AccountAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Account.AccountDto;
@@ -186,7 +187,8 @@ public class AccountServiceImpl implements AccountService{
         accountToCreate.setBicSwift(bic);
         accountToCreate.setBranch(branch);
         accountToCreate.setIban(iban.toString());
-        accountToCreate.setStatus(AccountStatus.valueOf(createAccountAdminDto.getStatus().toString()));
+        accountToCreate.setStatus(AccountStatus.valueOf(createAccountAdminDto.getStatus()));
+        accountToCreate.setAccountPurpose(AccountPurpose.valueOf(createAccountAdminDto.getAccountPurpose()));
         accountToCreate.setUsers(users);
 
         Account savedAccount = this.accountRepository.save(accountToCreate);
@@ -228,7 +230,7 @@ public class AccountServiceImpl implements AccountService{
         }
 
         if(!updateAccountAdminDto.getStatus().equals(account.getStatus())) {
-            account.setStatus(updateAccountAdminDto.getStatus());
+            account.setStatus(AccountStatus.valueOf(updateAccountAdminDto.getStatus()));
         }
 
         if(!updateAccountAdminDto.getUserIds().isEmpty()) { // Check if userIds from Form is empty

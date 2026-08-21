@@ -10,6 +10,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import com.jcooldevelopment.easybank_api.annotations.BicAnnotation;
 import com.jcooldevelopment.easybank_api.annotations.IbanAnnotation;
+import com.jcooldevelopment.easybank_api.contracts.enums.AccountPurpose;
 import com.jcooldevelopment.easybank_api.contracts.enums.AccountStatus;
 
 import jakarta.persistence.CascadeType;
@@ -78,6 +79,11 @@ public class Account {
     @ManyToOne
     @JoinColumn(name="accountType", nullable = false)
     private AccountType accountType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "purpose")
+    @ColumnDefault("'CLIENT'")
+    private AccountPurpose accountPurpose;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT NOW()", insertable = false, updatable = false)
     private LocalDateTime createdAt;

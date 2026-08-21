@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
+import com.jcooldevelopment.easybank_api.exception.AccountPurposeNotValid;
 import com.jcooldevelopment.easybank_api.exception.ActivationCodeExpiredException;
 import com.jcooldevelopment.easybank_api.exception.ResourceAlreadyExists;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
@@ -165,6 +166,17 @@ public class GlobalErrorHandler {
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
         problemDetails.setTitle("Orderer and beneficiary cannot be the same");
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
+    }
+
+    // 409 exception when using client account for internal purposes
+    @ExceptionHandler(AccountPurposeNotValid.class)
+    public ResponseEntity<ProblemDetail> handleAccountPurposeNotValid (AccountPurposeNotValid exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
+        problemDetails.setTitle("Account not valid for this purpose");
         
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
     }

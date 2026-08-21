@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.annotations.IbanAnnotation;
+import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -23,6 +24,9 @@ public class CreateOperationAdminDto {
 
     @NotNull(message = "There is no account selected.")
     private UUID accountId;
+
+    @NotNull(message = "There is no operation type selected.")
+    private OperationType operationType;
 
     @IbanAnnotation(message = "IBAN not valid.")
     private String beneficiaryAccount;

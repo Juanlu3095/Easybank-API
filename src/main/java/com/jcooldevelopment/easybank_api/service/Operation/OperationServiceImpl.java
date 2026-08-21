@@ -18,6 +18,7 @@ import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.contracts.entity.Account;
 import com.jcooldevelopment.easybank_api.contracts.entity.Movement;
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
+import com.jcooldevelopment.easybank_api.contracts.enums.AccountPurpose;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationOnlyIban;
@@ -27,6 +28,7 @@ import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
+import com.jcooldevelopment.easybank_api.exception.AccountPurposeNotValid;
 import com.jcooldevelopment.easybank_api.exception.NotEnoughBalanceException;
 import com.jcooldevelopment.easybank_api.exception.OrdererAndBeneficiaryCannotBeSameException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
@@ -202,6 +204,34 @@ public class OperationServiceImpl implements OperationService{
         }
     }
 
+    /**
+     * Validates activation, if enough amount in account, if it belongs to user and if beneficiary and orderer of an
+     * operation are not the same.
+     * @param account The entity account from DB
+     * @param createOperationDto The DTO for admin from the HTTP request
+     * @param usercode Usercode in users table
+     */
+    private void validateAdminAccountToUse(Account account, CreateOperationAdminDto createOperationDto, String usercode){
+        // Checks if that account is activated
+        if(!account.isActivated()) throw new AccountNotActivatedException("This account is not activated yet.");
+        // Checks if that account has enough money
+        if(account.getBalance().compareTo(createOperationDto.getAmount()) == -1){
+            throw new NotEnoughBalanceException("There is not enough money in your account to proceed.");
+        }
+        // Checks if orderer and beneficiary accounts are not the same
+        if(account.getIban().equals(createOperationDto.getBeneficiaryAccount())){
+            throw new OrdererAndBeneficiaryCannotBeSameException("Orderer and beneficiary IBAN accounts cannot be the same.");
+        }
+        // Checks if account belongs to user;
+        if(this.accountRepository.accountBelongsToUser(account.getId(), usercode) < 1){
+            throw new UserNotAuthorizedException("User has no authorization to access the account data");
+        }
+        // Checks if account is internal for adjustments
+        if(!account.getAccountPurpose().equals(AccountPurpose.BALANCE_ADJUSTMENT)){
+            throw new AccountPurposeNotValid("This account is not valid for internal purposes.");
+        }
+    }
+
     @Override
     public OperationDto create(CreateOperationDto createOperationDto) {
         Account userAccount = this.getAccountById(createOperationDto.getAccountId());
@@ -239,7 +269,7 @@ public class OperationServiceImpl implements OperationService{
             usercode
         ) == 1) {
             operation.setType(OperationType.TRANSFER);
-        } else if (createOperationDto.getOperationType().equals(OperationType.PAYMENT)){
+        } else if (createOperationDto.getOperationType().equals(OperationType.PAYMENT.toString())){
             operation.setType(OperationType.PAYMENT);
         } else {
             operation.setType(OperationType.MONEY_TRANSFER);
@@ -283,7 +313,71 @@ public class OperationServiceImpl implements OperationService{
 
     @Override
     public OperationAdminDto createByAdmin(CreateOperationAdminDto createOperationDto){
-        return null;
+        Account userAccount = this.getAccountById(createOperationDto.getAccountId());
+        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
+        this.validateAdminAccountToUse(userAccount, createOperationDto, usercode);
+
+        Account beneficiaryAccount = null;
+        String beneficiaryExternalAccount = "";
+        // Check if beneficiary account belongs to our bank
+        if(createOperationDto.getBeneficiaryAccount().substring(4, 8).equals(this.env.getProperty("BANK.CODE"))){
+            beneficiaryAccount = this.getAccountByIban(createOperationDto.getBeneficiaryAccount());
+            // Check if that account is activated
+            if(!beneficiaryAccount.isActivated()){
+                throw new AccountNotActivatedException("This account is not activated yet."); 
+            }
+        } else {
+            beneficiaryExternalAccount = createOperationDto.getBeneficiaryAccount();
+        }
+
+        Operation operation = new Operation();
+        operation.setConcept(createOperationDto.getConcept());
+        operation.setOrdererAccount(userAccount);
+        operation.setStatus(OperationStatus.DONE);
+        if(createOperationDto.getBeneficiaryAccount().substring(4, 8).equals(this.env.getProperty("BANK.CODE"))){
+            operation.setCounterpartAccount(beneficiaryAccount);
+            operation.setStatus(OperationStatus.DONE);
+        } else {
+            operation.setCounterpartExternalAccount(beneficiaryExternalAccount);
+            operation.setStatus(OperationStatus.PENDING);
+        }
+
+        operation.setType(OperationType.valueOf(createOperationDto.getOperationType().toString()));
+
+        Operation savedOperation = this.operationRepository.save(operation);
+
+        // Creates movement to add money to Beneficiary
+        Movement movToBeneficiary = new Movement();
+        if(beneficiaryAccount != null) movToBeneficiary.setAccount(beneficiaryAccount);
+        if(!beneficiaryExternalAccount.isBlank()) movToBeneficiary.setExternalAccount(beneficiaryExternalAccount);
+        movToBeneficiary.setAmount(createOperationDto.getAmount());
+        movToBeneficiary.setOperation(savedOperation);
+
+        // Creates movement to extract money from Account. This always be an account from our bank.
+        Movement movExtractFromAccount = new Movement();
+        movExtractFromAccount.setAccount(userAccount);
+        movExtractFromAccount.setAmount(createOperationDto.getAmount().negate());
+        movExtractFromAccount.setOperation(savedOperation);
+
+        List<Movement> movements = new ArrayList<>();
+        movements.add(movToBeneficiary);
+        movements.add(movExtractFromAccount);
+        List<Movement> savedMovements = this.movementRepository.saveAll(movements);
+
+        // Adds movements to operation for getting them when asking for operation
+        savedMovements.forEach(movement -> savedOperation.addMovement(movement));
+
+        // Update balance for orderer account
+        userAccount.setBalance(userAccount.getBalance().subtract(createOperationDto.getAmount()));
+        this.accountRepository.save(userAccount);
+
+        // Update balance for beneficiary account if our bank owns it
+        if(beneficiaryAccount != null){
+            beneficiaryAccount.setBalance(beneficiaryAccount.getBalance().add(createOperationDto.getAmount()));
+            this.accountRepository.save(beneficiaryAccount);
+        }
+
+        return this.operationMapper.EntityToAdminDto(savedOperation);
     }
 
     @Override

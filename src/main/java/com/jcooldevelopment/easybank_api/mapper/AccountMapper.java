@@ -39,6 +39,7 @@ public class AccountMapper {
         accountAdminDto.setIban(account.getIban());
         accountAdminDto.setId(account.getId());
         accountAdminDto.setStatus(account.getStatus());
+        accountAdminDto.setAccountPurpose(account.getAccountPurpose());
 
         List<UserDto> users = new ArrayList<UserDto>();
 
@@ -65,6 +66,7 @@ public class AccountMapper {
         return accountDto;
     }
 
+    // When is redundant to have users in data
     public AccountDtoNoUsers EntityToDtoNoUsers(Account account){
         AccountDtoNoUsers accountDto = new AccountDtoNoUsers();
         accountDto.setId(account.getId());
