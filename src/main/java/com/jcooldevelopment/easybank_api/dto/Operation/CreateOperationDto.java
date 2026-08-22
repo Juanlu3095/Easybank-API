@@ -3,8 +3,10 @@ package com.jcooldevelopment.easybank_api.dto.Operation;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import com.jcooldevelopment.easybank_api.annotations.EnumValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.annotations.IbanAnnotation;
 import com.jcooldevelopment.easybank_api.annotations.NotEnumValueAnnotation;
+import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -25,9 +27,13 @@ public class CreateOperationDto {
     @NotNull(message = "There is no account selected.")
     private UUID accountId;
 
+    @EnumValidatorAnnotation(
+        enumClass = OperationType.class,
+        message = "Operation type value not valid."
+    )
     @NotEnumValueAnnotation(
         forbiddenValue = "BALANCE_ADJUSTMENT",
-        message = "Operation type is not valid."
+        message = "Operation type is not valid for this user."
     )
     private String operationType;
 

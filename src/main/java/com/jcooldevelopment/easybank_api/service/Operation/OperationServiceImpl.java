@@ -253,7 +253,6 @@ public class OperationServiceImpl implements OperationService{
         Operation operation = new Operation();
         operation.setConcept(createOperationDto.getConcept());
         operation.setOrdererAccount(userAccount);
-        operation.setStatus(OperationStatus.DONE);
         if(createOperationDto.getBeneficiaryAccount().substring(4, 8).equals(this.env.getProperty("BANK.CODE"))){
             operation.setCounterpartAccount(beneficiaryAccount);
             operation.setStatus(OperationStatus.DONE);
@@ -342,7 +341,8 @@ public class OperationServiceImpl implements OperationService{
             operation.setStatus(OperationStatus.PENDING);
         }
 
-        operation.setType(OperationType.valueOf(createOperationDto.getOperationType().toString()));
+        // Admin only creates operations to fix errors in operations
+        operation.setType(OperationType.BALANCE_ADJUSTMENT);
 
         Operation savedOperation = this.operationRepository.save(operation);
 
