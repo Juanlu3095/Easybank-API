@@ -6,13 +6,14 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Meta;
 import org.springframework.data.jpa.repository.Query;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
 import com.jcooldevelopment.easybank_api.projections.operation.OperationProjection;
 
-public interface OperationRepository extends JpaRepository<Operation, UUID>{
+public interface OperationRepository extends JpaRepository<Operation, UUID>, JpaSpecificationExecutor<Operation>{
 
     // Duplicate sql alias for using SELECT *: https://stackoverflow.com/questions/78211463/encountered-a-duplicated-sql-alias-id-during-auto-discovery-of-a-native-sql-qu
     // Pagination in native query: https://stackoverflow.com/questions/38349930/spring-data-and-native-query-with-pagination

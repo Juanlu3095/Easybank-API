@@ -40,6 +40,7 @@ import com.jcooldevelopment.easybank_api.repository.AccountRepository;
 import com.jcooldevelopment.easybank_api.repository.MovementRepository;
 import com.jcooldevelopment.easybank_api.repository.OperationRepository;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
+import com.jcooldevelopment.easybank_api.specs.operation.OperationSpecs;
 import com.jcooldevelopment.easybank_api.utils.DataFormater;
 
 @Service
@@ -70,9 +71,10 @@ public class OperationServiceImpl implements OperationService{
     }
 
     @Override
-    public PaginatedResponse<OperationAdminDto> getAll(int page, int size) {
+    public PaginatedResponse<OperationAdminDto> getAll(int page, int size, String concept, String status, String type) {
+        OperationSpecs spec = new OperationSpecs(concept, status, type);
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
-        Page<Operation> operations = this.operationRepository.findAll(pageable);
+        Page<Operation> operations = this.operationRepository.findAll(spec, pageable);
         Page<OperationAdminDto> operationsToShow = operations.map(operation ->
             this.operationMapper.EntityToAdminDto(operation)
         );

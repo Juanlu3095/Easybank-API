@@ -39,9 +39,12 @@ public class OperationAdminController {
     @GetMapping("")
     public ResponseEntity<Apiresponse<PaginatedResponse<OperationAdminDto>>> getAllOperations(
         @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page,
-        @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size
+        @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size,
+        @RequestParam(required = false, defaultValue = "") String concept,
+        @RequestParam(required = false, defaultValue = "") String status,
+        @RequestParam(required = false, defaultValue = "") String type
     )  {
-        PaginatedResponse<OperationAdminDto> operations = this.operationService.getAll(page, size);
+        PaginatedResponse<OperationAdminDto> operations = this.operationService.getAll(page, size, concept, status, type);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<PaginatedResponse<OperationAdminDto>>("Operations found.", operations));
     }
