@@ -42,9 +42,10 @@ public class OperationAdminController {
         @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size,
         @RequestParam(required = false, defaultValue = "") String concept,
         @RequestParam(required = false, defaultValue = "") String status,
-        @RequestParam(required = false, defaultValue = "") String type
+        @RequestParam(required = false, defaultValue = "") String type,
+        @RequestParam(required = false, defaultValue = "") String ordererIban
     )  {
-        PaginatedResponse<OperationAdminDto> operations = this.operationService.getAll(page, size, concept, status, type);
+        PaginatedResponse<OperationAdminDto> operations = this.operationService.getAll(page, size, concept, status, type, ordererIban);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<PaginatedResponse<OperationAdminDto>>("Operations found.", operations));
     }

@@ -44,8 +44,6 @@ import com.jcooldevelopment.easybank_api.repository.UserRepository;
 import com.jcooldevelopment.easybank_api.specs.operation.OperationSpecs;
 import com.jcooldevelopment.easybank_api.utils.DataFormater;
 
-import io.micrometer.common.util.StringUtils;
-
 @Service
 public class OperationServiceImpl implements OperationService{
 
@@ -74,11 +72,12 @@ public class OperationServiceImpl implements OperationService{
     }
 
     @Override
-    public PaginatedResponse<OperationAdminDto> getAll(int page, int size, String concept, String status, String type) {
+    public PaginatedResponse<OperationAdminDto> getAll(int page, int size, String concept, String status, String type, String ordererIban) {
         Specification<Operation> filters = Specification
             .where(OperationSpecs.findByConcept(concept))
             .and(OperationSpecs.findByStatus(status))
-            .and(OperationSpecs.findByType(type));
+            .and(OperationSpecs.findByType(type))
+            .and(OperationSpecs.findByOrdererIban(ordererIban));
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
         Page<Operation> operations = this.operationRepository.findAll(filters, pageable);
         Page<OperationAdminDto> operationsToShow = operations.map(operation ->

@@ -2,7 +2,10 @@ package com.jcooldevelopment.easybank_api.specs.operation;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.jcooldevelopment.easybank_api.contracts.entity.Account;
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
+
+import jakarta.persistence.criteria.Join;
 
 // https://blog.codmind.com/filtros-dinamicos-en-spring-boot-mediante/
 // https://localhorse.net/article/spring-boot-consultas-personalizadas-con-jpql-y-criteria-api
@@ -34,6 +37,16 @@ public class OperationSpecs {
                 return criteriaBuilder.conjunction();
             }
            return criteriaBuilder.equal(root.get("status"), status);
+        };
+    }
+
+    public static Specification<Operation> findByOrdererIban(String ordererIban){
+        return (root, query, criteriaBuilder) -> {
+            if(ordererIban.isEmpty()){
+                return criteriaBuilder.conjunction();
+            }
+            Join<Account,Operation> operaationAccounts = root.join("ordererAccount");
+            return criteriaBuilder.equal(operaationAccounts.get("iban"), ordererIban);
         };
     }
     

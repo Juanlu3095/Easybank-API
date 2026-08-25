@@ -17,7 +17,7 @@ public interface OperationService {
      * @param size The number of results in each page.
      * @return Paginated response with operation DTOs for admin role.
      */
-    PaginatedResponse<OperationAdminDto> getAll(int page, int size, String concept, String status, String type);
+    PaginatedResponse<OperationAdminDto> getAll(int page, int size, String concept, String status, String type, String ordererIban);
 
     /**
      * Obtains all operations for the given account in database.
