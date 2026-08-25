@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,8 @@ import com.jcooldevelopment.easybank_api.repository.UserRepository;
 import com.jcooldevelopment.easybank_api.specs.operation.OperationSpecs;
 import com.jcooldevelopment.easybank_api.utils.DataFormater;
 
+import io.micrometer.common.util.StringUtils;
+
 @Service
 public class OperationServiceImpl implements OperationService{
 
@@ -72,9 +75,12 @@ public class OperationServiceImpl implements OperationService{
 
     @Override
     public PaginatedResponse<OperationAdminDto> getAll(int page, int size, String concept, String status, String type) {
-        OperationSpecs spec = new OperationSpecs(concept, status, type);
+        Specification<Operation> filters = Specification
+            .where(OperationSpecs.findByConcept(concept))
+            .and(OperationSpecs.findByStatus(status))
+            .and(OperationSpecs.findByType(type));
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
-        Page<Operation> operations = this.operationRepository.findAll(spec, pageable);
+        Page<Operation> operations = this.operationRepository.findAll(filters, pageable);
         Page<OperationAdminDto> operationsToShow = operations.map(operation ->
             this.operationMapper.EntityToAdminDto(operation)
         );

@@ -1,47 +1,40 @@
 package com.jcooldevelopment.easybank_api.specs.operation;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jspecify.annotations.Nullable;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-
 // https://blog.codmind.com/filtros-dinamicos-en-spring-boot-mediante/
 // https://localhorse.net/article/spring-boot-consultas-personalizadas-con-jpql-y-criteria-api
-public class OperationSpecs implements Specification<Operation>{
+// https://medium.com/@miguel.duque7/how-to-use-spring-data-jpa-specifications-to-filter-sql-queries-with-join-tables-1e821178c76b
+// Specification cannot be null error: https://stackoverflow.com/questions/60009797/jpa-specification-and-null-parameter-in-where-clause
+public class OperationSpecs {
 
-    private String concept, status, type;    
-
-    public OperationSpecs(String concept, String status, String type) {
-        this.concept = concept;
-        this.status = status;
-        this.type = type;
+    public static Specification<Operation> findByConcept(String concept){
+        return (root, query, criteriaBuilder) -> {
+            if(concept.isEmpty()){
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.equal(root.get("concept"), concept);
+        };
     }
 
-    @Override
-    public @Nullable Predicate toPredicate(Root<Operation> root, CriteriaQuery<?> cq, CriteriaBuilder cb) {
-        List<Predicate> predicates = new ArrayList<>();
+    public static Specification<Operation> findByType(String type){
+        return (root, query, criteriaBuilder) -> {
+            if(type.isEmpty()){
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.equal(root.get("type"), type);
+        };
+    }
 
-        if(!concept.isEmpty()){
-            predicates.add(cb.equal(root.get("concept"), concept));
-        }
-
-        if(!status.isEmpty()){
-            predicates.add(cb.equal(root.get("status"), status));
-        }
-
-        if(!type.isEmpty()){
-            predicates.add(cb.equal(root.get("type"), type));
-        }
-
-        return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+    public static Specification<Operation> findByStatus(String status){
+        return (root, query, criteriaBuilder) -> {
+            if(status.isEmpty()){
+                return criteriaBuilder.conjunction();
+            }
+           return criteriaBuilder.equal(root.get("status"), status);
+        };
     }
     
 }
