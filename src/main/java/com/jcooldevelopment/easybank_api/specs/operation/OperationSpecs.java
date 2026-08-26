@@ -45,8 +45,22 @@ public class OperationSpecs {
             if(ordererIban.isEmpty()){
                 return criteriaBuilder.conjunction();
             }
-            Join<Account,Operation> operaationAccounts = root.join("ordererAccount");
-            return criteriaBuilder.equal(operaationAccounts.get("iban"), ordererIban);
+            Join<Account,Operation> operationAccounts = root.join("ordererAccount");
+            return criteriaBuilder.equal(operationAccounts.get("iban"), ordererIban);
+        };
+    }
+
+    public static Specification<Operation> findByCounterpartIban(String counterpartIban, String bankCode){
+        return (root, query, criteriaBuilder) -> {
+            if(counterpartIban.isEmpty() || bankCode.isBlank()){
+                return criteriaBuilder.conjunction();
+            }
+            if(!counterpartIban.substring(4, 8).equals(bankCode)) {
+                return criteriaBuilder.equal(root.get("counterpartExternalAccount"), counterpartIban);
+            } else {
+                Join<Account,Operation> operationAccounts = root.join("counterpartAccount");
+                return criteriaBuilder.equal(operationAccounts.get("iban"), counterpartIban);
+            }
         };
     }
     

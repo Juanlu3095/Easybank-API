@@ -72,12 +72,21 @@ public class OperationServiceImpl implements OperationService{
     }
 
     @Override
-    public PaginatedResponse<OperationAdminDto> getAll(int page, int size, String concept, String status, String type, String ordererIban) {
+    public PaginatedResponse<OperationAdminDto> getAll(
+        int page,
+        int size,
+        String concept, 
+        String status,
+        String type,
+        String ordererIban,
+        String counterpartIban
+    ) {
         Specification<Operation> filters = Specification
             .where(OperationSpecs.findByConcept(concept))
             .and(OperationSpecs.findByStatus(status))
             .and(OperationSpecs.findByType(type))
-            .and(OperationSpecs.findByOrdererIban(ordererIban));
+            .and(OperationSpecs.findByOrdererIban(ordererIban))
+            .and(OperationSpecs.findByCounterpartIban(counterpartIban, this.env.getProperty("BANK.CODE")));
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
         Page<Operation> operations = this.operationRepository.findAll(filters, pageable);
         Page<OperationAdminDto> operationsToShow = operations.map(operation ->

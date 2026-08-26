@@ -43,9 +43,10 @@ public class OperationAdminController {
         @RequestParam(required = false, defaultValue = "") String concept,
         @RequestParam(required = false, defaultValue = "") String status,
         @RequestParam(required = false, defaultValue = "") String type,
-        @RequestParam(required = false, defaultValue = "") String ordererIban
+        @RequestParam(required = false, defaultValue = "") String ordererIban,
+        @RequestParam(required = false, defaultValue = "") String counterpartIban
     )  {
-        PaginatedResponse<OperationAdminDto> operations = this.operationService.getAll(page, size, concept, status, type, ordererIban);
+        PaginatedResponse<OperationAdminDto> operations = this.operationService.getAll(page, size, concept, status, type, ordererIban, counterpartIban);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<PaginatedResponse<OperationAdminDto>>("Operations found.", operations));
     }
