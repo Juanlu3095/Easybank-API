@@ -1,0 +1,52 @@
+:root{
+    --dark-green: #197A69;
+}
+
+/* SHARED PROPERTIES */
+.property-title{
+    font-size: 24px;
+}
+
+.property-value{
+    font-size: 20px;
+}
+
+body{
+    margin: 0 5rem;
+}
+
+/* HEADER */
+.logo-and-doc-name{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 0;
+}
+
+.logo-and-doc-name img{
+    width: 20%;
+}
+
+/* MAIN */
+.principal-data, .secondary-data{
+    border: 2px solid var(--dark-green);
+    padding: 1rem 3rem;
+    margin: 2rem 0;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.principal-data div, .secondary-data div{
+    flex: 1; /* It distributes width equally, making both principal and secondary's text aligned */
+}
+
+/* PRINCIPAL DATA */
+
+/* SECONDARY DATA */
+
+/* FOOTER */
+.contact-data{
+    margin: 2rem 0;
+    text-align: center;
+}
