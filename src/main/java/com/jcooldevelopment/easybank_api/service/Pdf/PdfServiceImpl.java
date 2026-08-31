@@ -30,7 +30,6 @@ public class PdfServiceImpl implements PdfService{
             Context context = new Context();
             // context.setVariable("domain", domain);
             String html = templateEngine.process("operationReceipt", context);
-            System.out.println(html);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
             ITextRenderer renderer = new ITextRenderer();

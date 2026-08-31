@@ -1,5 +1,7 @@
 package com.jcooldevelopment.easybank_api.config;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,6 +13,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.jcooldevelopment.easybank_api.filter.JwtAuthFilter;
 
@@ -24,6 +28,19 @@ public class SecurityConfig {
     public SecurityConfig(JwtAuthFilter jwtAuthFilter, AuthenticationProvider authProvider) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.authProvider = authProvider;
+    }
+
+    // https://docs.spring.io/spring-security/reference/reactive/integrations/cors.html
+    // https://www.geeksforgeeks.org/advance-java/spring-security-cors-configuration/
+    // https://stackoverflow.com/questions/76682586/allow-cors-with-spring-security-6-1-1-with-authenticated-requests
+    @Bean
+    UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     // This @Bean makes Spring execute the method, and it will use it when necesary. This method will be executed first because Spring
@@ -58,7 +75,8 @@ public class SecurityConfig {
                     ).permitAll()
 
                     .requestMatchers(HttpMethod.GET,
-                        "/error"
+                        "/error",
+                        "/api/operationreceipt/**"
                     ).permitAll()
 
                     .anyRequest().authenticated() // The rest of requests must be authenticated
