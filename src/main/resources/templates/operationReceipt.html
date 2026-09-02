@@ -98,9 +98,9 @@
                     <th><h3 class="property-title">Status</h3></th>
                 </tr>
                 <tr>
-                    <td><p class="property-value">27/08/2026 13:00</p></td>
-                    <td><p class="property-value">TRANSFER</p></td>
-                    <td><p class="property-value">DONE</p></td>
+                    <td><p class="property-value" th:text="${date_and_time}"></p></td>
+                    <td><p class="property-value" th:text="${operationType}"></p></td>
+                    <td><p class="property-value" th:text="${operationStatus}"></p></td>
                 </tr>
             </table>
         </div>
@@ -113,17 +113,17 @@
                     <th><h3 class="property-title">Beneficiary</h3></th>
                 </tr>
                 <tr>
-                    <td><p class="property-value">Amount: 178,99€</p></td>
-                    <td><p class="property-value">Roberto Gómez</p></td>
-                    <td><p class="property-value">Alfredo Jiménez</p></td>
+                    <td><p class="property-value" th:text="${'Amount: ' + amount + '€'}"></p></td>
+                    <td><p class="property-value" th:text="${ordererName}"></p></td>
+                    <td><p class="property-value" th:text="${beneficiaryName}">Alfredo Jiménez</p></td>
                 </tr>
                 <tr>
-                    <td><p class="property-value">Operation id: 123456789</p></td>
-                    <td><p class="property-value">ES76 2100 0418 4012 3456 7891</p></td>
-                    <td><p class="property-value">ES24 0049 5199 3287 1781 0958</p></td>
+                    <td><p class="property-value" th:text="${'Operation reference: ' + operationId}"></p></td>
+                    <td><p class="property-value" th:text="${ordererIban}">ES76 2100 0418 4012 3456 7891</p></td>
+                    <td><p class="property-value" th:text="${beneficiaryIban}">ES24 0049 5199 3287 1781 0958</p></td>
                 </tr>
                 <tr>
-                    <td><p class="property-value">Concept: Payment example</p></td>
+                    <td><p class="property-value" th:text="${'Concept: ' + concept}"></p></td>
                     <td></td>
                     <td></td>
                 </tr>

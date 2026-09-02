@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
+import com.jcooldevelopment.easybank_api.projections.user.UserNameAndSurnameProjection;
 
 public interface UserRepository extends JpaRepository<User, UUID>{
 
@@ -29,4 +30,14 @@ public interface UserRepository extends JpaRepository<User, UUID>{
     Optional<User> findByUsercode(String usercode);
 
     Optional<User> findByEmail(String email);
+
+    @Query(
+        value = """
+            SELECT users.name, users.surname
+            FROM users
+            WHERE users.usercode = ?1
+                """,
+        nativeQuery = true
+    )
+    Optional<UserNameAndSurnameProjection> findNameAndSurnameByUsercode(String usercode);
 }

@@ -2,6 +2,7 @@ package com.jcooldevelopment.easybank_api.service.Pdf;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -10,6 +11,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
+import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
+import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.repository.OperationRepository;
 
 @Service
@@ -27,9 +30,27 @@ public class PdfServiceImpl implements PdfService{
     @Override
     public String createOperationReceipt(UUID operationId) throws IOException{
         if(operationId != null){
+            // Get operation data
+            Operation operation = this.operationRepository.findById(operationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Operation not found."));
+
+            // Date and time format
+            DateTimeFormatter esFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"); // Spanish format
+            DateTimeFormatter enFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); // English format
+
             // Process Thymeleaf template
             Context context = new Context();
-            // context.setVariable("domain", domain);
+            context.setVariable("date_and_time", operation.getCreatedAt().format(enFormatter));
+            context.setVariable("operationType", operation.getType());
+            context.setVariable("operationStatus", operation.getStatus());
+            context.setVariable("amount", "12"); // It must return the amount from one of both movements or create a new operation column
+            context.setVariable("operationId", operationId);
+            context.setVariable("concept", operation.getConcept());
+            context.setVariable("ordererName", "Paco"); // It must return the person who authorize this operation
+            context.setVariable("ordererIban", operation.getOrdererAccount().getIban());
+            context.setVariable("beneficiaryName", "Pepe"); // This isn't needed
+            context.setVariable("beneficiaryIban", operation.getCounterpartAccount().getIban());
+
             // Careful with Flying Saucer, it does not work with modern css (Flexbox, rem, etc.)
             String html = templateEngine.process("operationReceipt", context);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
