@@ -2,6 +2,7 @@ package com.jcooldevelopment.easybank_api.service.Pdf;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class PdfServiceImpl implements PdfService{
 
     // https://es.stackoverflow.com/questions/497677/generar-cabecera-pdf-en-thymeleaf-flying-saucer-pdf-itext
     @Override
-    public byte[] createOperationReceipt(UUID operationId) throws IOException{
+    public String createOperationReceipt(UUID operationId) throws IOException{
         if(operationId != null){
             // Process Thymeleaf template
             Context context = new Context();
@@ -39,7 +40,11 @@ public class PdfServiceImpl implements PdfService{
             renderer.finishPDF();
             baos.close();
             byte[] pdfReceipt = baos.toByteArray();
-            return pdfReceipt;
+
+            // Transform to base64 since every browser can read this format and is easier for frontend
+            // https://stackoverflow.com/questions/50260391/open-pdf-from-bytes-array-in-angular-5
+            String string = Base64.getEncoder().encodeToString(pdfReceipt);
+            return string;
         }
         return null;
     }

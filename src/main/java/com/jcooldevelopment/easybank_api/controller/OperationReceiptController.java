@@ -24,13 +24,13 @@ public class OperationReceiptController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Apiresponse<byte[]>> getOperationReceipt(@PathVariable UUID id){
-        byte[] pdf;
+    public ResponseEntity<Apiresponse<String>> getOperationReceipt(@PathVariable UUID id){
+        String pdf;
         try {
             pdf = this.pdfService.createOperationReceipt(id);
             return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new Apiresponse<byte[]>("Operation receipt created.", pdf));
+                .body(new Apiresponse<String>("Operation receipt created.", pdf));
         } catch (IOException e) {
             // TODO Auto-generated catch block  
             e.printStackTrace();

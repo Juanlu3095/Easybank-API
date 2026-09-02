@@ -6,5 +6,5 @@ import java.io.IOException;
 
 public interface PdfService {
     
-    byte[] createOperationReceipt (UUID operationId) throws IOException;
+    String createOperationReceipt (UUID operationId) throws IOException;
 }
