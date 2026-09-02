@@ -24,7 +24,7 @@ body{
 }
 
 .logo-and-doc-name img{
-    width: 20%;
+    width: 20% !important;
 }
 
 /* MAIN */

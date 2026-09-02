@@ -30,6 +30,7 @@ public class PdfServiceImpl implements PdfService{
             // Process Thymeleaf template
             Context context = new Context();
             // context.setVariable("domain", domain);
+            // Careful with Flying Saucer, it does not work with modern css (Flexbox, rem, etc.)
             String html = templateEngine.process("operationReceipt", context);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
