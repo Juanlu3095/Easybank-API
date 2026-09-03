@@ -43,12 +43,11 @@ public class PdfServiceImpl implements PdfService{
             context.setVariable("date_and_time", operation.getCreatedAt().format(enFormatter));
             context.setVariable("operationType", operation.getType());
             context.setVariable("operationStatus", operation.getStatus());
-            context.setVariable("amount", "12"); // It must return the amount from one of both movements or create a new operation column
+            context.setVariable("amount", operation.getMovements().getFirst().getAmount().abs()); // return absolute value
             context.setVariable("operationId", operationId);
             context.setVariable("concept", operation.getConcept());
             context.setVariable("ordererName", "Paco"); // It must return the person who authorize this operation
             context.setVariable("ordererIban", operation.getOrdererAccount().getIban());
-            context.setVariable("beneficiaryName", "Pepe"); // This isn't needed
             context.setVariable("beneficiaryIban", operation.getCounterpartAccount().getIban());
 
             // Careful with Flying Saucer, it does not work with modern css (Flexbox, rem, etc.)
