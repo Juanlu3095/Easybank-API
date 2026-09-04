@@ -37,6 +37,7 @@ public class OperationMapper {
         operationDto.setId(operation.getId());
         operationDto.setConcept(operation.getConcept());
         operationDto.setCounterpartAccountIban(operation.getCounterpartExternalAccount());
+        operationDto.setOrderer(operation.getOrderer().getName() + " " + operation.getOrderer().getSurname());
         operationDto.setOrdererAccountIban(operation.getCounterpartAccount().getIban());
         operationDto.setStatus(operation.getStatus());
         operationDto.setType(operation.getType());
@@ -108,6 +109,7 @@ public class OperationMapper {
         operationDto.setStatus(OperationStatus.valueOf(operationProjection.status()));
         operationDto.setType(OperationType.valueOf(operationProjection.type()));
         operationDto.setOrdererAccountIban(operationProjection.ordererAccountIban());
+        operationDto.setOrderer(operationProjection.ordererName() + " " + operationProjection.ordererSurname());
 
         if(operationProjection.counterpartAccountIban() != null){
             operationDto.setCounterpartAccountIban(operationProjection.counterpartAccountIban());

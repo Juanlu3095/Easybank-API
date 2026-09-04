@@ -50,7 +50,9 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>, Jpa
         operation.status,
         operation.type,
         operation.updated_at as updatedAt,
-        (SELECT account.iban FROM account WHERE account.id = operation.orderer_account_id) as ordererAccountIban
+        (SELECT account.iban FROM account WHERE account.id = operation.orderer_account_id) as ordererAccountIban,
+        users.name as ordererName,
+        users.surname as ordererSurname
         FROM operation
         INNER JOIN account ON operation.orderer_account_id = account.id
         INNER JOIN user_account ON account.id = user_account.account_id
@@ -82,9 +84,12 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>, Jpa
         operation.status,
         operation.type,
         operation.updated_at as updatedAt,
-        (SELECT account.iban FROM account WHERE account.id = operation.orderer_account_id) as ordererAccountIban
+        (SELECT account.iban FROM account WHERE account.id = operation.orderer_account_id) as ordererAccountIban,
+        users.name as ordererName, 
+        users.surname as ordererSurname
         FROM operation
-        WHERE operation.id = ?1 
+        INNER JOIN users ON operation.orderer_user_id = users.id
+        WHERE operation.id = ?1
         """,
         nativeQuery = true
     )
@@ -123,7 +128,9 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>, Jpa
         operation.status,
         operation.type,
         operation.updated_at as updatedAt,
-        (SELECT account.iban FROM account WHERE account.id = operation.orderer_account_id) as ordererAccountIban
+        (SELECT account.iban FROM account WHERE account.id = operation.orderer_account_id) as ordererAccountIban,
+        users.name as ordererName,
+        users.surname as ordererSurname
         FROM operation
         INNER JOIN account ON 
             operation.orderer_account_id = account.id

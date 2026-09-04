@@ -31,6 +31,8 @@ public class OperationAdminDto {
 
     private String counterpartExternalAccount;
 
+    private String ordererName;
+
     private AccountDtoNoUsers ordererAccount;
 
     private LocalDateTime createdAt;

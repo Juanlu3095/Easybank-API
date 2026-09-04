@@ -42,6 +42,10 @@ public class Operation {
     private OperationType type;
 
     @ManyToOne
+    @JoinColumn(name = "orderer_user_id", nullable = false)
+    private User orderer;
+
+    @ManyToOne
     @JoinColumn(name = "orderer_account_id", nullable = false)
     private Account ordererAccount;
 
@@ -60,11 +64,21 @@ public class Operation {
     private OperationStatus status;
 
     @CreationTimestamp // Put this here because even with columnDefinition, it does not create this dateTime in app to return it
-    @Column(name = "created_at", insertable = false, updatable = false)
+    @Column(name = "created_at",
+            columnDefinition = "TIMESTAMP DEFAULT NOW()",
+            insertable = false,
+            updatable = false,
+            nullable = true
+    )
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", insertable = false, updatable = true) // updatable true for updating in put requests
+    @Column(name = "updated_at",
+            columnDefinition = "TIMESTAMP DEFAULT NOW()",
+            insertable = false,
+            updatable = true, // updatable true for updating in put requests
+            nullable = true
+    ) 
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "operation", fetch = FetchType.LAZY)

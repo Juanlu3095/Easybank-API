@@ -18,6 +18,8 @@ import java.util.UUID;
  * @param type
  * @param updatedAt
  * @param ordererAccountIban
+ * @param ordererName
+ * @param ordererSurname
  */
 public record OperationProjection(
     UUID id,
@@ -28,7 +30,9 @@ public record OperationProjection(
     String status,
     String type,
     LocalDateTime updatedAt,
-    String ordererAccountIban
+    String ordererAccountIban,
+    String ordererName,
+    String ordererSurname
 ) {
 
 }

@@ -29,6 +29,8 @@ public class OperationDto {
 
     private String counterpartAccountIban;
 
+    private String orderer;
+
     private String ordererAccountIban;
 
     private LocalDateTime createdAt;

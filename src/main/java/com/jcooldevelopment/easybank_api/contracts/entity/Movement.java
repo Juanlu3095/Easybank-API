@@ -47,10 +47,20 @@ public class Movement {
     private BigDecimal amount;
 
     @CreationTimestamp
-    @Column(name = "created_at", insertable = false, updatable = false)
+    @Column(name = "created_at",
+            columnDefinition = "TIMESTAMP DEFAULT NOW()",
+            insertable = false,
+            updatable = false,
+            nullable = true
+    )
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", insertable = false, updatable = true) // updatable true for updating in put requests
+    @Column(name = "updated_at",
+            columnDefinition = "TIMESTAMP DEFAULT NOW()",
+            insertable = false,
+            updatable = true, // updatable true for updating in put requests
+            nullable = true
+    )
     private LocalDateTime updatedAt;
 }

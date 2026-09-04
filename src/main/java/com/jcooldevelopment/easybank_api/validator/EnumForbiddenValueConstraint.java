@@ -10,7 +10,7 @@ public class EnumForbiddenValueConstraint implements ConstraintValidator<NotEnum
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value.isBlank()) return false;
+        if (value == null || value.isBlank()) return false;
 
         try {
             return !(OperationType.valueOf(value).equals(OperationType.BALANCE_ADJUSTMENT));

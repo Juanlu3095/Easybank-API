@@ -46,9 +46,10 @@ public class PdfServiceImpl implements PdfService{
             context.setVariable("amount", operation.getMovements().getFirst().getAmount().abs()); // return absolute value
             context.setVariable("operationId", operationId);
             context.setVariable("concept", operation.getConcept());
-            context.setVariable("ordererName", "Paco"); // It must return the person who authorize this operation
+            context.setVariable("orderer", operation.getOrderer().getName() + " " + operation.getOrderer().getSurname()); // It must return the person who authorize this operation
             context.setVariable("ordererIban", operation.getOrdererAccount().getIban());
-            context.setVariable("beneficiaryIban", operation.getCounterpartAccount().getIban());
+            context.setVariable("beneficiaryIban", operation.getCounterpartAccount() != null ? 
+                operation.getCounterpartAccount().getIban() : operation.getCounterpartExternalAccount());
 
             // Careful with Flying Saucer, it does not work with modern css (Flexbox, rem, etc.)
             String html = templateEngine.process("operationReceipt", context);

@@ -19,6 +19,7 @@ import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.contracts.entity.Account;
 import com.jcooldevelopment.easybank_api.contracts.entity.Movement;
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
+import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.AccountPurpose;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
@@ -50,6 +51,7 @@ public class OperationServiceImpl implements OperationService{
     private final OperationRepository operationRepository;
     private final MovementRepository movementRepository;
     private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
     private final OperationMapper operationMapper;
     private final MovementMapper movementMapper;
     private final Environment env;
@@ -66,6 +68,7 @@ public class OperationServiceImpl implements OperationService{
         this.operationRepository = operationRepository;
         this.movementRepository = movementRepository;
         this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
         this.operationMapper = operationMapper;
         this.movementMapper = movementMapper;
         this.env = env;
@@ -265,9 +268,13 @@ public class OperationServiceImpl implements OperationService{
         } else {
             beneficiaryExternalAccount = createOperationDto.getBeneficiaryAccount();
         }
+
+        User orderer = this.userRepository.findByUsercode(usercode)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         
         Operation operation = new Operation();
         operation.setConcept(createOperationDto.getConcept());
+        operation.setOrderer(orderer);
         operation.setOrdererAccount(userAccount);
         if(createOperationDto.getBeneficiaryAccount().substring(4, 8).equals(this.env.getProperty("BANK.CODE"))){
             operation.setCounterpartAccount(beneficiaryAccount);
