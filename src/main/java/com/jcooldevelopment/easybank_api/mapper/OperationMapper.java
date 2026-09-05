@@ -12,6 +12,7 @@ import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 import com.jcooldevelopment.easybank_api.projections.operation.OperationProjection;
+import com.jcooldevelopment.easybank_api.projections.operation.OperationProjectionWithAccount;
 
 @Component
 public class OperationMapper {
@@ -76,6 +77,7 @@ public class OperationMapper {
         operationDto.setConcept(operation.getConcept());
         operationDto.setStatus(operation.getStatus());
         operationDto.setType(operation.getType());
+        operationDto.setOrderer(operation.getOrderer().getName() + " " + operation.getOrderer().getSurname());
         operationDto.setOrdererAccount(ordererAccount);
         operationDto.setCounterpartAccount(beneficiaryAccount);
         operationDto.setCounterpartExternalAccount(externalBeneficiaryAccount);
@@ -89,15 +91,31 @@ public class OperationMapper {
         return operationDto;
     }
 
-    public OperationAdminDto projectionToAdminDto(OperationProjection operationProjection){
+    public OperationAdminDto projectionToAdminDto(OperationProjectionWithAccount operationProjection){
+        AccountDtoNoUsers ordererAccount = new AccountDtoNoUsers();
+        ordererAccount.setId(operationProjection.ordererAccountId());
+        ordererAccount.setIban(operationProjection.ordererAccountIban());
+        ordererAccount.setBicSwift(operationProjection.ordererAccountBicswift());
+        ordererAccount.setPlace(operationProjection.ordererAccountPlace());
+
+        AccountDtoNoUsers counterpartAccount = new AccountDtoNoUsers();
+        counterpartAccount.setId(operationProjection.counterpartAccountId());
+        counterpartAccount.setIban(operationProjection.counterpartAccountIban());
+        counterpartAccount.setBicSwift(operationProjection.counterpartAccountBicswift());
+        counterpartAccount.setPlace(operationProjection.counterpartAccountPlace());
+
         OperationAdminDto operationDto = new OperationAdminDto();
         operationDto.setId(operationProjection.id());
         operationDto.setConcept(operationProjection.concept());
         operationDto.setStatus(OperationStatus.valueOf(operationProjection.status()));
         operationDto.setType(OperationType.valueOf(operationProjection.type()));
+        operationDto.setOrderer(operationProjection.ordererName() + " " + operationProjection.ordererSurname());
+        operationDto.setOrdererAccount(ordererAccount);
+        operationDto.setCounterpartAccount(counterpartAccount);
         operationDto.setCounterpartExternalAccount(operationProjection.counterpartExternalAccountIban());
         operationDto.setCreatedAt(operationProjection.createdAt());
         operationDto.setUpdatedAt(operationProjection.updatedAt());
+        // movements
 
         return operationDto;
     }

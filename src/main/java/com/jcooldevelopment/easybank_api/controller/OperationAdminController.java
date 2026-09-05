@@ -10,6 +10,7 @@ import com.jcooldevelopment.easybank_api.service.Operation.OperationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 
+import java.net.URI;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -64,6 +65,7 @@ public class OperationAdminController {
     ){
         OperationAdminDto operation = this.operationService.createByAdmin(createOperationAdminDto);
         return ResponseEntity.status(HttpStatus.CREATED)
+            .location(URI.create("/api/client/operation/" + operation.getId()))
             .body(new Apiresponse<OperationAdminDto>("Operation created.", operation));
     }
 

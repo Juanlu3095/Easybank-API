@@ -26,6 +26,7 @@ public class PdfServiceImpl implements PdfService{
         this.templateEngine = templateEngine;
     }
 
+    // https://medium.com/linkit-intecs/create-pdf-using-angular-6-spring-boot-thymeleaf-b94cd85c69dd
     // https://es.stackoverflow.com/questions/497677/generar-cabecera-pdf-en-thymeleaf-flying-saucer-pdf-itext
     @Override
     public String createOperationReceipt(UUID operationId) throws IOException{

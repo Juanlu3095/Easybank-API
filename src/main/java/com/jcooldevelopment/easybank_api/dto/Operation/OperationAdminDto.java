@@ -31,7 +31,7 @@ public class OperationAdminDto {
 
     private String counterpartExternalAccount;
 
-    private String ordererName;
+    private String orderer;
 
     private AccountDtoNoUsers ordererAccount;
 

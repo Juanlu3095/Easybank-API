@@ -38,6 +38,7 @@ import com.jcooldevelopment.easybank_api.exception.UserNotAuthorizedException;
 import com.jcooldevelopment.easybank_api.mapper.MovementMapper;
 import com.jcooldevelopment.easybank_api.mapper.OperationMapper;
 import com.jcooldevelopment.easybank_api.projections.operation.OperationProjection;
+import com.jcooldevelopment.easybank_api.projections.operation.OperationProjectionWithAccount;
 import com.jcooldevelopment.easybank_api.repository.AccountRepository;
 import com.jcooldevelopment.easybank_api.repository.MovementRepository;
 import com.jcooldevelopment.easybank_api.repository.OperationRepository;
@@ -193,10 +194,10 @@ public class OperationServiceImpl implements OperationService{
     }
 
     public OperationAdminDto getByIdForAdmin(UUID id){
-        Operation operation = this.operationRepository.findById(id)
+        OperationProjectionWithAccount operation = this.operationRepository.findByIdAsProjectionForAdmin(id)
             .orElseThrow(() -> new ResourceNotFoundException("Operation not found."));
         
-        return this.operationMapper.EntityToAdminDto(operation);
+        return this.operationMapper.projectionToAdminDto(operation);
     }
 
     /**
@@ -241,10 +242,10 @@ public class OperationServiceImpl implements OperationService{
         if(account.getIban().equals(createOperationDto.getBeneficiaryAccount())){
             throw new OrdererAndBeneficiaryCannotBeSameException("Orderer and beneficiary IBAN accounts cannot be the same.");
         }
-        // Checks if account belongs to user;
-        if(this.accountRepository.accountBelongsToUser(account.getId(), usercode) < 1){
-            throw new UserNotAuthorizedException("User has no authorization to access the account data");
-        }
+        // Checks if account belongs to user; must verify if user has admin role, any admin can use BALANCE_ADJUSTMENT accounts
+        // if(this.accountRepository.accountBelongsToUser(account.getId(), usercode) < 1){
+        //     throw new UserNotAuthorizedException("User has no authorization to access the account data");
+        // }
         // Checks if account is internal for adjustments
         if(!account.getAccountPurpose().equals(AccountPurpose.BALANCE_ADJUSTMENT)){
             throw new AccountPurposeNotValid("This account is not valid for internal purposes.");
@@ -352,8 +353,12 @@ public class OperationServiceImpl implements OperationService{
             beneficiaryExternalAccount = createOperationDto.getBeneficiaryAccount();
         }
 
+        User orderer = this.userRepository.findByUsercode(usercode)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+
         Operation operation = new Operation();
         operation.setConcept(createOperationDto.getConcept());
+        operation.setOrderer(orderer);
         operation.setOrdererAccount(userAccount);
         operation.setStatus(OperationStatus.DONE);
         if(createOperationDto.getBeneficiaryAccount().substring(4, 8).equals(this.env.getProperty("BANK.CODE"))){

@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
 import com.jcooldevelopment.easybank_api.projections.operation.OperationProjection;
+import com.jcooldevelopment.easybank_api.projections.operation.OperationProjectionWithAccount;
 
 public interface OperationRepository extends JpaRepository<Operation, UUID>, JpaSpecificationExecutor<Operation>{
 
@@ -94,6 +95,42 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>, Jpa
         nativeQuery = true
     )
     Optional<OperationProjection> findByIdAsProjection(UUID id);
+
+    /**
+     * Obtains operation data for admin role to create operationAdminDto later.
+     * LEFT JOIN is used when operation.counterpart_account_id is null:
+     * https://es.stackoverflow.com/questions/203186/mysql-inner-join-con-columnas-id-nulas
+     * @param id
+     * @return Operation with accounts and their branches.
+     */
+    @Query(
+        value = """
+        SELECT operation.id,
+        operation.concept,
+        operation.counterpart_external_account_iban as counterpartExternalAccountIban,
+        operation.created_at as createdAt,
+        operation.status,
+        operation.type,
+        operation.updated_at as updatedAt,
+        ordererAccount.id as ordererAccountId,
+        ordererAccount.iban as ordererAccountIban,
+        ordererAccount.bic_swift as ordererAccountBicswift,
+        (SELECT branch.name FROM branch WHERE branch.id = ordererAccount.branch_id) as ordererAccountPlace,
+        users.name as ordererName, 
+        users.surname as ordererSurname,
+        counterpartAccount.id as counterpartAccountId,
+        counterpartAccount.iban as counterpartAccountIban,
+        counterpartAccount.bic_swift as counterpartAccountBicswift,
+        (SELECT branch.name FROM branch WHERE branch.id = counterpartAccount.branch_id) as counterpartAccountPlace
+        FROM operation
+        INNER JOIN users ON operation.orderer_user_id = users.id
+        INNER JOIN account ordererAccount ON operation.orderer_account_id = ordererAccount.id
+        LEFT JOIN account counterpartAccount ON operation.counterpart_account_id = counterpartAccount.id
+        WHERE operation.id = ?1
+        """,
+        nativeQuery = true
+    )
+    Optional<OperationProjectionWithAccount> findByIdAsProjectionForAdmin(UUID id);
 
     /**
      * Checks if said operation has user as orderer or beneficiary.
