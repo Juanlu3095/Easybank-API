@@ -1,9 +1,9 @@
 package com.jcooldevelopment.easybank_api.dto.Operation;
 
+import com.jcooldevelopment.easybank_api.annotations.EnumValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,10 +13,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateOperationDto {
 
-    @NotBlank(message = "Must indicate the operation type.")
-    private OperationType operationType;
+    @EnumValidatorAnnotation(
+        enumClass = OperationType.class,
+        message = "Operation type value not valid."
+    )
+    private String operationType;
 
-    @NotBlank(message = "Must indicate the status operation.")
-    private OperationStatus status;
+    @EnumValidatorAnnotation(
+        enumClass = OperationStatus.class,
+        message = "Operation status value not valid."
+    )
+    private String status;
 
 }

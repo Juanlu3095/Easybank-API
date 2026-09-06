@@ -423,8 +423,8 @@ public class OperationServiceImpl implements OperationService{
         Operation operation = this.operationRepository.findById(operationId)
             .orElseThrow(() -> new ResourceNotFoundException("Operation not found."));
 
-        operation.setType(updateOperationDto.getOperationType());
-        operation.setStatus(updateOperationDto.getStatus());
+        operation.setType(OperationType.valueOf(updateOperationDto.getOperationType()));
+        operation.setStatus(OperationStatus.valueOf(updateOperationDto.getStatus()));
         Operation updatedOperation = this.operationRepository.save(operation);
         return this.operationMapper.EntityToAdminDto(updatedOperation);
     }
