@@ -4,10 +4,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.Movement;
+import com.jcooldevelopment.easybank_api.dto.Account.AccountDtoNoUsers;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementDto;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationOnlyIban;
 import com.jcooldevelopment.easybank_api.projections.movement.MovementProjection;
+import com.jcooldevelopment.easybank_api.projections.movement.MovementProjectionWithAccountNoUsers;
 
 @Component
 public class MovementMapper {
@@ -45,6 +47,29 @@ public class MovementMapper {
         movementDto.setAmount(movement.getAmount());
         movementDto.setCreatedAt(movement.getCreatedAt());
         movementDto.setUpdatedAt(movement.getUpdatedAt());
+        return movementDto;
+    }
+
+    /**
+     * Transforms MovementProjectionWithAccountNoUsers to MovementPerOperationDto.
+     * @param MovementProjectionWithAccountNoUsers
+     * @return MovementPerOperationDto
+     */
+    public MovementPerOperationDto MovementProjectionToMovementPerOperationDto(MovementProjectionWithAccountNoUsers movementProjection){
+        AccountDtoNoUsers accountDto = new AccountDtoNoUsers();
+        accountDto.setId(movementProjection.accountId());
+        accountDto.setIban(movementProjection.accountIban());
+        accountDto.setBicSwift(movementProjection.accountBicSwift());
+        accountDto.setPlace(movementProjection.accountPlace());
+
+        MovementPerOperationDto movementDto = new MovementPerOperationDto();
+        movementDto.setId(movementProjection.id());
+        movementDto.setAccount(accountDto);
+        movementDto.setExternalAccount(movementProjection.externalAccount());
+        movementDto.setAmount(movementProjection.amount());
+        movementDto.setCreatedAt(movementProjection.createdAt());
+        movementDto.setUpdatedAt(movementProjection.updatedAt());
+
         return movementDto;
     }
 

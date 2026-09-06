@@ -23,6 +23,7 @@ import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.AccountPurpose;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
+import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationOnlyIban;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
@@ -196,8 +197,17 @@ public class OperationServiceImpl implements OperationService{
     public OperationAdminDto getByIdForAdmin(UUID id){
         OperationProjectionWithAccount operation = this.operationRepository.findByIdAsProjectionForAdmin(id)
             .orElseThrow(() -> new ResourceNotFoundException("Operation not found."));
+
+        // Search the movements by operationId, creating a List with only one uuid
+        List<MovementPerOperationDto> movements = this.movementRepository.findByOperationId(id)
+            .stream()
+            .map(movement -> this.movementMapper.MovementProjectionToMovementPerOperationDto(movement))
+            .toList();
         
-        return this.operationMapper.projectionToAdminDto(operation);
+        // CREATE A NEW OPERATION DTO FOR PROJECTION FOR ADMIN
+        OperationAdminDto operationDto = this.operationMapper.projectionToAdminDto(operation);
+        movements.forEach(movement -> operationDto.addMovement(movement));
+        return operationDto; 
     }
 
     /**

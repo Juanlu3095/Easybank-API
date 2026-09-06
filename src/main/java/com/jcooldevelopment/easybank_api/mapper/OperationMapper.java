@@ -115,7 +115,6 @@ public class OperationMapper {
         operationDto.setCounterpartExternalAccount(operationProjection.counterpartExternalAccountIban());
         operationDto.setCreatedAt(operationProjection.createdAt());
         operationDto.setUpdatedAt(operationProjection.updatedAt());
-        // movements
 
         return operationDto;
     }
