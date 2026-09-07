@@ -42,23 +42,45 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>, Jpa
     )    
     Page<Operation> findByUser(UUID id, Pageable pageable);
 
+    // https://www.migueltroyano.com/bbdd/funcion-concat-en-postgresql/
     @Query(value = """
         SELECT operation.id,
         operation.concept,
         operation.counterpart_external_account_iban as counterpartExternalAccountIban,
-        (SELECT account.iban FROM account WHERE account.id = operation.counterpart_account_id) as counterpartAccountIban,
+        counterpartAccount.iban as counterpartAccountIban,
         operation.created_at as createdAt,
         operation.status,
         operation.type,
         operation.updated_at as updatedAt,
-        (SELECT account.iban FROM account WHERE account.id = operation.orderer_account_id) as ordererAccountIban,
-        users.name as ordererName,
-        users.surname as ordererSurname
+        ordererAccount.iban as ordererAccountIban,
+        usersOrderer.name as ordererName,
+        usersOrderer.surname as ordererSurname
         FROM operation
-        INNER JOIN account ON operation.orderer_account_id = account.id
-        INNER JOIN user_account ON account.id = user_account.account_id
-        INNER JOIN users ON user_account.user_id = users.id
-        WHERE users.usercode = ?1
+        INNER JOIN account ordererAccount ON operation.orderer_account_id = ordererAccount.id
+        LEFT JOIN account counterpartAccount ON operation.counterpart_account_id = counterpartAccount.id
+        INNER JOIN user_account userAccountOrderer ON ordererAccount.id = userAccountOrderer.account_id
+        LEFT JOIN user_account userAccountCounterpart ON counterpartAccount.id = userAccountCounterpart.account_id
+        INNER JOIN users usersOrderer ON userAccountOrderer.user_id = usersOrderer.id
+        LEFT JOIN users usersCounterpart ON userAccountCounterpart.user_id = usersCounterpart.id
+        WHERE usersOrderer.usercode = ?1
+            AND (?2 IS NULL
+                OR ?2 = ''
+                OR operation.concept LIKE CONCAT('%', ?2, '%'))
+            AND (?3 IS NULL
+                OR ?3 = ''
+                OR operation.status LIKE CONCAT('%', ?3, '%'))
+            AND (?4 IS NULL
+                OR ?4 = ''
+                OR operation.type LIKE CONCAT('%', ?4, '%'))
+            AND (?5 IS NULL
+                OR ?5 = ''
+                OR ordererAccount.iban = ?5)
+            AND (?6 IS NULL
+                OR ?6 = ''
+                OR counterpartAccount.iban = ?6)
+            AND (?7 IS NULL
+                OR ?7 = ''
+                OR operation.counterpart_external_account_iban = ?7)
         ORDER BY operation.created_at DESC
         """,
         // CountQuery to tell JPA about info for pagination
@@ -68,11 +90,38 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>, Jpa
         INNER JOIN account ON operation.orderer_account_id = account.id
         INNER JOIN user_account ON account.id = user_account.account_id
         INNER JOIN users ON user_account.user_id = users.id
-        WHERE users.usercode = ?1 
+        WHERE users.usercode = ?1
+        AND (?2 IS NULL
+                OR ?2 = ''
+                OR operation.concept LIKE CONCAT('%', ?2, '%'))
+            AND (?3 IS NULL
+                OR ?3 = ''
+                OR operation.status LIKE CONCAT('%', ?3, '%'))
+            AND (?4 IS NULL
+                OR ?4 = ''
+                OR operation.type LIKE CONCAT('%', ?4, '%'))
+            AND (?5 IS NULL
+                OR ?5 = ''
+                OR ordererAccount.iban = ?5)
+            AND (?6 IS NULL
+                OR ?6 = ''
+                OR counterpartAccount.iban = ?6)
+            AND (?7 IS NULL
+                OR ?7 = ''
+                OR operation.counterpart_external_account_iban = ?7)
         """,
         nativeQuery = true
     )
-    Page<OperationProjection> findByUserWithProjection(String usercode, Pageable pageable);
+    Page<OperationProjection> findByUserWithProjection(
+        String usercode,
+        String concept,
+        String status,
+        String type,
+        String ordererIban,
+        String counterpartIban,
+        String counterpartExternalIban,
+        Pageable pageable
+    );
 
     // No need for join if account.iban is obtained by sub-query
     @Query(

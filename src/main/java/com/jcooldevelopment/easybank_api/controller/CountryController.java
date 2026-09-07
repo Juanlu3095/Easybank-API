@@ -56,7 +56,6 @@ public class CountryController {
     public ResponseEntity<Apiresponse<CountryDto>> putCountry(@PathVariable int id, @Valid @RequestBody UpdateCountryDto updateCountryDto) {
         CountryDto updatedCountry = this.countryService.update(id, updateCountryDto);
         return ResponseEntity.status(HttpStatus.OK)
-            .location(URI.create("/api/country/" + updatedCountry.getId()))
             .body(new Apiresponse<CountryDto>("Country updated.", updatedCountry));
     }
 

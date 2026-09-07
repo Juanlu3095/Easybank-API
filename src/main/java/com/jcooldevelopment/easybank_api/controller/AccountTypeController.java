@@ -57,7 +57,6 @@ public class AccountTypeController {
     public ResponseEntity<Apiresponse<AccountTypeDto>> putMessage(@PathVariable UUID id, @Valid @RequestBody UpdateAccountTypeDto updateAccountTypeDto) {
         AccountTypeDto updatedAccountType = this.accountTypeService.update(id, updateAccountTypeDto);
         return ResponseEntity.status(HttpStatus.OK)
-            .location(URI.create("/api/Accounttype/" + updatedAccountType.getId()))
             .body(new Apiresponse<AccountTypeDto>("Account type updated.", updatedAccountType));
     }
 

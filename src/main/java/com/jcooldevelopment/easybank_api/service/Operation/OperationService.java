@@ -33,7 +33,7 @@ public interface OperationService {
      * @param size The number of results in each page.
      * @return Paginated response with operation DTOs for client role.
      */
-    PaginatedResponse<OperationDto> getByAuth(int page, int size);
+    PaginatedResponse<OperationDto> getByAuth(int page, int size, String concept, String status, String type, String ordererIban, String counterpartIban, String counterpartExternalIban);
 
     /**
      * Obtains all operations for the given user by JWT in database.

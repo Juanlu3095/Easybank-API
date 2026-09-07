@@ -59,7 +59,6 @@ public class BranchAdminController {
     ) {
         BranchAdminDto updatedBranch = this.branchService.update(id, updateBranchDto);
         return ResponseEntity.status(HttpStatus.OK)
-            .location(URI.create("/api/branch/" + updatedBranch.getId()))
             .body(new Apiresponse<BranchAdminDto>("Branch updated.", updatedBranch));
     }
 

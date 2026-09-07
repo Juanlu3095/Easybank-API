@@ -37,9 +37,15 @@ public class OperationClientController {
     @GetMapping("")
     public ResponseEntity<Apiresponse<PaginatedResponse<OperationDto>>> getAllOperations(
         @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page,
-        @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size
+        @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size,
+        @RequestParam(required = false, defaultValue = "") String concept,
+        @RequestParam(required = false, defaultValue = "") String status,
+        @RequestParam(required = false, defaultValue = "") String type,
+        @RequestParam(required = false, defaultValue = "") String ordererIban,
+        @RequestParam(required = false, defaultValue = "") String counterpartIban,
+        @RequestParam(required = false, defaultValue = "") String counterpartExternalIban
     )  {
-        PaginatedResponse<OperationDto> operations = this.operationService.getByAuth(page, size);
+        PaginatedResponse<OperationDto> operations = this.operationService.getByAuth(page, size, concept, status, type, ordererIban, counterpartIban, counterpartExternalIban);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<PaginatedResponse<OperationDto>>("Operations found.", operations));
     }

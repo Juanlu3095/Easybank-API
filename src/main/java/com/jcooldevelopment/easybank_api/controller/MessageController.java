@@ -68,7 +68,6 @@ public class MessageController {
     public ResponseEntity<Apiresponse<MessageDto>> putMessage(@PathVariable UUID id, @Valid @RequestBody UpdateMessageDto message) {
         MessageDto updatedMessage = this.messageService.update(id, message);
         return ResponseEntity.status(HttpStatus.OK)
-            .location(URI.create("/api/message/" + updatedMessage.getId()))
             .body(new Apiresponse<MessageDto>("Message updated.", updatedMessage));
     }
 

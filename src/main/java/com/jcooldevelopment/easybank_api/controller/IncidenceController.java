@@ -65,7 +65,6 @@ public class IncidenceController {
     public ResponseEntity<Apiresponse<IncidenceDto>> putIncidence(@PathVariable UUID id, @Valid @RequestBody UpdateIncidenceDto updateIncidenceDto) {
         IncidenceDto updatedIncidence = this.incidenceService.update(id, updateIncidenceDto);
         return ResponseEntity.status(HttpStatus.OK)
-            .location(URI.create("/api/incidence/" + updatedIncidence.getId()))
             .body(new Apiresponse<IncidenceDto>("Incidence updated.", updatedIncidence));
     }
 

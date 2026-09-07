@@ -64,7 +64,6 @@ public class UserController {
     public ResponseEntity<Apiresponse<UserDto>> putUser(@PathVariable UUID id, @Valid @RequestBody UpdateUserDto updateUserDto) {
         UserDto updatedUser = this.userService.update(id, updateUserDto);
         return ResponseEntity.status(HttpStatus.OK)
-            .location(URI.create("/api/user/" + updatedUser.getId()))
             .body(new Apiresponse<UserDto>("User updated.", updatedUser));
     }
 

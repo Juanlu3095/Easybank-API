@@ -71,7 +71,6 @@ public class AccountAdminController {
         AccountAdminDto account = this.accountService.updateByAdmin(id, updateAccountDto);
         return ResponseEntity
             .status(HttpStatus.OK)
-            .location(URI.create("/api/admin/account/" + account.getId()))
             .body(new Apiresponse<AccountAdminDto>("Account updated.", account));   
     }
 
@@ -88,7 +87,6 @@ public class AccountAdminController {
         AccountAdminDto updatedAccount = this.accountService.deleteUserFromAccount(id, userIds.getIds());
         return ResponseEntity
             .status(HttpStatus.OK)
-            .location(URI.create("/api/admin/account/" + updatedAccount.getId()))
             .body(new Apiresponse<>("Users delete from account succesfully.", updatedAccount));
     }
 }
