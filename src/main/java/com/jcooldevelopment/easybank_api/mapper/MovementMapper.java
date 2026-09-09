@@ -79,7 +79,7 @@ public class MovementMapper {
         movementOnlyIban.setAmount(movement.getAmount());
         movementOnlyIban.setOperationId(movement.getOperation().getId());
 
-        if(movement.getAccount().getIban() != null) {
+        if(movement.getAccount() != null) {
             movementOnlyIban.setAccountIban(movement.getAccount().getIban());
         } else {
             movementOnlyIban.setAccountIban(movement.getExternalAccount());

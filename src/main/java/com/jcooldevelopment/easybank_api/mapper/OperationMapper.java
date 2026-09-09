@@ -39,7 +39,9 @@ public class OperationMapper {
         operationDto.setConcept(operation.getConcept());
         operationDto.setCounterpartAccountIban(operation.getCounterpartExternalAccount());
         operationDto.setOrderer(operation.getOrderer().getName() + " " + operation.getOrderer().getSurname());
-        operationDto.setOrdererAccountIban(operation.getCounterpartAccount().getIban());
+        if (operation.getCounterpartAccount() != null){
+            operationDto.setOrdererAccountIban(operation.getCounterpartAccount().getIban());
+        }
         operationDto.setStatus(operation.getStatus());
         operationDto.setType(operation.getType());
         operationDto.setCreatedAt(operation.getCreatedAt());

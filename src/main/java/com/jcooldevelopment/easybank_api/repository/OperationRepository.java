@@ -87,19 +87,22 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>, Jpa
         countQuery = """
         SELECT COUNT(*)
         FROM operation
-        INNER JOIN account ON operation.orderer_account_id = account.id
-        INNER JOIN user_account ON account.id = user_account.account_id
-        INNER JOIN users ON user_account.user_id = users.id
-        WHERE users.usercode = ?1
+        INNER JOIN account ordererAccount ON operation.orderer_account_id = ordererAccount.id
+        LEFT JOIN account counterpartAccount ON operation.counterpart_account_id = counterpartAccount.id
+        INNER JOIN user_account userAccountOrderer ON ordererAccount.id = userAccountOrderer.account_id
+        LEFT JOIN user_account userAccountCounterpart ON counterpartAccount.id = userAccountCounterpart.account_id
+        INNER JOIN users usersOrderer ON userAccountOrderer.user_id = usersOrderer.id
+        LEFT JOIN users usersCounterpart ON userAccountCounterpart.user_id = usersCounterpart.id
+        WHERE usersOrderer.usercode = ?1
         AND (?2 IS NULL
                 OR ?2 = ''
                 OR operation.concept LIKE CONCAT('%', ?2, '%'))
             AND (?3 IS NULL
                 OR ?3 = ''
-                OR operation.status LIKE CONCAT('%', ?3, '%'))
+                OR operation.status = ?3)
             AND (?4 IS NULL
                 OR ?4 = ''
-                OR operation.type LIKE CONCAT('%', ?4, '%'))
+                OR operation.type = ?4)
             AND (?5 IS NULL
                 OR ?5 = ''
                 OR ordererAccount.iban = ?5)
