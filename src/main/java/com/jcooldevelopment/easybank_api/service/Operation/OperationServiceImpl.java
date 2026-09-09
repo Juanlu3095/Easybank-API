@@ -142,11 +142,19 @@ public class OperationServiceImpl implements OperationService{
     }
 
     @Override
-    public PaginatedResponse<OperationDto> getByAuth(int page, int size, String concept, String status, String type, String ordererIban, String counterpartIban, String counterpartExternalIban) {
+    public PaginatedResponse<OperationDto> getByAuth(int page, int size, String concept, String status, String type, String ordererIban, String counterpartIban) {
         String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
 
+        String accountCounterpart = null;
+        String accountExternalCounterpart = null;
+
         Pageable pageable = PageRequest.of(page - 1, size); // Sort in custom sql query not here, it creates problems
-        Page<OperationProjection> operations = this.operationRepository.findByUserWithProjection(usercode, concept, status, type, ordererIban, counterpartIban, counterpartExternalIban, pageable);
+        if (counterpartIban.substring(4, 8).equals(this.env.getProperty("BANK.CODE"))) {
+            accountCounterpart = counterpartIban;
+        } else {
+            accountExternalCounterpart = counterpartIban;
+        }
+        Page<OperationProjection> operations = this.operationRepository.findByUserWithProjection(usercode, concept, status, type, ordererIban, accountCounterpart, accountExternalCounterpart, pageable);
 
         // Create a map of movements and then group by operationId
         Map<UUID, List<MovementPerOperationOnlyIban>> movementsByOperation = this.getMovementsByOperations(operations);

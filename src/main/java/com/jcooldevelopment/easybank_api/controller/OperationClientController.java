@@ -42,10 +42,9 @@ public class OperationClientController {
         @RequestParam(required = false, defaultValue = "") String status,
         @RequestParam(required = false, defaultValue = "") String type,
         @RequestParam(required = false, defaultValue = "") String ordererIban,
-        @RequestParam(required = false, defaultValue = "") String counterpartIban,
-        @RequestParam(required = false, defaultValue = "") String counterpartExternalIban
+        @RequestParam(required = false, defaultValue = "") String counterpartIban
     )  {
-        PaginatedResponse<OperationDto> operations = this.operationService.getByAuth(page, size, concept, status, type, ordererIban, counterpartIban, counterpartExternalIban);
+        PaginatedResponse<OperationDto> operations = this.operationService.getByAuth(page, size, concept, status, type, ordererIban, counterpartIban);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<PaginatedResponse<OperationDto>>("Operations found.", operations));
     }
