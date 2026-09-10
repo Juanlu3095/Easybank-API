@@ -8,7 +8,6 @@ import com.jcooldevelopment.easybank_api.dto.Operation.OperationFilterDto;
 import com.jcooldevelopment.easybank_api.service.Operation.OperationService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 
 import java.net.URI;
 import java.util.UUID;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/client/operation")
@@ -55,10 +53,9 @@ public class OperationClientController {
     @GetMapping("/account/{accountId}")
     public ResponseEntity<Apiresponse<PaginatedResponse<OperationDto>>> getOperationsByAccount(
         @PathVariable UUID accountId,
-        @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page,
-        @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size
+        @Valid OperationFilterDto operationFilterDto
     ){
-        PaginatedResponse<OperationDto> operations = this.operationService.getByAccount(accountId, page, size);
+        PaginatedResponse<OperationDto> operations = this.operationService.getByAccount(accountId, operationFilterDto);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<PaginatedResponse<OperationDto>>("Operations found.", operations));
     }

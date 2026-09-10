@@ -111,15 +111,32 @@ public class OperationServiceImpl implements OperationService{
     }
 
     @Override
-    public PaginatedResponse<OperationDto> getByAccount(UUID accountId, int page, int size) {
+    public PaginatedResponse<OperationDto> getByAccount(UUID accountId, OperationFilterDto operationFilterDto) {
         // Check if account belongs to authenticated user
         String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
         if(this.accountRepository.accountBelongsToUser(accountId, usercode) < 1){
-            throw new UserNotAuthorizedException("User has no authorization to access the account data");
+            throw new UserNotAuthorizedException("User has no authorization to access the account data.");
         }
 
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
-        Page<OperationProjection> operations = this.operationRepository.findByAccountIdWithProjection(accountId, pageable);
+        Pageable pageable = PageRequest.of(operationFilterDto.getPage() - 1, operationFilterDto.getSize(), Sort.by(Operation::getCreatedAt).descending());
+        String accountCounterpartIban = "";
+        String accountCounterpartExternalIban = "";
+        if (operationFilterDto.getCounterpartIban() == null || operationFilterDto.getCounterpartIban().substring(4, 8).equals(this.env.getProperty("BANK.CODE"))) {
+            accountCounterpartIban = operationFilterDto.getCounterpartIban();
+        } else {
+            accountCounterpartExternalIban = operationFilterDto.getCounterpartIban();
+        }
+
+        Page<OperationProjection> operations = this.operationRepository.findByAccountIdWithProjection(
+            accountId, 
+            operationFilterDto.getConcept(),
+            operationFilterDto.getStatus(),
+            operationFilterDto.getType(),
+            operationFilterDto.getOrdererIban(),
+            accountCounterpartIban,
+            accountCounterpartExternalIban,
+            pageable
+        );
 
         // Create a map of movements and then group by operationId
         Map<UUID, List<MovementPerOperationOnlyIban>> movementsByOperation = this.getMovementsByOperations(operations);

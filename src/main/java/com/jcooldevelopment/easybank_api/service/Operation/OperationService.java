@@ -21,11 +21,10 @@ public interface OperationService {
 
     /**
      * Obtains all operations for the given account in database.
-     * @param page In a paginated response, the result page to obtain.
-     * @param size The number of results in each page.
+     * @param operationFilterDto It contains filters: page number and size, concept, type, status and orderer and beneficiary IBANs.
      * @return Paginated response with operation DTOs.
      */
-    PaginatedResponse<OperationDto> getByAccount(UUID accountId, int page, int size);
+    PaginatedResponse<OperationDto> getByAccount(UUID accountId, OperationFilterDto operationFilterDto);
 
     /**
      * Obtains all operations for the given user by JWT in database.

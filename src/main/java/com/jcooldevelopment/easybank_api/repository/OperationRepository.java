@@ -212,32 +212,82 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>, Jpa
         SELECT operation.id,
         operation.concept,
         operation.counterpart_external_account_iban as counterpartExternalAccountIban,
-        (SELECT account.iban FROM account WHERE account.id = operation.counterpart_account_id) as counterpartAccountIban,
+        counterpartAccount.iban as counterpartAccountIban,
         operation.created_at as createdAt,
         operation.status,
         operation.type,
         operation.updated_at as updatedAt,
-        (SELECT account.iban FROM account WHERE account.id = operation.orderer_account_id) as ordererAccountIban,
+        ordererAccount.iban as ordererAccountIban,
         users.name as ordererName,
         users.surname as ordererSurname
         FROM operation
-        INNER JOIN account ON 
-            operation.orderer_account_id = account.id
-            OR operation.counterpart_account_id = account.id
-        INNER JOIN user_account ON account.id = user_account.account_id
+        INNER JOIN account ordererAccount ON 
+            operation.orderer_account_id = ordererAccount.id
+        LEFT JOIN account counterpartAccount ON
+            operation.counterpart_account_id = counterpartAccount.id
+        INNER JOIN user_account ON ordererAccount.id = user_account.account_id
         INNER JOIN users ON user_account.user_id = users.id
-        WHERE account.id = ?1
+        WHERE ordererAccount.id = ?1
+            OR counterpartAccount.id = ?1
+            AND (?2 IS NULL
+                OR ?2 = ''
+                OR operation.concept LIKE CONCAT('%', ?2, '%'))
+            AND (?3 IS NULL
+                OR ?3 = ''
+                OR operation.status = ?3)
+            AND (?4 IS NULL
+                OR ?4 = ''
+                OR operation.type = ?4)
+            AND (?5 IS NULL
+                OR ?5 = ''
+                OR ordererAccount.iban = ?5)
+            AND (?6 IS NULL
+                OR ?6 = ''
+                OR counterpartAccount.iban = ?6)
+            AND (?7 IS NULL
+                OR ?7 = ''
+                OR operation.counterpart_external_account_iban = ?7)
         ORDER BY operation.created_at DESC
         """,
         nativeQuery = true,
         countQuery = """
         SELECT COUNT(*)
         FROM operation
-        INNER JOIN account ON operation.orderer_account_id = account.id
-        INNER JOIN user_account ON account.id = user_account.account_id
+        INNER JOIN account ordererAccount ON 
+            operation.orderer_account_id = ordererAccount.id
+        LEFT JOIN account counterpartAccount ON
+            operation.counterpart_account_id = counterpartAccount.id
+        INNER JOIN user_account ON ordererAccount.id = user_account.account_id
         INNER JOIN users ON user_account.user_id = users.id
-        WHERE account.id = ?1
+        WHERE ordererAccount.id = ?1
+            AND (?2 IS NULL
+                OR ?2 = ''
+                OR operation.concept LIKE CONCAT('%', ?2, '%'))
+            AND (?3 IS NULL
+                OR ?3 = ''
+                OR operation.status = ?3)
+            AND (?4 IS NULL
+                OR ?4 = ''
+                OR operation.type = ?4)
+            AND (?5 IS NULL
+                OR ?5 = ''
+                OR ordererAccount.iban = ?5)
+            AND (?6 IS NULL
+                OR ?6 = ''
+                OR counterpartAccount.iban = ?6)
+            AND (?7 IS NULL
+                OR ?7 = ''
+                OR operation.counterpart_external_account_iban = ?7)
         """
     )
-    Page<OperationProjection> findByAccountIdWithProjection(UUID accountId, Pageable pageable);
+    Page<OperationProjection> findByAccountIdWithProjection(
+        UUID accountId, 
+        String concept,
+        String status,
+        String type,
+        String ordererIban,
+        String counterpartIban,
+        String counterpartExternalIban,
+        Pageable pageable
+    );
 }
