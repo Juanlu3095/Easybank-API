@@ -47,6 +47,6 @@ public class UpdateUserDto {
     @Length(min = 8, max = 100, message = "Password length must have a minimum of {min} characters and a maximum of {max}.")
     private String password;
 
-    @EnumValidatorAnnotation(enumClass = UserRole.class, message = "Role is not a valid value.")
+    @EnumValidatorAnnotation(enumClass = UserRole.class, allowNull = false, message = "Role is not a valid value.")
     private String role;
 }

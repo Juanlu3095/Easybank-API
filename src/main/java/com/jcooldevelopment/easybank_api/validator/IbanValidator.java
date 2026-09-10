@@ -12,9 +12,17 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class IbanValidator implements ConstraintValidator<IbanAnnotation, String>{
 
+    boolean allowNull;
+
+    @Override
+    public void initialize(IbanAnnotation ibanAnnotation){
+        allowNull = ibanAnnotation.allowNull();
+    }
+
     // https://github.com/arturmkrtchyan/iban4j
     @Override
     public boolean isValid(String iban, ConstraintValidatorContext context) {
+        if(allowNull && iban == null) return true;
         try {
             IbanUtil.validate(iban);
             return true;

@@ -24,7 +24,7 @@ public class CreateOperationAdminDto {
     @NotNull(message = "There is no account selected.")
     private UUID accountId;
 
-    @IbanAnnotation(message = "IBAN not valid.")
+    @IbanAnnotation(message = "IBAN not valid.", allowNull = false)
     private String beneficiaryAccount;
 
     @Digits(integer = 17, fraction = 2, message = "The amount must have a maximum of 17 integers and 2 decimals.")

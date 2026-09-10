@@ -15,9 +15,10 @@ import jakarta.persistence.criteria.Join;
 // Specification cannot be null error: https://stackoverflow.com/questions/60009797/jpa-specification-and-null-parameter-in-where-clause
 public class OperationSpecs {
 
+    // All params can be null or "", but we need to verify null since it will produce an error if not this way
     public static Specification<Operation> findByConcept(String concept){
         return (root, query, criteriaBuilder) -> {
-            if(concept.isEmpty()){
+            if(concept == null || concept.isEmpty()){
                 return criteriaBuilder.conjunction(); // if concept is "" it ignores this query
             }
             return criteriaBuilder.equal(root.get("concept"), concept);
@@ -26,7 +27,7 @@ public class OperationSpecs {
 
     public static Specification<Operation> findByType(String type){
         return (root, query, criteriaBuilder) -> {
-            if(type.isEmpty()){
+            if(type == null || type.isEmpty()){
                 return criteriaBuilder.conjunction();
             }
             return criteriaBuilder.equal(root.get("type"), type);
@@ -35,7 +36,7 @@ public class OperationSpecs {
 
     public static Specification<Operation> findByStatus(String status){
         return (root, query, criteriaBuilder) -> {
-            if(status.isEmpty()){
+            if(status == null || status.isEmpty()){
                 return criteriaBuilder.conjunction();
             }
            return criteriaBuilder.equal(root.get("status"), status);
@@ -44,7 +45,7 @@ public class OperationSpecs {
 
     public static Specification<Operation> findByOrdererIban(String ordererIban){
         return (root, query, criteriaBuilder) -> {
-            if(ordererIban.isEmpty()){
+            if(ordererIban == null || ordererIban.isEmpty()){
                 return criteriaBuilder.conjunction();
             }
             Join<Account,Operation> operationAccounts = root.join("ordererAccount");
@@ -54,7 +55,7 @@ public class OperationSpecs {
 
     public static Specification<Operation> findByCounterpartIban(String counterpartIban, String bankCode){
         return (root, query, criteriaBuilder) -> {
-            if(counterpartIban.isEmpty() || bankCode.isBlank()){
+            if(counterpartIban == null || counterpartIban.isEmpty() || bankCode.isBlank()){
                 return criteriaBuilder.conjunction();
             }
             // If account's bank code is not equal to our bank we use counterpart account external

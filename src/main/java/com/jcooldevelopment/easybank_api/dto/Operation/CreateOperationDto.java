@@ -29,6 +29,7 @@ public class CreateOperationDto {
 
     @EnumValidatorAnnotation(
         enumClass = OperationType.class,
+        allowNull = false,
         message = "Operation type value not valid."
     )
     @NotEnumValueAnnotation(
@@ -37,7 +38,7 @@ public class CreateOperationDto {
     )
     private String operationType;
 
-    @IbanAnnotation(message = "IBAN not valid.")
+    @IbanAnnotation(message = "IBAN not valid.", allowNull = false)
     private String beneficiaryAccount;
 
     @Digits(integer = 17, fraction = 2, message = "The amount must have a maximum of 17 integers and 2 decimals.")

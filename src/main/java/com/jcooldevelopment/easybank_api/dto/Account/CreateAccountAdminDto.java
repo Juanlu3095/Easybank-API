@@ -20,10 +20,10 @@ public class CreateAccountAdminDto {
     @NotNull(message="There is no branch selected.")
     private Long branchId; // User will select his/her preferred branch from a list
 
-    @EnumValidatorAnnotation(enumClass = AccountStatus.class, message = "The account status value is not valid.")
+    @EnumValidatorAnnotation(enumClass = AccountStatus.class, allowNull = false, message = "The account status value is not valid.")
     private String status;
 
-    @EnumValidatorAnnotation(enumClass = AccountPurpose.class, message = "The purpose value is not valid.")
+    @EnumValidatorAnnotation(enumClass = AccountPurpose.class, allowNull = false, message = "The purpose value is not valid.")
     private String accountPurpose;
 
     @NotNull(message="There is no user selected.")

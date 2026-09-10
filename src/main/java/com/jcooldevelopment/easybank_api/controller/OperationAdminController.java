@@ -4,11 +4,11 @@ import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.OperationFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 import com.jcooldevelopment.easybank_api.service.Operation.OperationService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 
 import java.net.URI;
 import java.util.UUID;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -39,15 +38,9 @@ public class OperationAdminController {
 
     @GetMapping("")
     public ResponseEntity<Apiresponse<PaginatedResponse<OperationAdminDto>>> getAllOperations(
-        @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page,
-        @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size,
-        @RequestParam(required = false, defaultValue = "") String concept,
-        @RequestParam(required = false, defaultValue = "") String status,
-        @RequestParam(required = false, defaultValue = "") String type,
-        @RequestParam(required = false, defaultValue = "") String ordererIban,
-        @RequestParam(required = false, defaultValue = "") String counterpartIban
+        @Valid OperationFilterDto operationFilterDto
     )  {
-        PaginatedResponse<OperationAdminDto> operations = this.operationService.getAll(page, size, concept, status, type, ordererIban, counterpartIban);
+        PaginatedResponse<OperationAdminDto> operations = this.operationService.getAll(operationFilterDto);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<PaginatedResponse<OperationAdminDto>>("Operations found.", operations));
     }

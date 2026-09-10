@@ -29,6 +29,7 @@ import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.OperationFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
 import com.jcooldevelopment.easybank_api.exception.AccountPurposeNotValid;
@@ -77,22 +78,14 @@ public class OperationServiceImpl implements OperationService{
     }
 
     @Override
-    public PaginatedResponse<OperationAdminDto> getAll(
-        int page,
-        int size,
-        String concept, 
-        String status,
-        String type,
-        String ordererIban,
-        String counterpartIban
-    ) {
+    public PaginatedResponse<OperationAdminDto> getAll(OperationFilterDto operationFilterDto) {
         Specification<Operation> filters = Specification
-            .where(OperationSpecs.findByConcept(concept))
-            .and(OperationSpecs.findByStatus(status))
-            .and(OperationSpecs.findByType(type))
-            .and(OperationSpecs.findByOrdererIban(ordererIban))
-            .and(OperationSpecs.findByCounterpartIban(counterpartIban, this.env.getProperty("BANK.CODE")));
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Operation::getCreatedAt).descending());
+            .where(OperationSpecs.findByConcept(operationFilterDto.getConcept()))
+            .and(OperationSpecs.findByStatus(operationFilterDto.getStatus()))
+            .and(OperationSpecs.findByType(operationFilterDto.getType()))
+            .and(OperationSpecs.findByOrdererIban(operationFilterDto.getOrdererIban()))
+            .and(OperationSpecs.findByCounterpartIban(operationFilterDto.getCounterpartIban(), this.env.getProperty("BANK.CODE")));
+        Pageable pageable = PageRequest.of(operationFilterDto.getPage() - 1, operationFilterDto.getSize(), Sort.by(Operation::getCreatedAt).descending());
         Page<Operation> operations = this.operationRepository.findAll(filters, pageable);
         Page<OperationAdminDto> operationsToShow = operations.map(operation ->
             this.operationMapper.EntityToAdminDto(operation)
@@ -142,19 +135,28 @@ public class OperationServiceImpl implements OperationService{
     }
 
     @Override
-    public PaginatedResponse<OperationDto> getByAuth(int page, int size, String concept, String status, String type, String ordererIban, String counterpartIban) {
+    public PaginatedResponse<OperationDto> getByAuth(OperationFilterDto operationFilterDto) {
         String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
 
         String accountCounterpart = null;
         String accountExternalCounterpart = null;
 
-        Pageable pageable = PageRequest.of(page - 1, size); // Sort in custom sql query not here, it creates problems
-        if (counterpartIban.substring(4, 8).equals(this.env.getProperty("BANK.CODE"))) {
-            accountCounterpart = counterpartIban;
+        Pageable pageable = PageRequest.of(operationFilterDto.getPage() - 1, operationFilterDto.getSize()); // Sort in custom sql query not here, it creates problems
+        if (operationFilterDto.getCounterpartIban() == null || operationFilterDto.getCounterpartIban().substring(4, 8).equals(this.env.getProperty("BANK.CODE"))) {
+            accountCounterpart = operationFilterDto.getCounterpartIban();
         } else {
-            accountExternalCounterpart = counterpartIban;
+            accountExternalCounterpart = operationFilterDto.getCounterpartIban();
         }
-        Page<OperationProjection> operations = this.operationRepository.findByUserWithProjection(usercode, concept, status, type, ordererIban, accountCounterpart, accountExternalCounterpart, pageable);
+        Page<OperationProjection> operations = this.operationRepository.findByUserWithProjection(
+            usercode, 
+            operationFilterDto.getConcept(), 
+            operationFilterDto.getStatus(), 
+            operationFilterDto.getType(), 
+            operationFilterDto.getOrdererIban(), 
+            accountCounterpart,
+            accountExternalCounterpart, 
+            pageable
+        );
 
         // Create a map of movements and then group by operationId
         Map<UUID, List<MovementPerOperationOnlyIban>> movementsByOperation = this.getMovementsByOperations(operations);

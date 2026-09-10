@@ -51,6 +51,6 @@ public class CreateUserDto {
     @Length(min = 8, max = 100, message = "Password repeat length must have a minimum of {min} characters and a maximum of {max}.")
     private String repeatPassword;
 
-    @EnumValidatorAnnotation(enumClass = UserRole.class, message = "Role is not a valid value.")
+    @EnumValidatorAnnotation(enumClass = UserRole.class, allowNull = false, message = "Role is not a valid value.")
     private String role;
 }

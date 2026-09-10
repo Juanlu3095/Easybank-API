@@ -4,6 +4,7 @@ import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.OperationFilterDto;
 import com.jcooldevelopment.easybank_api.service.Operation.OperationService;
 
 import jakarta.validation.Valid;
@@ -34,17 +35,12 @@ public class OperationClientController {
         this.operationService = operationService;
     }
 
+    // Not using @RequestParam for operationFilterDto: https://stackoverflow.com/questions/73201089/how-to-use-requestparam-with-dto
     @GetMapping("")
     public ResponseEntity<Apiresponse<PaginatedResponse<OperationDto>>> getAllOperations(
-        @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page,
-        @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size,
-        @RequestParam(required = false, defaultValue = "") String concept,
-        @RequestParam(required = false, defaultValue = "") String status,
-        @RequestParam(required = false, defaultValue = "") String type,
-        @RequestParam(required = false, defaultValue = "") String ordererIban,
-        @RequestParam(required = false, defaultValue = "") String counterpartIban
+        @Valid OperationFilterDto operationFilterDto
     )  {
-        PaginatedResponse<OperationDto> operations = this.operationService.getByAuth(page, size, concept, status, type, ordererIban, counterpartIban);
+        PaginatedResponse<OperationDto> operations = this.operationService.getByAuth(operationFilterDto);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<PaginatedResponse<OperationDto>>("Operations found.", operations));
     }

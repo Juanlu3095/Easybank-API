@@ -7,17 +7,17 @@ import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.OperationFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 
 public interface OperationService {
 
     /**
      * Obtains all operations in database.
-     * @param page In a paginated response, the result page to obtain.
-     * @param size The number of results in each page.
+     * @param operationFilterDto It contains filters: page number and size, concept, type, status and orderer and beneficiary IBANs.
      * @return Paginated response with operation DTOs for admin role.
      */
-    PaginatedResponse<OperationAdminDto> getAll(int page, int size, String concept, String status, String type, String ordererIban, String counterpartIban);
+    PaginatedResponse<OperationAdminDto> getAll(OperationFilterDto operationFilterDto);
 
     /**
      * Obtains all operations for the given account in database.
@@ -29,11 +29,10 @@ public interface OperationService {
 
     /**
      * Obtains all operations for the given user by JWT in database.
-     * @param page In a paginated response, the result page to obtain.
-     * @param size The number of results in each page.
+     * @param operationFilterDto It contains filters: page number and size, concept, type, status and orderer and beneficiary IBANs.
      * @return Paginated response with operation DTOs for client role.
      */
-    PaginatedResponse<OperationDto> getByAuth(int page, int size, String concept, String status, String type, String ordererIban, String counterpartIban);
+    PaginatedResponse<OperationDto> getByAuth(OperationFilterDto operationFilterDto);
 
     /**
      * Obtains all operations for the given user by JWT in database.

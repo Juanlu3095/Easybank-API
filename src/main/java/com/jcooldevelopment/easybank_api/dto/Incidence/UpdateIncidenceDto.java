@@ -23,6 +23,6 @@ public class UpdateIncidenceDto {
     @NotBlank(message="Name cannot be blank.")
     private String message;
 
-    @EnumValidatorAnnotation(enumClass = IncidenceStatus.class, message = "Must be an incidence status valid value.")
+    @EnumValidatorAnnotation(enumClass = IncidenceStatus.class, allowNull = false, message = "Must be an incidence status valid value.")
     private String status; // If user is ADMIN it can be updated, if is client no
 }

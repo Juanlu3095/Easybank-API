@@ -11,7 +11,6 @@ import java.lang.annotation.RetentionPolicy;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.NotNull;
 
 // https://docs.spring.io/spring-framework/reference/core/validation/beanvalidation.html#validation-beanvalidation-spring-constraints
 // https://stackoverflow.com/questions/62372281/how-to-validate-enum-in-dto
@@ -24,9 +23,9 @@ import jakarta.validation.constraints.NotNull;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Constraint(validatedBy = EnumValidatorContraint.class)
-@NotNull
 public @interface EnumValidatorAnnotation {
     Class<? extends Enum<?>> enumClass();
+    boolean allowNull(); // This allows to use null in case we use it as filter in GET queries
     String message() default "Must be a valid Enum.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
