@@ -18,29 +18,107 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>, Jpa
 
     // Duplicate sql alias for using SELECT *: https://stackoverflow.com/questions/78211463/encountered-a-duplicated-sql-alias-id-during-auto-discovery-of-a-native-sql-qu
     // Pagination in native query: https://stackoverflow.com/questions/38349930/spring-data-and-native-query-with-pagination
-    @Meta(comment = "Search operations asigned to a user's id")
+    @Meta(comment = "Search operations asigned to a user's id with filters")
     @Query(value = """
-        SELECT operation.id, operation.concept, operation.counterpart_external_account_iban, operation.counterpart_account_id,
-        operation.created_at, operation.status, operation.type, operation.updated_at, operation.orderer_account_id
+        SELECT operation.id as id, 
+        operation.concept as concept, 
+        operation.counterpart_external_account_iban as counterpartExternalAccountIban, 
+        operation.created_at as createdAt, 
+        operation.status as status, 
+        operation.type as type, 
+        operation.updated_at as updatedAt, 
+        ordererAccount.id as ordererAccountId,
+        ordererAccount.iban as ordererAccountIban,
+        ordererAccount.bic_swift as ordererAccountBicswift,
+        ordererBranch.name as ordererAccountPlace,
+        users.name as ordererName,
+        users.surname as ordererSurname,
+        counterpartAccount.id as counterpartAccountId,
+        counterpartAccount.iban as counterpartAccountIban,
+        counterpartAccount.bic_swift as counterpartAccountBicswift,
+        counterpartBranch.name as counterpartAccountPlace
         FROM operation
-        INNER JOIN account ON operation.orderer_account_id = account.id
-        INNER JOIN user_account ON account.id = user_account.account_id
-        INNER JOIN users ON user_account.user_id = users.id
+        INNER JOIN account ordererAccount
+            ON operation.orderer_account_id = ordererAccount.id
+        LEFT JOIN account counterpartAccount
+            ON operation.counterpart_account_id = counterpartAccount.id
+        INNER JOIN branch ordererBranch
+            ON ordererAccount.branch_id = ordererBranch.id
+        LEFT JOIN branch counterpartBranch
+            ON counterpartAccount.branch_id = counterpartBranch.id
+        INNER JOIN user_account 
+            ON ordererAccount.id = user_account.account_id
+        INNER JOIN users 
+            ON user_account.user_id = users.id
         WHERE users.id = ?1
+        AND (?2 IS NULL
+                OR ?2 = ''
+                OR operation.concept LIKE CONCAT('%', ?2, '%'))
+            AND (?3 IS NULL
+                OR ?3 = ''
+                OR operation.status = ?3)
+            AND (?4 IS NULL
+                OR ?4 = ''
+                OR operation.type = ?4)
+            AND (?5 IS NULL
+                OR ?5 = ''
+                OR ordererAccount.iban = ?5)
+            AND (?6 IS NULL
+                OR ?6 = ''
+                OR counterpartAccount.iban = ?6)
+            AND (?7 IS NULL
+                OR ?7 = ''
+                OR operation.counterpart_external_account_iban = ?7)
         ORDER BY operation.created_at DESC
         """,
         // CountQuery to tell JPA about info for pagination
         countQuery = """
         SELECT COUNT(*)
         FROM operation
-        INNER JOIN account ON operation.orderer_account_id = account.id
-        INNER JOIN user_account ON account.id = user_account.account_id
-        INNER JOIN users ON user_account.user_id = users.id
-        WHERE users.id = ?1 
+        INNER JOIN account ordererAccount
+            ON operation.orderer_account_id = ordererAccount.id
+        INNER JOIN account counterpartAccount
+            ON operation.counterpart_account_id = counterpartAccount.id
+        INNER JOIN branch ordererBranch
+            ON ordererAccount.branch_id = ordererBranch.id
+        INNER JOIN branch counterpartBranch
+            ON counterpartAccount.branch_id = counterpartBranch.id
+        INNER JOIN user_account 
+            ON ordererAccount.id = user_account.account_id
+        INNER JOIN users 
+            ON user_account.user_id = users.id
+        WHERE users.id = ?1
+        AND (?2 IS NULL
+                OR ?2 = ''
+                OR operation.concept LIKE CONCAT('%', ?2, '%'))
+            AND (?3 IS NULL
+                OR ?3 = ''
+                OR operation.status = ?3)
+            AND (?4 IS NULL
+                OR ?4 = ''
+                OR operation.type = ?4)
+            AND (?5 IS NULL
+                OR ?5 = ''
+                OR ordererAccount.iban = ?5)
+            AND (?6 IS NULL
+                OR ?6 = ''
+                OR counterpartAccount.iban = ?6)
+            AND (?7 IS NULL
+                OR ?7 = ''
+                OR operation.counterpart_external_account_iban = ?7)
         """,
         nativeQuery = true
     )    
-    Page<Operation> findByUser(UUID id, Pageable pageable);
+    Page<OperationProjectionWithAccount> findByUserId(
+        UUID id, 
+        String concept,
+        String status,
+        String type,
+        String ordererIban,
+        String counterpartIban,
+        String counterpartExternalIban,
+        Pageable pageable
+    );
 
     // https://www.migueltroyano.com/bbdd/funcion-concat-en-postgresql/
     @Query(value = """

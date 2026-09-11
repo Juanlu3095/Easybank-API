@@ -110,6 +110,21 @@ public class OperationServiceImpl implements OperationService{
             .collect(Collectors.groupingBy(movement -> movement.getOperationId()));
     }
 
+    private Map<UUID, List<MovementPerOperationDto>> getMovementsByOperationsWithAccount (Page<OperationProjectionWithAccount> operations){
+        List<UUID> uuids = new ArrayList<>();
+        for (OperationProjectionWithAccount operation : operations.getContent()) {
+            uuids.add(operation.id());
+        }
+
+        List<MovementPerOperationDto> movements = this.movementRepository.findByOperationIdsWithAccount(uuids)
+            .stream()
+            .map(movement -> this.movementMapper.MovementProjectionToMovementPerOperationDto(movement))
+            .toList();
+
+        return movements.stream()
+            .collect(Collectors.groupingBy(movement -> movement.getOperationId()));
+    }
+
     @Override
     public PaginatedResponse<OperationDto> getByAccount(UUID accountId, OperationFilterDto operationFilterDto) {
         // Check if account belongs to authenticated user
@@ -190,9 +205,39 @@ public class OperationServiceImpl implements OperationService{
     }
 
     @Override
-    public PaginatedResponse<OperationAdminDto> getByUser(UUID userId, int page, int size) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getByUser'");
+    public PaginatedResponse<OperationAdminDto> getByUserId(UUID userId, OperationFilterDto operationFilterDto) {
+        String accountCounterpart = "";
+        String accountExternalCounterpart = "";
+
+        Pageable pageable = PageRequest.of(operationFilterDto.getPage() - 1, operationFilterDto.getSize()); // Sort in custom sql query not here, it creates problems
+        if (operationFilterDto.getCounterpartIban() == null || operationFilterDto.getCounterpartIban().substring(4, 8).equals(this.env.getProperty("BANK.CODE"))) {
+            accountCounterpart = operationFilterDto.getCounterpartIban();
+        } else {
+            accountExternalCounterpart = operationFilterDto.getCounterpartIban();
+        }
+
+        Page<OperationProjectionWithAccount> operations = this.operationRepository.findByUserId(
+            userId, 
+            operationFilterDto.getConcept(), 
+            operationFilterDto.getStatus(), 
+            operationFilterDto.getType(), 
+            operationFilterDto.getOrdererIban(), 
+            accountCounterpart,
+            accountExternalCounterpart, 
+            pageable
+        );
+
+        // Create a map of movements and then group by operationId
+        Map<UUID, List<MovementPerOperationDto>> movementsByOperation = this.getMovementsByOperationsWithAccount(operations);
+
+        Page<OperationAdminDto> operationsDto = operations.map(operation -> {
+            OperationAdminDto operationDto = this.operationMapper.projectionToAdminDto(operation);
+            List<MovementPerOperationDto> movementsToAdd = movementsByOperation.get(operationDto.getId());
+            movementsToAdd.forEach(movement -> operationDto.addMovement(movement));
+            return operationDto;
+        });
+
+        return DataFormater.paginate(operationsDto);
     }
 
     @Override

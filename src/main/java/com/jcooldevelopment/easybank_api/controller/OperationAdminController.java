@@ -51,6 +51,16 @@ public class OperationAdminController {
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<OperationAdminDto>("Operation found.", operation));
     }
+    
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Apiresponse<PaginatedResponse<OperationAdminDto>>> getByUser(
+        @PathVariable UUID userId,
+        @Valid OperationFilterDto operationFilterDto
+    ){
+        PaginatedResponse<OperationAdminDto> operation = this.operationService.getByUserId(userId, operationFilterDto);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(new Apiresponse<PaginatedResponse<OperationAdminDto>>("Operation found.", operation));
+    }
 
     @PostMapping("")
     public ResponseEntity<Apiresponse<OperationAdminDto>> postOperation(

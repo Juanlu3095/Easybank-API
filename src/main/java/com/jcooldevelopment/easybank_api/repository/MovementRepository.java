@@ -32,6 +32,29 @@ public interface MovementRepository extends JpaRepository<Movement, UUID>{
     )
     List<MovementProjection> findByOperationIds(List<UUID> uuids);
 
+    @Query(
+        value = """
+        SELECT movement.id as id,
+        account.id as accountId,
+        account.iban as accountIban,
+        account.bic_swift as accountBicSwift,
+        branch.name as accountPlace,
+        movement.external_account as externalAccount,
+        movement.amount as amount,
+        movement.created_at as createdAt,
+        movement.updated_at as updatedAt,
+        movement.operation_id as operationId
+        FROM movement
+        LEFT JOIN account
+            ON movement.account_id = account.id
+        LEFT JOIN branch
+            ON account.branch_id = branch.id
+        WHERE movement.operation_id IN ?1        
+        """,
+        nativeQuery = true
+    )
+    List<MovementProjectionWithAccountNoUsers> findByOperationIdsWithAccount(List<UUID> uuids);
+
     /**
      * Used for obtaining Movement with Account no users DTO.
      * @param uuid

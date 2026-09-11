@@ -69,6 +69,7 @@ public class MovementMapper {
         movementDto.setAmount(movementProjection.amount());
         movementDto.setCreatedAt(movementProjection.createdAt());
         movementDto.setUpdatedAt(movementProjection.updatedAt());
+        movementDto.setOperationId(movementProjection.operationId());
 
         return movementDto;
     }

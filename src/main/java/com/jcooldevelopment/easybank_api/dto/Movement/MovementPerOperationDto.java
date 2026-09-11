@@ -23,6 +23,8 @@ public class MovementPerOperationDto {
     private String externalAccount;
 
     private BigDecimal amount;
+
+    private UUID operationId;
     
     private LocalDateTime createdAt;
 

@@ -34,13 +34,12 @@ public interface OperationService {
     PaginatedResponse<OperationDto> getByAuth(OperationFilterDto operationFilterDto);
 
     /**
-     * Obtains all operations for the given user by JWT in database.
+     * Obtains all operations for the given user in database.
      * @param userId The user's id.
-     * @param page In a paginated response, the result page to obtain.
-     * @param size The number of results in each page.
+     * @param operationFilterDto It contains filters: page number and size, concept, type, status and orderer and beneficiary IBANs.
      * @return Paginated response with operation DTOs for admin role.
      */
-    PaginatedResponse<OperationAdminDto> getByUser(UUID userId, int page, int size);
+    PaginatedResponse<OperationAdminDto> getByUserId(UUID userId, OperationFilterDto operationFilterDto);
 
     /**
      * Obtains an operation for the given operation's id.
