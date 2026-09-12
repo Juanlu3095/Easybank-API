@@ -28,6 +28,7 @@ import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationOnlyIb
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.OperationAuthorizationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
@@ -266,6 +267,7 @@ public class OperationServiceImpl implements OperationService{
         return operation;
     }
 
+    @Override
     public OperationAdminDto getByIdForAdmin(UUID id){
         OperationProjectionWithAccount operation = this.operationRepository.findByIdAsProjectionForAdmin(id)
             .orElseThrow(() -> new ResourceNotFoundException("Operation not found."));
@@ -488,6 +490,11 @@ public class OperationServiceImpl implements OperationService{
         }
 
         return this.operationMapper.EntityToAdminDto(savedOperation);
+    }
+
+    @Override 
+    public void authorizeOperation(UUID operationId, OperationAuthorizationDto operationAuthorizationDto){
+
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationAdminDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.OperationAuthorizationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
@@ -71,6 +72,15 @@ public interface OperationService {
      * @return The created operation by admin
      */
     OperationAdminDto createByAdmin(CreateOperationAdminDto createOperationDto);
+
+    /**
+     * Validates if there is an operation which waits an authorization. Then if PIN is correct,
+     * operation status becomes "DONE" and money transactions are done.
+     * @param operationId The operation's id to authorize.
+     * @param operationAuthorizationDto It contains the user's PIN.
+     * @return
+     */
+    void authorizeOperation(UUID operationId, OperationAuthorizationDto operationAuthorizationDto);
 
     /**
      * Updates an operation by id with PATCH request.

@@ -67,5 +67,11 @@ public class OperationClientController {
             .location(URI.create("/api/client/operation/" + createdOperation.getId()))
             .body(new Apiresponse<OperationDto>("Operation created.", createdOperation));
     }
+
+    @PostMapping("/authorize/{operationId}")
+    public ResponseEntity<Apiresponse<Void>> authorizeOperation(@PathVariable UUID operationId){
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(new Apiresponse<>("Operation authorized.", null));
+    }
     
 }
