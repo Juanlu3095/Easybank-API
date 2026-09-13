@@ -7,12 +7,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.jcooldevelopment.easybank_api.annotations.DniValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
 
@@ -28,8 +26,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -48,36 +44,28 @@ public class User implements UserDetails{
     @Column(name="id")
     private UUID id;
 
-    @NotBlank(message = "Name cannot be blank.")
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @NotBlank(message = "Surname cannot be blank.")
     @Column(name = "surname", nullable = false, length = 100)
     private String surname;
 
-    @DniValidatorAnnotation
     @Column(name = "dni", unique = true, nullable = false, length = 10)
     private String dni;
 
-    @Email
     @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;
 
-    @NotBlank(message = "Phone cannot be blank.")
     @Column(name = "phone", unique = false, nullable = false, length = 45)
     private String phone;
 
-    @NotBlank(message = "Usercode cannot be blank.")
     @Column(name = "usercode", nullable = false, unique = true)
-    @Length(min = 10, max = 10, message = "Usercode length must have a minimum of {min} characters and a maximum of {max}.")
     private String usercode; // Must generate a random number of a given length as username in login form and must be UNIQUE
 
-    @NotBlank(message = "Password cannot be blank.")
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "pin", length = 50, nullable = true)
+    @Column(name = "pin", length = 6, nullable = true)
     private String pin; // Secret code for safe transactions
 
     @Enumerated(EnumType.STRING)

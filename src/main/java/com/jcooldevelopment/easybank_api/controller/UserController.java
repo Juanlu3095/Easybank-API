@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
+import com.jcooldevelopment.easybank_api.dto.User.CreatePinDto;
 import com.jcooldevelopment.easybank_api.dto.User.CreateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UpdateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UserDto;
@@ -74,5 +75,11 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Service unavailable.", null));
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("User deleted.", null));
+    }
+
+    @PostMapping("/pin")
+    public ResponseEntity<Apiresponse<Void>> createPin(@Valid @RequestBody CreatePinDto createPinDto){
+        this.userService.setPin(createPinDto);
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<>("User pin set successfully.", null));
     }
 }

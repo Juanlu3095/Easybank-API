@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
 import com.jcooldevelopment.easybank_api.exception.AccountPurposeNotValid;
 import com.jcooldevelopment.easybank_api.exception.ActivationCodeExpiredException;
+import com.jcooldevelopment.easybank_api.exception.ClientPinAlreadySetException;
 import com.jcooldevelopment.easybank_api.exception.ResourceAlreadyExists;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
@@ -177,6 +178,17 @@ public class GlobalErrorHandler {
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
         problemDetails.setTitle("Account not valid for this purpose");
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
+    }
+
+    // 409 exception when user's pin already exists and client wants to set another
+    @ExceptionHandler(ClientPinAlreadySetException.class)
+    public ResponseEntity<ProblemDetail> handleClientPinAlreadySetException (ClientPinAlreadySetException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/409"));
+        problemDetails.setTitle("User's pin already set");
         
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetails);
     }

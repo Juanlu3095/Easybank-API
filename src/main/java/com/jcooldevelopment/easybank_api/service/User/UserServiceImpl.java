@@ -8,15 +8,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
+import com.jcooldevelopment.easybank_api.dto.User.CreatePinDto;
 import com.jcooldevelopment.easybank_api.dto.User.CreateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UpdateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UserDto;
+import com.jcooldevelopment.easybank_api.exception.ClientPinAlreadySetException;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
@@ -172,6 +175,21 @@ public class UserServiceImpl implements UserService{
         this.emailService.sendMailToEnableUser(user.getUsercode(), activationCode, user.getEmail());
 
         return true;
+    }
+
+    @Override
+    public void setPin(CreatePinDto createPinDto){
+        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = this.userRepository.findByUsercode(usercode)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+
+        if (user.getPin() != null){
+            throw new ClientPinAlreadySetException("The current user already set a PIN.");
+        }
+
+        user.setPin(createPinDto.getPin());
+        this.userRepository.save(user);
     }
 
 }

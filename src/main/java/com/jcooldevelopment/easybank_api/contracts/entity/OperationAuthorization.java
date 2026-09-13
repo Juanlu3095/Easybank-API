@@ -7,6 +7,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ public class OperationAuthorization {
     private UUID id;
 
     @OneToOne
-    @Column(name = "operation_id", nullable = false)
+    @JoinColumn(name = "operation_id", nullable = false)
     private Operation operation;
 
     @Column(name = "expires_at")

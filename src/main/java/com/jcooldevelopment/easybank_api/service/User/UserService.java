@@ -3,6 +3,7 @@ package com.jcooldevelopment.easybank_api.service.User;
 import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
+import com.jcooldevelopment.easybank_api.dto.User.CreatePinDto;
 import com.jcooldevelopment.easybank_api.dto.User.CreateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UpdateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UserDto;
@@ -27,4 +28,11 @@ public interface UserService {
      * @return true if email was sent, and false if not.
      */
     public boolean resendEmail(UUID id);
+
+    /**
+     * Sets authenticated user's pin. For client role.
+     * @param createPinDto The pin to set.
+     * @throws ClientPinAlreadySetException If user's pin is already set.
+     */
+    public void setPin(CreatePinDto createPinDto);
 }
