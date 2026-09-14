@@ -18,6 +18,7 @@ import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
 import com.jcooldevelopment.easybank_api.exception.AccountPurposeNotValid;
 import com.jcooldevelopment.easybank_api.exception.ActivationCodeExpiredException;
 import com.jcooldevelopment.easybank_api.exception.ClientPinAlreadySetException;
+import com.jcooldevelopment.easybank_api.exception.ClientPinNotSetException;
 import com.jcooldevelopment.easybank_api.exception.ResourceAlreadyExists;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
@@ -45,7 +46,7 @@ public class GlobalErrorHandler {
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
-        problemDetails.setTitle("Credentials not valid.");
+        problemDetails.setTitle("Credentials not valid");
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
     }
@@ -56,7 +57,7 @@ public class GlobalErrorHandler {
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
             "Credentials not valid.");
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
-        problemDetails.setTitle("Credentials not valid.");
+        problemDetails.setTitle("Credentials not valid");
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
     }
@@ -66,7 +67,7 @@ public class GlobalErrorHandler {
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
             "Credentials expired.");
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
-        problemDetails.setTitle("Credentials expired.");
+        problemDetails.setTitle("Credentials expired");
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
     }
@@ -77,7 +78,18 @@ public class GlobalErrorHandler {
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
-        problemDetails.setTitle("Credentials not valid.");
+        problemDetails.setTitle("Credentials not valid");
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
+    }
+
+    // Pin not established yet. Error 401
+    @ExceptionHandler(ClientPinNotSetException.class)
+    public ResponseEntity<ProblemDetail> handleClientPinNotSetException (ClientPinNotSetException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
+        problemDetails.setTitle("Client PIN not set");
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
     }
@@ -88,7 +100,7 @@ public class GlobalErrorHandler {
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403"));
-        problemDetails.setTitle("User not authorized.");
+        problemDetails.setTitle("User not authorized");
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetails);
     }

@@ -188,7 +188,11 @@ public class UserServiceImpl implements UserService{
             throw new ClientPinAlreadySetException("The current user already set a PIN.");
         }
 
-        user.setPin(createPinDto.getPin());
+        // https://www.baeldung.com/java-password-hashing
+        // Hash is needed since is going to verify if the introduced pin for validating operation has the same
+        // hashed value, and also Bcrypt is slower than SHA family because the last were used in machines of limited
+        // resources.
+        user.setPin(passwordEncoder.encode(createPinDto.getPin()));
         this.userRepository.save(user);
     }
 

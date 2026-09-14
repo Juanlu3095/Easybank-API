@@ -59,7 +59,8 @@ public interface OperationService {
     OperationAdminDto getByIdForAdmin(UUID operationId);
 
     /**
-     * Creates a new operation in database by client.
+     * Creates a new operation in database by client. It only creates the operation, not
+     * making any money transaction.
      * @param createOperationDto The DTO to create an operation, usually from a form.
      * @return The operation created.
      */
@@ -67,7 +68,8 @@ public interface OperationService {
 
     /**
      * Creates a new operation by admin, mainly for operation adjustment, for example
-     * when an error occurs.
+     * when an error occurs. It implies money transactions if beneficiary account
+     * belongs to our bank.
      * @param createOperationDto DTO to create operation by admin.
      * @return The created operation by admin
      */

@@ -1,5 +1,7 @@
 package com.jcooldevelopment.easybank_api.service.Operation;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +15,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.contracts.entity.Account;
 import com.jcooldevelopment.easybank_api.contracts.entity.Movement;
 import com.jcooldevelopment.easybank_api.contracts.entity.Operation;
+import com.jcooldevelopment.easybank_api.contracts.entity.OperationAuthorization;
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.AccountPurpose;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
@@ -34,7 +38,12 @@ import com.jcooldevelopment.easybank_api.dto.Operation.OperationFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
 import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
 import com.jcooldevelopment.easybank_api.exception.AccountPurposeNotValid;
+import com.jcooldevelopment.easybank_api.exception.ClientPinIncorrectException;
+import com.jcooldevelopment.easybank_api.exception.ClientPinNotSetException;
 import com.jcooldevelopment.easybank_api.exception.NotEnoughBalanceException;
+import com.jcooldevelopment.easybank_api.exception.OperationAuthorizationCannotBeDoneException;
+import com.jcooldevelopment.easybank_api.exception.OperationAuthorizationDoneException;
+import com.jcooldevelopment.easybank_api.exception.OperationAuthorizationExpiredException;
 import com.jcooldevelopment.easybank_api.exception.OrdererAndBeneficiaryCannotBeSameException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.exception.UserNotAuthorizedException;
@@ -44,6 +53,7 @@ import com.jcooldevelopment.easybank_api.projections.operation.OperationProjecti
 import com.jcooldevelopment.easybank_api.projections.operation.OperationProjectionWithAccount;
 import com.jcooldevelopment.easybank_api.repository.AccountRepository;
 import com.jcooldevelopment.easybank_api.repository.MovementRepository;
+import com.jcooldevelopment.easybank_api.repository.OperationAuthorizationRepository;
 import com.jcooldevelopment.easybank_api.repository.OperationRepository;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
 import com.jcooldevelopment.easybank_api.specs.operation.OperationSpecs;
@@ -53,28 +63,34 @@ import com.jcooldevelopment.easybank_api.utils.DataFormater;
 public class OperationServiceImpl implements OperationService{
 
     private final OperationRepository operationRepository;
+    private final OperationAuthorizationRepository operationAuthorizationRepository;
     private final MovementRepository movementRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final OperationMapper operationMapper;
     private final MovementMapper movementMapper;
+    private final PasswordEncoder passwordEncoder;
     private final Environment env;
 
     public OperationServiceImpl(
         OperationRepository operationRepository,
+        OperationAuthorizationRepository operationAuthorizationRepository,
         MovementRepository movementRepository,
         AccountRepository accountRepository,
         UserRepository userRepository,
         OperationMapper operationMapper,
         MovementMapper movementMapper,
+        PasswordEncoder passwordEncoder,
         Environment env
     ) {
         this.operationRepository = operationRepository;
+        this.operationAuthorizationRepository = operationAuthorizationRepository;
         this.movementRepository = movementRepository;
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
         this.operationMapper = operationMapper;
         this.movementMapper = movementMapper;
+        this.passwordEncoder = passwordEncoder;
         this.env = env;
     }
 
@@ -363,7 +379,7 @@ public class OperationServiceImpl implements OperationService{
         operation.setOrdererAccount(userAccount);
         if(createOperationDto.getBeneficiaryAccount().substring(4, 8).equals(this.env.getProperty("BANK.CODE"))){
             operation.setCounterpartAccount(beneficiaryAccount);
-            operation.setStatus(OperationStatus.DONE);
+            operation.setStatus(OperationStatus.PENDING_AUTHORIZATION);
         } else {
             operation.setCounterpartExternalAccount(beneficiaryExternalAccount);
             operation.setStatus(OperationStatus.PENDING);
@@ -404,16 +420,6 @@ public class OperationServiceImpl implements OperationService{
 
         // Adds movements to operation for getting them when asking for operation
         savedMovements.forEach(movement -> savedOperation.addMovement(movement));
-
-        // Update balance for orderer account
-        userAccount.setBalance(userAccount.getBalance().subtract(createOperationDto.getAmount()));
-        this.accountRepository.save(userAccount);
-
-        // Update balance for beneficiary account if our bank owns it
-        if(beneficiaryAccount != null){
-            beneficiaryAccount.setBalance(beneficiaryAccount.getBalance().add(createOperationDto.getAmount()));
-            this.accountRepository.save(beneficiaryAccount);
-        }
 
         return this.operationMapper.EntityToDto(savedOperation);
     }
@@ -479,12 +485,13 @@ public class OperationServiceImpl implements OperationService{
         // Adds movements to operation for getting them when asking for operation
         savedMovements.forEach(movement -> savedOperation.addMovement(movement));
 
-        // Update balance for orderer account
-        userAccount.setBalance(userAccount.getBalance().subtract(createOperationDto.getAmount()));
-        this.accountRepository.save(userAccount);
-
-        // Update balance for beneficiary account if our bank owns it
+        // Only if both accounts belong to our bank, the money transactions will be done.
         if(beneficiaryAccount != null){
+            // Update balance for orderer account
+            userAccount.setBalance(userAccount.getBalance().subtract(createOperationDto.getAmount()));
+            this.accountRepository.save(userAccount);
+
+            // Update balance for beneficiary account if our bank owns it
             beneficiaryAccount.setBalance(beneficiaryAccount.getBalance().add(createOperationDto.getAmount()));
             this.accountRepository.save(beneficiaryAccount);
         }
@@ -494,7 +501,70 @@ public class OperationServiceImpl implements OperationService{
 
     @Override 
     public void authorizeOperation(UUID operationId, OperationAuthorizationDto operationAuthorizationDto){
+        OperationAuthorization authorization = this.operationAuthorizationRepository.findByOperationId(operationId)
+            .orElseThrow(() -> new ResourceNotFoundException("There is no pending authorization for this operation."));
 
+        // Verifies if authorization expired
+        if(LocalDateTime.now().isAfter(authorization.getExpiresAt()))
+            throw new OperationAuthorizationExpiredException("This authorization already expired.");
+        
+        Operation operation = this.operationRepository.findById(operationId)
+            .orElseThrow(() -> new ResourceNotFoundException("Operation not found."));
+    
+        this.verifyOperationStatus(operation.getStatus());
+
+        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = this.userRepository.findByUsercode(usercode)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+
+        if(user.getPin() == null) throw new ClientPinNotSetException("The current user has not set the pin.");
+        
+        boolean verifyPin = this.passwordEncoder.matches(operationAuthorizationDto.getPin(), user.getPin());
+        if(!verifyPin) throw new ClientPinIncorrectException("The given PIN is incorrect. Please try again.");
+        
+        Account ordererAccount = operation.getOrdererAccount();
+        Account beneficiaryAccount = operation.getCounterpartAccount();
+
+        this.doTransferOperations(ordererAccount, beneficiaryAccount, operation);
+    }
+
+    /**
+     * Verifies operation status. If there is no problem it will not throw any error.
+     * @param status The operation status to verify.
+     * @throws OperationAuthorizationCannotBeDoneException If status is PENDING.
+     * @throws OperationAuthorizationDoneException If status is DONE.
+     * @throws OperationAuthorizationCannotBeDoneException If status is either CANCELED or BLOCKED.
+     */
+    private void verifyOperationStatus(OperationStatus status){
+        switch (status) {
+            case PENDING:
+                throw new OperationAuthorizationCannotBeDoneException("This operation cannot be authorized yet since the other party must approve it.");
+            case DONE:
+                throw new OperationAuthorizationDoneException("This operation has already been authorized.");
+            case CANCELED, BLOCKED:
+                throw new OperationAuthorizationCannotBeDoneException("This operation cannot be authorized. Please check out your list operation for more info.");
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Updates amount of orderer and beneficiary accounts only if both belongs to our bank.
+     * Must verify if the operation status is PENDING_AUTHORIZATION first.
+     * @param ordererAccount
+     * @param beneficiaryAccount
+     * @param operation
+     */
+    private void doTransferOperations(Account ordererAccount, Account beneficiaryAccount, Operation operation){
+        BigDecimal amountToUpdate = operation.getMovements().getFirst().getAmount().abs();
+
+        // Update balance for orderer account
+        ordererAccount.setBalance(ordererAccount.getBalance().subtract(amountToUpdate));
+        this.accountRepository.save(ordererAccount);
+
+        // Update balance for beneficiary account
+        beneficiaryAccount.setBalance(beneficiaryAccount.getBalance().add(amountToUpdate));
+        this.accountRepository.save(beneficiaryAccount);
     }
 
     @Override

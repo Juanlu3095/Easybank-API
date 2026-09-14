@@ -65,7 +65,8 @@ public class User implements UserDetails{
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "pin", length = 6, nullable = true)
+    // https://stackoverflow.com/questions/5881169/what-column-type-length-should-i-use-for-storing-a-bcrypt-hashed-password-in-a-d
+    @Column(name = "pin", length = 60, nullable = true)
     private String pin; // Secret code for safe transactions
 
     @Enumerated(EnumType.STRING)

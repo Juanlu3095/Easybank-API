@@ -3,6 +3,7 @@ package com.jcooldevelopment.easybank_api.controller;
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationDto;
+import com.jcooldevelopment.easybank_api.dto.Operation.OperationAuthorizationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationFilterDto;
 import com.jcooldevelopment.easybank_api.service.Operation.OperationService;
@@ -69,7 +70,8 @@ public class OperationClientController {
     }
 
     @PostMapping("/authorize/{operationId}")
-    public ResponseEntity<Apiresponse<Void>> authorizeOperation(@PathVariable UUID operationId){
+    public ResponseEntity<Apiresponse<Void>> authorizeOperation(@PathVariable UUID operationId, OperationAuthorizationDto operationAuthorizationDto){
+        this.operationService.authorizeOperation(operationId, operationAuthorizationDto);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<>("Operation authorized.", null));
     }
