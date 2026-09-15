@@ -33,6 +33,11 @@ public class OperationAuthorization {
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", 
+        columnDefinition = "TIMESTAMP DEFAULT NOW()",
+        insertable = false,
+        updatable = false,
+        nullable = true
+    )
     private LocalDateTime createdAt;
 }

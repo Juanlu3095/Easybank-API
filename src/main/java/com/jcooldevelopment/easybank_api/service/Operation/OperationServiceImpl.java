@@ -421,7 +421,16 @@ public class OperationServiceImpl implements OperationService{
         // Adds movements to operation for getting them when asking for operation
         savedMovements.forEach(movement -> savedOperation.addMovement(movement));
 
+        this.createAuthorization(savedOperation);
+
         return this.operationMapper.EntityToDto(savedOperation);
+    }
+
+    private void createAuthorization(Operation operation){
+        OperationAuthorization authorization = new OperationAuthorization();
+        authorization.setOperation(operation);
+        authorization.setExpiresAt(LocalDateTime.now().plusMinutes(30));
+        this.operationAuthorizationRepository.save(authorization);
     }
 
     @Override

@@ -1,0 +1,11 @@
+POST http://localhost:8080/api/client/operation
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NDc3Mzg5LCJleHAiOjE3ODk0NzkxODl9.DVHIc4bbnAvml6pIMKPM06yEnrH8aSkq6Zmd0J0Q3k0
+
+{
+  "concept": "prueba desde client rest",
+  "accountId": "f5e0bee5-681b-4039-9944-f2bda1b82ddf",
+  "operationType": "TRANSFER",
+  "beneficiaryAccount": "ES3400011234246855039185",
+  "amount": 0.01
+}
