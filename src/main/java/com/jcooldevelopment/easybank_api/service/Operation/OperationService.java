@@ -10,6 +10,9 @@ import com.jcooldevelopment.easybank_api.dto.Operation.OperationAuthorizationDto
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.OperationFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Operation.UpdateOperationDto;
+import com.jcooldevelopment.easybank_api.exception.ClientPinIncorrectException;
+import com.jcooldevelopment.easybank_api.exception.ClientPinNotSetException;
+import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 
 public interface OperationService {
 
@@ -80,7 +83,9 @@ public interface OperationService {
      * operation status becomes "DONE" and money transactions are done.
      * @param operationId The operation's id to authorize.
      * @param operationAuthorizationDto It contains the user's PIN.
-     * @return
+     * @throws ResourceNotFoundException If it does not found the operation, authorization or authenticated user.
+     * @throws ClientPinNotSetException If authenticated user has no PIN set.
+     * @throws ClientPinIncorrectException If PIN is not correct.
      */
     void authorizeOperation(UUID operationId, OperationAuthorizationDto operationAuthorizationDto);
 

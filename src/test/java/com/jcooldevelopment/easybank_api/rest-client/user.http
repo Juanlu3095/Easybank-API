@@ -1,6 +1,6 @@
 POST http://localhost:8080/api/user/pin
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5MzI2NzQ2LCJleHAiOjE3ODkzMjg1NDZ9.b5NX8eZSgjURVXBtyxy9KTuMJ9Hcf19LxBoceOoNAu8
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NDk1NTMxLCJleHAiOjE3ODk0OTczMzF9.vz5qzvjUcvDog9uw0JXEq82Zv3_e0bC_b506yISXCQc
 
 {
     "pin": "1234"

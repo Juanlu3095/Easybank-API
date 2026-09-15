@@ -1,11 +1,21 @@
+### Create operation
 POST http://localhost:8080/api/client/operation
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NDc3Mzg5LCJleHAiOjE3ODk0NzkxODl9.DVHIc4bbnAvml6pIMKPM06yEnrH8aSkq6Zmd0J0Q3k0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NTA0OTIzLCJleHAiOjE3ODk1MDY3MjN9.V4w-P2Q1Yxd_BjBiRKqKtRnh1o5GNRN5HwjnocC9X10
 
 {
-  "concept": "prueba desde client rest",
+  "concept": "prueba desde client rest 2",
   "accountId": "f5e0bee5-681b-4039-9944-f2bda1b82ddf",
   "operationType": "TRANSFER",
   "beneficiaryAccount": "ES3400011234246855039185",
   "amount": 0.01
+}
+
+### Authorize operation by operationId
+POST http://localhost:8080/api/client/operation/authorize/4fc8cde0-ca39-4c37-925f-9afed71591af
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NTA0OTIzLCJleHAiOjE3ODk1MDY3MjN9.V4w-P2Q1Yxd_BjBiRKqKtRnh1o5GNRN5HwjnocC9X10
+
+{
+  "pin": "1234"
 }

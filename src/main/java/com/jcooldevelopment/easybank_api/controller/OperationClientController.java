@@ -70,7 +70,7 @@ public class OperationClientController {
     }
 
     @PostMapping("/authorize/{operationId}")
-    public ResponseEntity<Apiresponse<Void>> authorizeOperation(@PathVariable UUID operationId, OperationAuthorizationDto operationAuthorizationDto){
+    public ResponseEntity<Apiresponse<Void>> authorizeOperation(@PathVariable UUID operationId, @Valid @RequestBody OperationAuthorizationDto operationAuthorizationDto){
         this.operationService.authorizeOperation(operationId, operationAuthorizationDto);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<>("Operation authorized.", null));
