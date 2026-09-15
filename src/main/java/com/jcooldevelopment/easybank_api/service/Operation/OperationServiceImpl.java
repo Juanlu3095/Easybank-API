@@ -526,13 +526,26 @@ public class OperationServiceImpl implements OperationService{
         User user = this.userRepository.findByUsercode(usercode)
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
+        // Verify if operation is assigned to authenticated user 
+        if(this.operationRepository.operationBelongsToUser(operationId, usercode) == 0){
+            throw new UserNotAuthorizedException("User not authorized to get access to this operation.");
+        }
+
         if(user.getPin() == null) throw new ClientPinNotSetException("The current user has not set the pin.");
         
+        // Verify if PIN is the same as the one in database
         boolean verifyPin = this.passwordEncoder.matches(operationAuthorizationDto.getPin(), user.getPin());
         if(!verifyPin) throw new ClientPinIncorrectException("The given PIN is incorrect. Please try again.");
         
         Account ordererAccount = operation.getOrdererAccount();
         Account beneficiaryAccount = operation.getCounterpartAccount();
+
+        // Updates operation status to DONE
+        operation.setStatus(OperationStatus.DONE);
+        this.operationRepository.save(operation);
+
+        // Delete authorization from database when everything is okay.
+        this.operationAuthorizationRepository.delete(authorization);
 
         this.doTransferOperations(ordererAccount, beneficiaryAccount, operation);
     }

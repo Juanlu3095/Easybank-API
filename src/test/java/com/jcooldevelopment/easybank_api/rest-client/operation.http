@@ -1,7 +1,7 @@
 ### Create operation
 POST http://localhost:8080/api/client/operation
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NTA0OTIzLCJleHAiOjE3ODk1MDY3MjN9.V4w-P2Q1Yxd_BjBiRKqKtRnh1o5GNRN5HwjnocC9X10
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NTE0ODIzLCJleHAiOjE3ODk1MTY2MjN9.jHrKTnx1tkwfwNZUnXeCOixUEcF-JKrJjWDa0pPEeTM
 
 {
   "concept": "prueba desde client rest 2",
@@ -12,9 +12,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxN
 }
 
 ### Authorize operation by operationId
-POST http://localhost:8080/api/client/operation/authorize/4fc8cde0-ca39-4c37-925f-9afed71591af
+POST http://localhost:8080/api/client/operation/authorize/3a3d2cbf-2de1-4bd4-8aba-64f00db55fa8
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NTA0OTIzLCJleHAiOjE3ODk1MDY3MjN9.V4w-P2Q1Yxd_BjBiRKqKtRnh1o5GNRN5HwjnocC9X10
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NTE0ODIzLCJleHAiOjE3ODk1MTY2MjN9.jHrKTnx1tkwfwNZUnXeCOixUEcF-JKrJjWDa0pPEeTM
 
 {
   "pin": "1234"
