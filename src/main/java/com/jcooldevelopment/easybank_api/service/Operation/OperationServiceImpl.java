@@ -421,7 +421,10 @@ public class OperationServiceImpl implements OperationService{
         // Adds movements to operation for getting them when asking for operation
         savedMovements.forEach(movement -> savedOperation.addMovement(movement));
 
-        this.createAuthorization(savedOperation);
+        // Creates authorization if both account belongs to our bank
+        if(beneficiaryAccount != null){
+            this.createAuthorization(savedOperation);
+        }
 
         return this.operationMapper.EntityToDto(savedOperation);
     }
