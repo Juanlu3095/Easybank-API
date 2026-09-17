@@ -1,10 +1,10 @@
 ### Create operation
 POST http://localhost:8080/api/client/operation
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NTE0ODIzLCJleHAiOjE3ODk1MTY2MjN9.jHrKTnx1tkwfwNZUnXeCOixUEcF-JKrJjWDa0pPEeTM
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NjQ5MjM5LCJleHAiOjE3ODk2NTEwMzl9.VyHlvT30uljy0h_w3Z4ZH8pZtldgNBuDpaGOpYhm_BA
 
 {
-  "concept": "prueba desde client rest 2",
+  "concept": "prueba redis desde client rest 2",
   "accountId": "f5e0bee5-681b-4039-9944-f2bda1b82ddf",
   "operationType": "TRANSFER",
   "beneficiaryAccount": "ES3400011234246855039185",
@@ -12,10 +12,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxN
 }
 
 ### Authorize operation by operationId
-POST http://localhost:8080/api/client/operation/authorize/3a3d2cbf-2de1-4bd4-8aba-64f00db55fa8
+POST http://localhost:8080/api/client/operation/authorize/7c62f619-1d99-4237-9176-de56fdb9a1b4
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NTE0ODIzLCJleHAiOjE3ODk1MTY2MjN9.jHrKTnx1tkwfwNZUnXeCOixUEcF-JKrJjWDa0pPEeTM
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NjQ5MjM5LCJleHAiOjE3ODk2NTEwMzl9.VyHlvT30uljy0h_w3Z4ZH8pZtldgNBuDpaGOpYhm_BA
 
 {
-  "pin": "1234"
+  "pin": "12345"
 }

@@ -56,6 +56,7 @@ import com.jcooldevelopment.easybank_api.repository.MovementRepository;
 import com.jcooldevelopment.easybank_api.repository.OperationAuthorizationRepository;
 import com.jcooldevelopment.easybank_api.repository.OperationRepository;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
+import com.jcooldevelopment.easybank_api.service.PinAttempt.PinAttemptService;
 import com.jcooldevelopment.easybank_api.specs.operation.OperationSpecs;
 import com.jcooldevelopment.easybank_api.utils.DataFormater;
 
@@ -71,6 +72,7 @@ public class OperationServiceImpl implements OperationService{
     private final MovementMapper movementMapper;
     private final PasswordEncoder passwordEncoder;
     private final Environment env;
+    private final PinAttemptService pinAttemptService;
 
     public OperationServiceImpl(
         OperationRepository operationRepository,
@@ -81,7 +83,8 @@ public class OperationServiceImpl implements OperationService{
         OperationMapper operationMapper,
         MovementMapper movementMapper,
         PasswordEncoder passwordEncoder,
-        Environment env
+        Environment env,
+        PinAttemptService pinAttemptService
     ) {
         this.operationRepository = operationRepository;
         this.operationAuthorizationRepository = operationAuthorizationRepository;
@@ -92,6 +95,7 @@ public class OperationServiceImpl implements OperationService{
         this.movementMapper = movementMapper;
         this.passwordEncoder = passwordEncoder;
         this.env = env;
+        this.pinAttemptService = pinAttemptService;
     }
 
     @Override
@@ -538,8 +542,11 @@ public class OperationServiceImpl implements OperationService{
         
         // Verify if PIN is the same as the one in database
         boolean verifyPin = this.passwordEncoder.matches(operationAuthorizationDto.getPin(), user.getPin());
-        if(!verifyPin) throw new ClientPinIncorrectException("The given PIN is incorrect. Please try again.");
-        
+        if(!verifyPin) {
+            this.pinAttemptService.addAttempt(usercode);
+            throw new ClientPinIncorrectException("The given PIN is incorrect. Please try again.");
+        }
+
         Account ordererAccount = operation.getOrdererAccount();
         Account beneficiaryAccount = operation.getCounterpartAccount();
 

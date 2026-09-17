@@ -18,6 +18,7 @@ import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
 import com.jcooldevelopment.easybank_api.exception.AccountPurposeNotValid;
 import com.jcooldevelopment.easybank_api.exception.ActivationCodeExpiredException;
 import com.jcooldevelopment.easybank_api.exception.ClientPinAlreadySetException;
+import com.jcooldevelopment.easybank_api.exception.ClientPinIncorrectException;
 import com.jcooldevelopment.easybank_api.exception.ClientPinNotSetException;
 import com.jcooldevelopment.easybank_api.exception.ResourceAlreadyExists;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
@@ -26,6 +27,7 @@ import com.jcooldevelopment.easybank_api.exception.EmailCouldNotBeSendException;
 import com.jcooldevelopment.easybank_api.exception.EncryptionException;
 import com.jcooldevelopment.easybank_api.exception.IncorrectPasswordException;
 import com.jcooldevelopment.easybank_api.exception.NotEnoughBalanceException;
+import com.jcooldevelopment.easybank_api.exception.OperationAuthorizationExpiredException;
 import com.jcooldevelopment.easybank_api.exception.OrdererAndBeneficiaryCannotBeSameException;
 import com.jcooldevelopment.easybank_api.exception.ResetPasswordExpiredException;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
@@ -90,6 +92,17 @@ public class GlobalErrorHandler {
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
         problemDetails.setTitle("Client PIN not set");
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
+    }
+
+    // Incorrect PIN to authorize an operation
+    @ExceptionHandler(ClientPinIncorrectException.class)
+    public ResponseEntity<ProblemDetail> handleClientPinIncorrectException (ClientPinIncorrectException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
+        problemDetails.setTitle("Incorrect PIN");
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetails);
     }
@@ -223,6 +236,17 @@ public class GlobalErrorHandler {
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/410"));
         problemDetails.setTitle("Expired token");
+
+        return ResponseEntity.status(HttpStatus.GONE).body(problemDetails);
+    }
+
+    // 410 exception for expired operation authorization
+    @ExceptionHandler(OperationAuthorizationExpiredException.class)
+    public ResponseEntity<ProblemDetail> handleOperationAuthorizationExpiredException (OperationAuthorizationExpiredException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.GONE,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/410"));
+        problemDetails.setTitle("Operation authorization expired");
 
         return ResponseEntity.status(HttpStatus.GONE).body(problemDetails);
     }
