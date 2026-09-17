@@ -27,6 +27,7 @@ import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.AccountPurpose;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationStatus;
 import com.jcooldevelopment.easybank_api.contracts.enums.OperationType;
+import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationDto;
 import com.jcooldevelopment.easybank_api.dto.Movement.MovementPerOperationOnlyIban;
 import com.jcooldevelopment.easybank_api.dto.Operation.CreateOperationAdminDto;
@@ -515,8 +516,29 @@ public class OperationServiceImpl implements OperationService{
         return this.operationMapper.EntityToAdminDto(savedOperation);
     }
 
+    /**
+     * Verify user status to allow or not an operation.
+     * @param user The user entity to verify.
+     * @throws UserNotAuthorizedException if user is either blocked or not enabled.
+     */
+    private void verifyUserStatus(User user){
+        switch (user.getStatus()) {
+            case BLOCKED:
+                throw new UserNotAuthorizedException("Cannot proceed since user account is blocked.");
+            case NOT_ENABLED:
+                throw new UserNotAuthorizedException("Cannot proceed since user account is not enabled.");
+            default:
+                break;
+        }
+    }
+
     @Override 
     public void authorizeOperation(UUID operationId, OperationAuthorizationDto operationAuthorizationDto){
+        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = this.userRepository.findByUsercode(usercode)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+        this.verifyUserStatus(user);  
+
         OperationAuthorization authorization = this.operationAuthorizationRepository.findByOperationId(operationId)
             .orElseThrow(() -> new ResourceNotFoundException("There is no pending authorization for this operation."));
 
@@ -529,10 +551,6 @@ public class OperationServiceImpl implements OperationService{
     
         this.verifyOperationStatus(operation.getStatus());
 
-        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = this.userRepository.findByUsercode(usercode)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
-
         // Verify if operation is assigned to authenticated user 
         if(this.operationRepository.operationBelongsToUser(operationId, usercode) == 0){
             throw new UserNotAuthorizedException("User not authorized to get access to this operation.");
@@ -543,7 +561,11 @@ public class OperationServiceImpl implements OperationService{
         // Verify if PIN is the same as the one in database
         boolean verifyPin = this.passwordEncoder.matches(operationAuthorizationDto.getPin(), user.getPin());
         if(!verifyPin) {
-            this.pinAttemptService.addAttempt(usercode);
+            var pinAttempt = this.pinAttemptService.addAttempt(usercode);
+            if (pinAttempt.getAttempts_number() == 5) {
+                user.setStatus(UserStatus.BLOCKED);
+                this.userRepository.save(user);
+            }
             throw new ClientPinIncorrectException("The given PIN is incorrect. Please try again.");
         }
 
