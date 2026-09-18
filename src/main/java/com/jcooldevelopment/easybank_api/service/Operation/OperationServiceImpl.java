@@ -359,8 +359,13 @@ public class OperationServiceImpl implements OperationService{
 
     @Override
     public OperationDto create(CreateOperationDto createOperationDto) {
-        Account userAccount = this.getAccountById(createOperationDto.getAccountId());
         String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
+        User orderer = this.userRepository.findByUsercode(usercode)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+        // Verifies if used is blocked or not enabled before doing anything more
+        this.verifyUserStatus(orderer);
+
+        Account userAccount = this.getAccountById(createOperationDto.getAccountId());
         this.validateAccountToUse(userAccount, createOperationDto, usercode);
 
         Account beneficiaryAccount = null;
@@ -375,8 +380,6 @@ public class OperationServiceImpl implements OperationService{
             beneficiaryExternalAccount = createOperationDto.getBeneficiaryAccount();
         }
 
-        User orderer = this.userRepository.findByUsercode(usercode)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         
         Operation operation = new Operation();
         operation.setConcept(createOperationDto.getConcept());
@@ -566,8 +569,12 @@ public class OperationServiceImpl implements OperationService{
                 user.setStatus(UserStatus.BLOCKED);
                 this.userRepository.save(user);
             }
-            throw new ClientPinIncorrectException("The given PIN is incorrect. Please try again.");
+            int attemptsLeft = 5 - pinAttempt.getAttempts_number();
+            throw new ClientPinIncorrectException("The given PIN is incorrect. You have " + attemptsLeft + " attempt(s) left.");
         }
+
+        // Deletes pin attempts from redis when the one used is correct
+        this.pinAttemptService.deletePinAttempt(usercode);
 
         Account ordererAccount = operation.getOrdererAccount();
         Account beneficiaryAccount = operation.getCounterpartAccount();

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -114,6 +115,16 @@ public class GlobalErrorHandler {
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403"));
         problemDetails.setTitle("User not authorized");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetails);
+    }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<ProblemDetail> handleLockedException (LockedException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403"));
+        problemDetails.setTitle("User blocked");
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetails);
     }

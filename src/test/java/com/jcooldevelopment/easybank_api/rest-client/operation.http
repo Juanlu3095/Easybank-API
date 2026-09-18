@@ -1,7 +1,7 @@
 ### Create operation
 POST http://localhost:8080/api/client/operation
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NjQ5MjM5LCJleHAiOjE3ODk2NTEwMzl9.VyHlvT30uljy0h_w3Z4ZH8pZtldgNBuDpaGOpYhm_BA
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NjY4ODA2LCJleHAiOjE3ODk2NzA2MDZ9.lhHLq7r5KwGnxpku5wguVtoxHfiEl_FJLondgXQRr7Y
 
 {
   "concept": "prueba redis desde client rest 2",
@@ -12,9 +12,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxN
 }
 
 ### Authorize operation by operationId
-POST http://localhost:8080/api/client/operation/authorize/7c62f619-1d99-4237-9176-de56fdb9a1b4
+POST http://localhost:8080/api/client/operation/authorize/bf902a8d-d720-4a7f-8a6a-6d583ec0c8bd
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NjQ5MjM5LCJleHAiOjE3ODk2NTEwMzl9.VyHlvT30uljy0h_w3Z4ZH8pZtldgNBuDpaGOpYhm_BA
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzg5NjY4ODA2LCJleHAiOjE3ODk2NzA2MDZ9.lhHLq7r5KwGnxpku5wguVtoxHfiEl_FJLondgXQRr7Y
 
 {
   "pin": "12345"
