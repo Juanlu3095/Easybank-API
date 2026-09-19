@@ -5,8 +5,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -43,9 +44,9 @@ import jakarta.validation.ConstraintViolationException;
 @RestControllerAdvice
 public class GlobalErrorHandler {
 
-    // 401 Exception
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ProblemDetail> handleAuthenticationException (AuthenticationException exception) {
+    // 401 Exception. AuthenticationException is for every exception even blocked and not enabled, BadCredentials is not.
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ProblemDetail> handleAuthenticationException (BadCredentialsException exception) {
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
@@ -119,12 +120,24 @@ public class GlobalErrorHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetails);
     }
 
+    // 403 error when user is locked/blocked
     @ExceptionHandler(LockedException.class)
     public ResponseEntity<ProblemDetail> handleLockedException (LockedException exception) {
         ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
             exception.getMessage());
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403"));
         problemDetails.setTitle("User blocked");
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetails);
+    }
+
+    // 403 error when user is not enabled
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ProblemDetail> handleDisabledException (DisabledException exception) {
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
+            exception.getMessage());
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403"));
+        problemDetails.setTitle("User disabled");
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetails);
     }

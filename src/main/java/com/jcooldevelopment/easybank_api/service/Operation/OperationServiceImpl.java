@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -380,7 +382,6 @@ public class OperationServiceImpl implements OperationService{
             beneficiaryExternalAccount = createOperationDto.getBeneficiaryAccount();
         }
 
-        
         Operation operation = new Operation();
         operation.setConcept(createOperationDto.getConcept());
         operation.setOrderer(orderer);
@@ -527,9 +528,9 @@ public class OperationServiceImpl implements OperationService{
     private void verifyUserStatus(User user){
         switch (user.getStatus()) {
             case BLOCKED:
-                throw new UserNotAuthorizedException("Cannot proceed since user account is blocked.");
+                throw new LockedException("Cannot proceed since user account is blocked.");
             case NOT_ENABLED:
-                throw new UserNotAuthorizedException("Cannot proceed since user account is not enabled.");
+                throw new DisabledException("Cannot proceed since user account is not enabled.");
             default:
                 break;
         }
@@ -565,11 +566,12 @@ public class OperationServiceImpl implements OperationService{
         boolean verifyPin = this.passwordEncoder.matches(operationAuthorizationDto.getPin(), user.getPin());
         if(!verifyPin) {
             var pinAttempt = this.pinAttemptService.addAttempt(usercode);
-            if (pinAttempt.getAttempts_number() == 5) {
+            int pin_max_attempts = Integer.parseInt(this.env.getProperty("BANK.PIN.ATTEMPTS_MAX"));
+            if (pinAttempt.getAttempts_number() >= pin_max_attempts) {
                 user.setStatus(UserStatus.BLOCKED);
                 this.userRepository.save(user);
             }
-            int attemptsLeft = 5 - pinAttempt.getAttempts_number();
+            int attemptsLeft = pin_max_attempts - pinAttempt.getAttempts_number();
             throw new ClientPinIncorrectException("The given PIN is incorrect. You have " + attemptsLeft + " attempt(s) left.");
         }
 

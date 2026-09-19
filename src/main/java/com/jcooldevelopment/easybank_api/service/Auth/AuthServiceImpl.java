@@ -2,7 +2,9 @@ package com.jcooldevelopment.easybank_api.service.Auth;
 
 import java.time.LocalDateTime;
 
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +28,7 @@ import com.jcooldevelopment.easybank_api.repository.UserRepository;
 import com.jcooldevelopment.easybank_api.service.ActivationCode.ActivationCodeService;
 import com.jcooldevelopment.easybank_api.service.Email.EmailService;
 import com.jcooldevelopment.easybank_api.service.Jwt.JwtService;
+import com.jcooldevelopment.easybank_api.service.PasswordAttempt.PasswordAttemptService;
 import com.jcooldevelopment.easybank_api.service.ResetPasswordToken.ResetPasswordTokenService;
 import com.jcooldevelopment.easybank_api.utils.EncryptUtils;
 
@@ -37,33 +40,62 @@ public class AuthServiceImpl implements AuthService{
     private final ActivationCodeService activationCodeService;
     private final JwtService jwtService;
     private final ResetPasswordTokenService resetPasswordTokenService;
+    private final PasswordAttemptService passwordAttemptService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final Environment env;
 
     public AuthServiceImpl(UserRepository userRepository,
         EmailService emailService,
         ActivationCodeService activationCodeService,
         JwtService jwtService,
         ResetPasswordTokenService resetPasswordTokenService,
+        PasswordAttemptService passwordAttemptService,
         PasswordEncoder passwordEncoder,
-        AuthenticationManager authenticationManager
+        AuthenticationManager authenticationManager,
+        Environment env
     ) {
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.activationCodeService = activationCodeService;
         this.jwtService = jwtService;
         this.resetPasswordTokenService = resetPasswordTokenService;
+        this.passwordAttemptService = passwordAttemptService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.env = env;
     }
 
     @Override
     public String login(LoginDto request) {
-        this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsercode(), request.getPassword()));
-        UserDetails user = this.userRepository.findByUsercode(request.getUsercode())
-            .orElseThrow(() -> new ResourceNotFoundException("User not found."));
-        
-        return this.jwtService.getToken(user);
+        int password_max_attempts = Integer.parseInt(this.env.getProperty("BANK.PASSWORD.ATTEMPTS_MAX"));
+        try {
+            this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsercode(), request.getPassword()));
+            UserDetails user = this.userRepository.findByUsercode(request.getUsercode())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+            
+            // Delete failed attempts in Redis when correct password is provided
+            this.passwordAttemptService.deleteAttempts(request.getUsercode());
+            return this.jwtService.getToken(user);
+
+        } catch(BadCredentialsException e){
+            // Add attempt to Redis
+            String usercode = request.getUsercode();
+            int updatedAttempts = this.passwordAttemptService.addAttempt(usercode).getAttempts_number();
+
+            // If number of attempts becomes 5, user will be blocked.
+            if(updatedAttempts >= password_max_attempts){
+                User user = this.userRepository.findByUsercode(usercode)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+                
+                user.setStatus(UserStatus.BLOCKED);
+                this.userRepository.save(user);
+            }
+            // According to Java API, throwable cannot change its message once it is created, so must create a new one.
+            // Exception continues its road
+            int attemptsLeft = password_max_attempts - updatedAttempts;
+            throw new BadCredentialsException("Incorrect credentials. You have " + attemptsLeft + " attempt(s) left.");
+        }
     }
 
     @Override
