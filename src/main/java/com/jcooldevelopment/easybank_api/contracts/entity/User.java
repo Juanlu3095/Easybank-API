@@ -110,9 +110,11 @@ public class User implements UserDetails{
         }
     }
 
+    // Need "ROLE_" for access route by role using hasRole(), since this one adds "ROLE_" to role string
+    // https://medium.com/@chanuthmaduka1986/secure-spring-boot-application-with-easy-role-based-access-control-8c2355933902
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name().toString()));
     }
 
     @Override

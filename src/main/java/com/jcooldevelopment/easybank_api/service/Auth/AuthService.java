@@ -26,8 +26,8 @@ public interface AuthService {
     void forgotPassword(String email);
 
     /**
-     * Updates user's password.
-     * @param token The token to find to verify if that user requested wants to reset password.
+     * Updates user's password using token obtained by email.
+     * @param token The token to find to verify if that user requested wants to reset password using email.
      * @param resetPasswordDto It contains password and repeat password.
      * @return
      */
