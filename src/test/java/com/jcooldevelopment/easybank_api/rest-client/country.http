@@ -1,0 +1,19 @@
+### Get all countries
+GET http://localhost:8080/api/country
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMDc5MjgzLCJleHAiOjE3OTAwODEwODN9.R8u5wLozCqKtOdPORoT4R0J-IhAJCWGWA-ai3CWKjb0
+
+### Get one country by id
+GET http://localhost:8080/api/country/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMDc5MjgzLCJleHAiOjE3OTAwODEwODN9.R8u5wLozCqKtOdPORoT4R0J-IhAJCWGWA-ai3CWKjb0
+
+### Create a country
+POST http://localhost:8080/api/country
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMDc5MjgzLCJleHAiOjE3OTAwODEwODN9.R8u5wLozCqKtOdPORoT4R0J-IhAJCWGWA-ai3CWKjb0
+
+{
+    "name": "Portugal",
+    "code": "PR"
+}

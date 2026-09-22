@@ -32,9 +32,9 @@ public class OperationReceiptController {
                 .status(HttpStatus.OK)
                 .body(new Apiresponse<String>("Operation receipt created.", pdf));
         } catch (IOException e) {
-            // TODO Auto-generated catch block  
-            e.printStackTrace();
-            return null;
+            return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new Apiresponse<>("There was an error in server. Please contact our support team.", null));
         }
         
     }
