@@ -1,0 +1,9 @@
+### Create incidence by CLIENT
+POST http://localhost:8080/api/client/incidence
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMzYyNDY1LCJleHAiOjE3OTAzNjQyNjV9.iSAkxhptOsOmOupjyEbrhEzNk8tnvJdZP9DG4j6ZKeA
+
+{
+  "incidence_type": 1,
+  "message": "Prueba de incidencia como cliente"
+}

@@ -90,8 +90,6 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET,
                         "/api/accounttype/**",
                         "/api/country/**",
-                        "/api/incidence/**",
-                        "/api/incidencetype/**",
                         "/api/operationreceipt/**"
                     ).authenticated()
 
@@ -99,7 +97,8 @@ public class SecurityConfig {
                     .requestMatchers(
                         "/api/client/account/**",
                         "/api/client/branch/**",
-                        "/api/client/operation/**"
+                        "/api/client/operation/**",
+                        "/api/client/incidence/**"
                     ).hasRole(UserRole.CLIENT.toString())
 
                     .requestMatchers(HttpMethod.GET,
@@ -124,7 +123,8 @@ public class SecurityConfig {
                     .requestMatchers(
                         "/api/admin/account/**",
                         "/api/admin/branch/**",
-                        "/api/admin/operation/**"
+                        "/api/admin/operation/**",
+                        "/api/admin/incidence/**"
                     ).hasRole(UserRole.ADMIN.toString())
 
                     .requestMatchers(HttpMethod.GET,

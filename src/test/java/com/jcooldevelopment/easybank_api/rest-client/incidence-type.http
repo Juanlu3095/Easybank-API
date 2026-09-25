@@ -1,0 +1,8 @@
+### Creates an incidence type
+POST http://localhost:8080/api/incidencetype
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwMjU5OTMzLCJleHAiOjE3OTAyNjE3MzN9.ef5SRV4Wk0z4vmDYD8I5KWMjBUjoEItro06Be99qFdU
+
+{
+    "name": "Technical problem"
+}

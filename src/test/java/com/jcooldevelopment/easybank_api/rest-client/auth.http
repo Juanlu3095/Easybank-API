@@ -1,7 +1,17 @@
+### Login with client credentials
 POST http://localhost:8080/api/auth/login
 content-type: application/json
 
 {
     "usercode": "ppzk6TxYKr",
+    "password": "stringggg"
+}
+
+### Login with admin credentials
+POST http://localhost:8080/api/auth/login
+content-type: application/json
+
+{
+    "usercode": "iK51rrJpAK",
     "password": "stringggg"
 }

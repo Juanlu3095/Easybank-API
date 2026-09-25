@@ -1,0 +1,11 @@
+### Create incidence by ADMIN
+POST http://localhost:8080/api/admin/incidence
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwMzQzNjc2LCJleHAiOjE3OTAzNDU0NzZ9.i2DVqh9VHli8b49Z5a6rtFfqzUwGogbwR_OGBJlLoUo
+
+{
+  "user_id": "d5fb388a-c86b-4238-aaf2-fa81edb54ec8",
+  "incidence_type": 1,
+  "status": "IN_PROCESS",
+  "message": "Prueba de incidencia como admin"
+}
