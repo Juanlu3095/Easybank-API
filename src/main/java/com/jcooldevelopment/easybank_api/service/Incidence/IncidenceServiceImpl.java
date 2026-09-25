@@ -61,7 +61,9 @@ public class IncidenceServiceImpl implements IncidenceService{
 
     @Override 
     public PaginatedResponse<IncidenceDto> getByAuth(int page, int size){
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Incidence::getCreatedAt).descending());
+        // Careful here, sorting must be done in repository not here when using native query otherwise Hibernate will
+        // make mistakes.
+        Pageable pageable = PageRequest.of(page - 1, size);
         // Obtain all incidences using usercode in SecurityContextHolder
         String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
         Page<IncidenceProjection> incidences = this.incidenceRepository.findByUsercode(usercode, pageable);

@@ -1,9 +1,19 @@
 ### Create incidence by CLIENT
 POST http://localhost:8080/api/client/incidence
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMzYyNDY1LCJleHAiOjE3OTAzNjQyNjV9.iSAkxhptOsOmOupjyEbrhEzNk8tnvJdZP9DG4j6ZKeA
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMzc1MTk4LCJleHAiOjE3OTAzNzY5OTh9.Kk6YoU62PQXk3UGr4mA0RP_vHtl4yeblBs0b7AiQh74
 
 {
   "incidence_type": 1,
   "message": "Prueba de incidencia como cliente"
 }
+
+### Get all incidences for CLIENT
+GET http://localhost:8080/api/client/incidence
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMzc3MTMwLCJleHAiOjE3OTAzNzg5MzB9.bbL-mR6moLcLdF5EayXQkf9XyDWlJ6Xti19FGh2ouBc
+
+### Get incidence by id for CLIENT
+GET http://localhost:8080/api/client/incidence/f41b279e-9faa-49c1-97e5-80a323686138
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMzc1MTk4LCJleHAiOjE3OTAzNzY5OTh9.Kk6YoU62PQXk3UGr4mA0RP_vHtl4yeblBs0b7AiQh74

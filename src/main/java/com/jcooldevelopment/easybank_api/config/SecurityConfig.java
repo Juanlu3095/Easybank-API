@@ -98,6 +98,7 @@ public class SecurityConfig {
                         "/api/client/account/**",
                         "/api/client/branch/**",
                         "/api/client/operation/**",
+                        "/api/client/incidence",
                         "/api/client/incidence/**"
                     ).hasRole(UserRole.CLIENT.toString())
 
@@ -128,7 +129,6 @@ public class SecurityConfig {
                     ).hasRole(UserRole.ADMIN.toString())
 
                     .requestMatchers(HttpMethod.GET,
-                        "/api/incidence",
                         "/api/message/**",
                         "/api/user/**"
                     ).hasRole(UserRole.ADMIN.toString())

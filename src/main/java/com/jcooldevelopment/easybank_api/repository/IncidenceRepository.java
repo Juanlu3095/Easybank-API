@@ -14,25 +14,37 @@ public interface IncidenceRepository extends JpaRepository<Incidence, UUID>{
 
     @Query(
         value = """
-        SELECT 
-        incidences.id as id,
+        SELECT incidences.id as id,
         incidences.created_at as created_at,
         incidences.message as message,
         incidences.status as status,
         incidences.updated_at as updated_at,
-        incidenceType.name as incidenceType,
-        incidenceType.id as incidenceTypeId
+        incidence_type.name as incidenceType,
+        incidence_type.id as incidenceTypeId
         FROM incidences
-        INNER JOIN incidence_type
-            ON incidence.incidence_type = incidenceType.id
+        LEFT JOIN incidence_type
+            ON incidences.incidence_type = incidence_type.id
         WHERE incidences.user_id =
         (
             SELECT users.id
             FROM users
             WHERE users.usercode = ?1
         )
+        ORDER BY incidences.created_at
         """,
-        nativeQuery = true
+        nativeQuery = true,
+        countQuery = """
+            SELECT COUNT(*)
+            FROM incidences
+            INNER JOIN incidence_type
+                ON incidences.incidence_type = incidence_type.id
+            WHERE incidences.user_id =
+            (
+                SELECT users.id
+                FROM users
+                WHERE users.usercode = ?1
+            )        
+        """
     )
     Page<IncidenceProjection> findByUsercode(String usercode, Pageable pageable);
 
