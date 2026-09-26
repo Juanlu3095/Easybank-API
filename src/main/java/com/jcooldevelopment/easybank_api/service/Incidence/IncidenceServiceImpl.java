@@ -119,19 +119,21 @@ public class IncidenceServiceImpl implements IncidenceService{
     }
 
     @Override
-    public IncidenceAdminDto createByAdmin(CreateIncidenceAdminDto createIncidenceDtoDto){
-        IncidenceType incidenceType = incidenceTypeRepository.findById(createIncidenceDtoDto.getIncidence_type())
+    public IncidenceAdminDto createByAdmin(CreateIncidenceAdminDto createIncidenceDto){
+        IncidenceType incidenceType = incidenceTypeRepository.findById(createIncidenceDto.getIncidence_type())
             .orElseThrow(() -> new ResourceNotFoundException("Incidence type not found."));
 
         // Get user with given id in DTO
-        User user = this.userRepository.findById(createIncidenceDtoDto.getUser_id())
+        User user = this.userRepository.findById(createIncidenceDto.getUser_id())
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         
-        Incidence incidenceToSave = incidenceMapper.CreateIncidenceAdminDtoToEntity(createIncidenceDtoDto);
-        incidenceToSave.setUser_id(user);
+        Incidence incidenceToSave = new Incidence();
+        incidenceToSave.setUser(user);
         incidenceToSave.setCreatedAt(LocalDateTime.now());
         incidenceToSave.setUpdatedAt(LocalDateTime.now());
         incidenceToSave.setIncidence_type(incidenceType);
+        incidenceToSave.setMessage(createIncidenceDto.getMessage());
+        incidenceToSave.setStatus(IncidenceStatus.valueOf(createIncidenceDto.getStatus()));
         Incidence savedIncidence = incidenceRepository.save(incidenceToSave);
         return incidenceMapper.EntityToAdminDto(savedIncidence);
     }
@@ -148,7 +150,7 @@ public class IncidenceServiceImpl implements IncidenceService{
         User user = this.userRepository.findByUsercode(usercode)
             .orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
-        incidenceToUpdate.setUser_id(user); // Must get User_id from JWT
+        incidenceToUpdate.setUser(user); // Must get User_id from JWT
         incidenceToUpdate.setIncidence_type(incidenceType);
         incidenceToUpdate.setMessage(updateIncidenceDto.getMessage());
         incidenceToUpdate.setStatus(IncidenceStatus.valueOf(updateIncidenceDto.getStatus())); // Valueof to obtain contraint value in enum

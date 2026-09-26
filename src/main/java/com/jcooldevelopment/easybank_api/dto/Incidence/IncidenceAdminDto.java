@@ -19,7 +19,7 @@ public class IncidenceAdminDto {
 
     private UUID id;
 
-    @JsonIgnoreProperties({ "password", "pin"}) // Makes columns "password" and "pin" not visible
+    @JsonIgnoreProperties({ "password", "pin" }) // Makes columns "password" and "pin" not visible
     private UserForIncidence user;
 
     private IncidenceType incidence_type;
