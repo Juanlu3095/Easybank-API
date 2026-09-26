@@ -69,7 +69,7 @@ public class IncidenceAdminController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Apiresponse<Void>> deleteIncidence(UUID id) {
+    public ResponseEntity<Apiresponse<Void>> deleteIncidence(@PathVariable UUID id) {
         this.incidenceService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("Incidence deleted.", null));
     }

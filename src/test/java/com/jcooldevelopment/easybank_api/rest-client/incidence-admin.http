@@ -32,6 +32,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxN
 }
 
 ### Deletes an incidence by id
-DELETE http://localhost:8080/api/admin/incidence/2c95c739-65b7-4ec1-88e6-c08e4b68398f
+DELETE http://localhost:8080/api/admin/incidence/f7d47ece-bdbc-44d7-ab1c-dba521d5109e
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNDYzNDQ0LCJleHAiOjE3OTA0NjUyNDR9.S3kF8_UhTWf3s-l89fVJAexIyfmarLPLiuHDfTgdU4c
