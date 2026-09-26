@@ -11,6 +11,8 @@ import com.jcooldevelopment.easybank_api.dto.Incidence.CreateIncidenceDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.IncidenceAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.IncidenceDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.UpdateIncidenceDto;
+import com.jcooldevelopment.easybank_api.dto.User.UserForIncidence;
+import com.jcooldevelopment.easybank_api.projections.incidence.IncidenceAdminProjection;
 import com.jcooldevelopment.easybank_api.projections.incidence.IncidenceProjection;
 
 @Component
@@ -55,5 +57,31 @@ public class IncidenceMapper {
         incidenceDto.setStatus(IncidenceStatus.valueOf(incidenceProjection.status()));
         incidenceDto.setUpdatedAt(incidenceProjection.updated_at());
         return incidenceDto;
+    }
+
+    public IncidenceAdminDto ProjectionToAdminDto(IncidenceAdminProjection projection){
+        IncidenceType incidenceType = new IncidenceType();
+        incidenceType.setId(projection.incidenceTypeId());
+        incidenceType.setName(projection.incidenceType());
+
+        UserForIncidence user = new UserForIncidence();
+        user.setDni(projection.dni());
+        user.setEmail(projection.email());
+        user.setId(projection.userId());
+        user.setName(projection.userName());
+        user.setPhone(projection.phone());
+        user.setRole(projection.userRole());
+        user.setSurname(projection.userSurname());
+
+        IncidenceAdminDto incidenceAdminDto = new IncidenceAdminDto();
+        incidenceAdminDto.setCreatedAt(projection.created_at());
+        incidenceAdminDto.setId(projection.id());
+        incidenceAdminDto.setIncidence_type(incidenceType);
+        incidenceAdminDto.setMessage(projection.message());
+        incidenceAdminDto.setStatus(IncidenceStatus.valueOf(projection.status()));
+        incidenceAdminDto.setUpdatedAt(projection.updated_at());
+        incidenceAdminDto.setUser(user);
+
+        return incidenceAdminDto;
     }
 }

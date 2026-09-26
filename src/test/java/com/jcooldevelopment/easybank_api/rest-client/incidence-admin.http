@@ -1,7 +1,17 @@
+### Get all incidences
+GET http://localhost:8080/api/admin/incidence
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNDUyODY3LCJleHAiOjE3OTA0NTQ2Njd9.MJmYkSoAfHz5EwVMWk5iM9BaxVYXEZPDCdDpAPFQWoA
+
+### Get an incidence by id
+GET http://localhost:8080/api/admin/incidence/2c95c739-65b7-4ec1-88e6-c08e4b68398f
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNDUyODY3LCJleHAiOjE3OTA0NTQ2Njd9.MJmYkSoAfHz5EwVMWk5iM9BaxVYXEZPDCdDpAPFQWoA
+
 ### Create incidence by ADMIN
 POST http://localhost:8080/api/admin/incidence
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwMzQzNjc2LCJleHAiOjE3OTAzNDU0NzZ9.i2DVqh9VHli8b49Z5a6rtFfqzUwGogbwR_OGBJlLoUo
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNDUyODY3LCJleHAiOjE3OTA0NTQ2Njd9.MJmYkSoAfHz5EwVMWk5iM9BaxVYXEZPDCdDpAPFQWoA
 
 {
   "user_id": "d5fb388a-c86b-4238-aaf2-fa81edb54ec8",
@@ -9,3 +19,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxN
   "status": "IN_PROCESS",
   "message": "Prueba de incidencia como admin"
 }
+
+### Updates an incidence by id
+PUT http://localhost:8080/api/admin/incidence/2c95c739-65b7-4ec1-88e6-c08e4b68398f
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNDUyODY3LCJleHAiOjE3OTA0NTQ2Njd9.MJmYkSoAfHz5EwVMWk5iM9BaxVYXEZPDCdDpAPFQWoA
+
+{
+
+}
+
+### Deletes an incidence by id
+DELETE http://localhost:8080/api/admin/incidence/2c95c739-65b7-4ec1-88e6-c08e4b68398f
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNDUyODY3LCJleHAiOjE3OTA0NTQ2Njd9.MJmYkSoAfHz5EwVMWk5iM9BaxVYXEZPDCdDpAPFQWoA

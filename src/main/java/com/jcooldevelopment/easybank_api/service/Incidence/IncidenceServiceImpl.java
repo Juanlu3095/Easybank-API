@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
@@ -23,6 +22,7 @@ import com.jcooldevelopment.easybank_api.dto.Incidence.UpdateIncidenceDto;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.exception.UserNotAuthorizedException;
 import com.jcooldevelopment.easybank_api.mapper.IncidenceMapper;
+import com.jcooldevelopment.easybank_api.projections.incidence.IncidenceAdminProjection;
 import com.jcooldevelopment.easybank_api.projections.incidence.IncidenceProjection;
 import com.jcooldevelopment.easybank_api.repository.IncidenceRepository;
 import com.jcooldevelopment.easybank_api.repository.IncidenceTypeRepository;
@@ -50,10 +50,10 @@ public class IncidenceServiceImpl implements IncidenceService{
 
     @Override
     public PaginatedResponse<IncidenceAdminDto> getAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Incidence::getCreatedAt).descending());
-        Page<Incidence> incidences = this.incidenceRepository.findAll(pageable);
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<IncidenceAdminProjection> incidences = this.incidenceRepository.findAllAsProjection(pageable);
         Page<IncidenceAdminDto> incidencesToShow = incidences.map(incidence ->
-            this.incidenceMapper.EntityToAdminDto(incidence)
+            this.incidenceMapper.ProjectionToAdminDto(incidence)
         );
         PaginatedResponse<IncidenceAdminDto> paginatedResult = DataFormater.paginate(incidencesToShow);
         return paginatedResult;
