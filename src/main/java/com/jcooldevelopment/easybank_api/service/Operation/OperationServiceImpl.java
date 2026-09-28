@@ -103,6 +103,7 @@ public class OperationServiceImpl implements OperationService{
 
     @Override
     public PaginatedResponse<OperationAdminDto> getAll(OperationFilterDto operationFilterDto) {
+        // Specification only used when repository method is not custom made
         Specification<Operation> filters = Specification
             .where(OperationSpecs.findByConcept(operationFilterDto.getConcept()))
             .and(OperationSpecs.findByStatus(operationFilterDto.getStatus()))

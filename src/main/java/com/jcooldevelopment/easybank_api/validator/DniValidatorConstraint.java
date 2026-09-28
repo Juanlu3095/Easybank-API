@@ -7,8 +7,18 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class DniValidatorConstraint implements ConstraintValidator<DniValidatorAnnotation, String>{
 
+    boolean allowNull;
+
+    @Override
+    public void initialize(DniValidatorAnnotation constraintAnnotation) {        
+        // For filters in GET queries
+        allowNull = constraintAnnotation.allowNull();
+    }
+
     @Override
     public boolean isValid(String dni, ConstraintValidatorContext context) {
+        if(allowNull) return true;
+
         if (dni.length() != 9) { 
             return false;
         }

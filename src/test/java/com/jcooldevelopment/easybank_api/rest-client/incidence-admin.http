@@ -1,7 +1,32 @@
 ### Get all incidences
 GET http://localhost:8080/api/admin/incidence
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNDYzNDQ0LCJleHAiOjE3OTA0NjUyNDR9.S3kF8_UhTWf3s-l89fVJAexIyfmarLPLiuHDfTgdU4c
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNjA2MTc3LCJleHAiOjE3OTA2MDc5Nzd9.dUSgepS3zA6zjn69rQ3BYMaT4dmilWNQeCl0MHh4ecM
+
+### Get all incidences by status
+GET http://localhost:8080/api/admin/incidence?status=SOLVED
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNjA2MTc3LCJleHAiOjE3OTA2MDc5Nzd9.dUSgepS3zA6zjn69rQ3BYMaT4dmilWNQeCl0MHh4ecM
+
+### Get all incidences by incidence type
+GET http://localhost:8080/api/admin/incidence?incidenceType=Question
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNjA2MTc3LCJleHAiOjE3OTA2MDc5Nzd9.dUSgepS3zA6zjn69rQ3BYMaT4dmilWNQeCl0MHh4ecM
+
+### Get all incidences by username
+GET http://localhost:8080/api/admin/incidence?userName=Pepe&userSurname=Pérez
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNjA2MTc3LCJleHAiOjE3OTA2MDc5Nzd9.dUSgepS3zA6zjn69rQ3BYMaT4dmilWNQeCl0MHh4ecM
+
+### Get all incidences by user email
+GET http://localhost:8080/api/admin/incidence?userEmail=dev
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNjA2MTc3LCJleHAiOjE3OTA2MDc5Nzd9.dUSgepS3zA6zjn69rQ3BYMaT4dmilWNQeCl0MHh4ecM
+
+### Get all incidences by user dni
+GET http://localhost:8080/api/admin/incidence?userDni=83998868Q
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNjA2MTc3LCJleHAiOjE3OTA2MDc5Nzd9.dUSgepS3zA6zjn69rQ3BYMaT4dmilWNQeCl0MHh4ecM
 
 ### Get an incidence by id
 GET http://localhost:8080/api/admin/incidence/2c95c739-65b7-4ec1-88e6-c08e4b68398f

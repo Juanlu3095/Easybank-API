@@ -1,3 +1,28 @@
+### Get all incidences for CLIENT
+GET http://localhost:8080/api/client/incidence
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMzc3MTMwLCJleHAiOjE3OTAzNzg5MzB9.bbL-mR6moLcLdF5EayXQkf9XyDWlJ6Xti19FGh2ouBc
+
+### Get all incidences by message
+GET http://localhost:8080/api/client/incidence?message=hola
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwNTM2MzIyLCJleHAiOjE3OTA1MzgxMjJ9.4d-zjO9-jQZ-ORg0DpzTQEtat_Pv4eA9n0W-X-UhRLc
+
+### Get all incidences by status
+GET http://localhost:8080/api/client/incidence?status=SOLVED
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwNjA1ODcwLCJleHAiOjE3OTA2MDc2NzB9.c74UV8JDBtsDUzMhGXk2yYurKM4QfBODOz7aeZeK3p8
+
+### Get all incidences by incidence type
+GET http://localhost:8080/api/client/incidence?incidenceType=Question
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwNjA1ODcwLCJleHAiOjE3OTA2MDc2NzB9.c74UV8JDBtsDUzMhGXk2yYurKM4QfBODOz7aeZeK3p8
+
+### Get incidence by id for CLIENT
+GET http://localhost:8080/api/client/incidence/f41b279e-9faa-49c1-97e5-80a323686138
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMzc1MTk4LCJleHAiOjE3OTAzNzY5OTh9.Kk6YoU62PQXk3UGr4mA0RP_vHtl4yeblBs0b7AiQh74
+
 ### Create incidence by CLIENT
 POST http://localhost:8080/api/client/incidence
 Content-Type: application/json
@@ -7,13 +32,3 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxN
   "incidence_type": 1,
   "message": "Prueba de incidencia como cliente"
 }
-
-### Get all incidences for CLIENT
-GET http://localhost:8080/api/client/incidence
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMzc3MTMwLCJleHAiOjE3OTAzNzg5MzB9.bbL-mR6moLcLdF5EayXQkf9XyDWlJ6Xti19FGh2ouBc
-
-### Get incidence by id for CLIENT
-GET http://localhost:8080/api/client/incidence/f41b279e-9faa-49c1-97e5-80a323686138
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMzc1MTk4LCJleHAiOjE3OTAzNzY5OTh9.Kk6YoU62PQXk3UGr4mA0RP_vHtl4yeblBs0b7AiQh74

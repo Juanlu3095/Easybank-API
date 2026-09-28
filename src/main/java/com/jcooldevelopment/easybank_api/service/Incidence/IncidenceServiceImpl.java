@@ -17,7 +17,9 @@ import com.jcooldevelopment.easybank_api.contracts.enums.IncidenceStatus;
 import com.jcooldevelopment.easybank_api.dto.Incidence.CreateIncidenceAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.CreateIncidenceDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.IncidenceAdminDto;
+import com.jcooldevelopment.easybank_api.dto.Incidence.IncidenceAdminFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.IncidenceDto;
+import com.jcooldevelopment.easybank_api.dto.Incidence.IncidenceFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.UpdateIncidenceDto;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.exception.UserNotAuthorizedException;
@@ -49,9 +51,25 @@ public class IncidenceServiceImpl implements IncidenceService{
     }
 
     @Override
-    public PaginatedResponse<IncidenceAdminDto> getAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<IncidenceAdminProjection> incidences = this.incidenceRepository.findAllAsProjection(pageable);
+    public PaginatedResponse<IncidenceAdminDto> getAll(IncidenceAdminFilterDto filterDto) {
+        // Verify if there is an not null incidence type request param for search and see if exists in database
+        // It is not necessary to look for it when its value is blank
+        if(filterDto.getIncidenceType() != null){
+            this.incidenceTypeRepository.findByName(filterDto.getIncidenceType())
+                .orElseThrow(() -> new ResourceNotFoundException("Incidence type not found."));
+        }
+
+        Pageable pageable = PageRequest.of(filterDto.getPage() - 1, filterDto.getSize());
+        Page<IncidenceAdminProjection> incidences = this.incidenceRepository.findAllAsProjection(
+            filterDto.getMessage(),
+            filterDto.getStatus(),
+            filterDto.getUserName(),
+            filterDto.getUserSurname(),
+            filterDto.getUserEmail(),
+            filterDto.getUserDni(),
+            filterDto.getIncidenceType(),
+            pageable
+        );
         Page<IncidenceAdminDto> incidencesToShow = incidences.map(incidence ->
             this.incidenceMapper.ProjectionToAdminDto(incidence)
         );
@@ -60,13 +78,23 @@ public class IncidenceServiceImpl implements IncidenceService{
     }
 
     @Override 
-    public PaginatedResponse<IncidenceDto> getByAuth(int page, int size){
+    public PaginatedResponse<IncidenceDto> getByAuth(IncidenceFilterDto filterDto){
+        if(filterDto.getIncidenceType() != null){
+            this.incidenceTypeRepository.findByName(filterDto.getIncidenceType())
+                .orElseThrow(() -> new ResourceNotFoundException("Incidence type not found."));
+        }
         // Careful here, sorting must be done in repository not here when using native query otherwise Hibernate will
         // make mistakes.
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Pageable pageable = PageRequest.of(filterDto.getPage() - 1, filterDto.getSize());
         // Obtain all incidences using usercode in SecurityContextHolder
         String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
-        Page<IncidenceProjection> incidences = this.incidenceRepository.findByUsercode(usercode, pageable);
+        Page<IncidenceProjection> incidences = this.incidenceRepository.findByUsercode(
+            usercode,
+            filterDto.getMessage(),
+            filterDto.getStatus(),
+            filterDto.getIncidenceType(),
+            pageable
+        );
         Page<IncidenceDto> incidencesToShow = incidences.map(incidence ->
             this.incidenceMapper.ProjectionToDto(incidence)
         );

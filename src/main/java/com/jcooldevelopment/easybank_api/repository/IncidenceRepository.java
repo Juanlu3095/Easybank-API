@@ -31,12 +31,23 @@ public interface IncidenceRepository extends JpaRepository<Incidence, UUID>{
         FROM incidences
         LEFT JOIN incidence_type
             ON incidences.incidence_type = incidence_type.id
+        INNER JOIN users
+            ON incidences.user_id = users.id
         WHERE incidences.user_id =
         (
             SELECT users.id
             FROM users
             WHERE users.usercode = ?1
         )
+            AND (?2 IS NULL
+                OR ?2 = ''
+                OR incidences.message = ?2)
+            AND (?3 IS NULL
+                OR ?3 = ''
+                OR incidences.status = ?3)
+            AND (?4 IS NULL
+                OR ?4 = ''
+                OR incidence_type.name = ?4)
         ORDER BY incidences.created_at DESC
         """,
         nativeQuery = true,
@@ -50,10 +61,25 @@ public interface IncidenceRepository extends JpaRepository<Incidence, UUID>{
                 SELECT users.id
                 FROM users
                 WHERE users.usercode = ?1
-            )        
+            )
+            AND (?2 IS NULL
+                OR ?2 = ''
+                OR incidences.message = ?2)
+            AND (?3 IS NULL
+                OR ?3 = ''
+                OR incidences.status = ?3)
+            AND (?4 IS NULL
+                OR ?4 = ''
+                OR incidence_type.name = ?4)    
         """
     )
-    Page<IncidenceProjection> findByUsercode(String usercode, Pageable pageable);
+    Page<IncidenceProjection> findByUsercode(
+        String usercode,
+        String message,
+        String status,
+        String incidenceType,
+        Pageable pageable
+    );
 
     @Query(
         value = """
@@ -118,6 +144,27 @@ public interface IncidenceRepository extends JpaRepository<Incidence, UUID>{
         ON incidences.incidence_type = incidence_type.id
     INNER JOIN users
         ON incidences.user_id = users.id
+    WHERE (?1 IS NULL
+            OR ?1 = ''
+            OR incidences.message LIKE CONCAT('%', ?1, '%'))
+        AND (?2 IS NULL
+                OR ?2 = ''
+                OR incidences.status = ?2)
+        AND (?3 IS NULL
+                OR ?3 = ''
+                OR users.name LIKE CONCAT('%', ?3, '%'))
+        AND (?4 IS NULL
+                OR ?4 = ''
+                OR users.surname LIKE CONCAT('%', ?4, '%'))
+        AND (?5 IS NULL
+                OR ?5 = ''
+                OR users.email LIKE CONCAT('%', ?5, '%'))
+        AND (?6 IS NULL
+                OR ?6 = ''
+                OR users.dni LIKE CONCAT('%', ?6, '%'))
+        AND (?7 IS NULL
+                OR ?7 = ''
+                OR incidence_type.name = ?7)  
     ORDER BY incidences.created_at DESC
     """,
     countQuery = """
@@ -126,8 +173,38 @@ public interface IncidenceRepository extends JpaRepository<Incidence, UUID>{
     INNER JOIN incidence_type
         ON incidences.incidence_type = incidence_type.id
     INNER JOIN users
-        ON incidences.user_id = users.id    
+        ON incidences.user_id = users.id
+    WHERE (?1 IS NULL
+            OR ?1 = ''
+            OR incidences.message LIKE CONCAT('%', ?1, '%'))
+        AND (?2 IS NULL
+                OR ?2 = ''
+                OR incidences.status = ?2)
+        AND (?3 IS NULL
+                OR ?3 = ''
+                OR users.name LIKE CONCAT('%', ?3, '%'))
+        AND (?4 IS NULL
+                OR ?4 = ''
+                OR users.surname LIKE CONCAT('%', ?4, '%'))
+        AND (?5 IS NULL
+                OR ?5 = ''
+                OR users.email LIKE CONCAT('%', ?5, '%'))
+        AND (?6 IS NULL
+                OR ?6 = ''
+                OR users.dni LIKE CONCAT('%', ?6, '%'))
+        AND (?7 IS NULL
+                OR ?7 = ''
+                OR incidence_type.name = ?7)    
     """,
     nativeQuery = true)
-    Page<IncidenceAdminProjection> findAllAsProjection(Pageable pageable);
+    Page<IncidenceAdminProjection> findAllAsProjection(
+        String message,
+        String status,
+        String userName,
+        String userSurname,
+        String userEmail,
+        String userDni,
+        String incidenceType,
+        Pageable pageable
+    );
 }

@@ -32,7 +32,7 @@ public class CreateUserDto {
 
     @NotBlank(message = "DNI cannot be blank.")
     @Length(min = 9, max = 9, message = "DNI must have a length of {min} characters.")
-    @DniValidatorAnnotation
+    @DniValidatorAnnotation(allowNull = false)
     private String dni;
 
     @Email(message = "Email format is not valid.")

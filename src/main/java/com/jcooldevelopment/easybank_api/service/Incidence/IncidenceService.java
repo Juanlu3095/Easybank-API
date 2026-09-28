@@ -6,26 +6,26 @@ import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.Incidence.CreateIncidenceAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.CreateIncidenceDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.IncidenceAdminDto;
+import com.jcooldevelopment.easybank_api.dto.Incidence.IncidenceAdminFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.IncidenceDto;
+import com.jcooldevelopment.easybank_api.dto.Incidence.IncidenceFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Incidence.UpdateIncidenceDto;
 
 public interface IncidenceService {
 
     /**
      * Obtains all incidences with pagination. For admin role.
-     * @param page The number of page to see.
-     * @param size The size of each page with results.
+     * @param IncidenceAdminFilterDto It contains page number and size, also filters for incidences.
      * @return Incidences DTO with pagination for admin.
      */
-    public PaginatedResponse<IncidenceAdminDto> getAll(int page, int size);
+    public PaginatedResponse<IncidenceAdminDto> getAll(IncidenceAdminFilterDto filterDto);
 
     /**
      * Obtains all incidences that belongs to user with pagination using JWT. For client role.
-     * @param page The number of page to see.
-     * @param size The size of each page with results.
+     * @param IncidenceFilterDto It contains page number and size, also filters for incidences.
      * @return Incidences DTO with pagination
      */
-    public PaginatedResponse<IncidenceDto> getByAuth(int page, int size);
+    public PaginatedResponse<IncidenceDto> getByAuth(IncidenceFilterDto filterDto);
 
     /**
      * Obtains one specific incidence by id, previous verification of user belonging. For client role.

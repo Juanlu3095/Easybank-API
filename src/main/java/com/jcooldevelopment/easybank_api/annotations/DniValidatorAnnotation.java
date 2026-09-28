@@ -10,7 +10,6 @@ import com.jcooldevelopment.easybank_api.validator.DniValidatorConstraint;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.NotNull;
 
 @Target({
     ElementType.FIELD
@@ -18,9 +17,9 @@ import jakarta.validation.constraints.NotNull;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Constraint(validatedBy = DniValidatorConstraint.class)
-@NotNull
 public @interface DniValidatorAnnotation {
     String message() default "DNI format is not valid.";
+    boolean allowNull(); // This allows to use null in case we use it as filter in GET queries
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
