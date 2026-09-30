@@ -99,7 +99,8 @@ public class SecurityConfig {
                         "/api/client/branch/**",
                         "/api/client/operation/**",
                         "/api/client/incidence",
-                        "/api/client/incidence/**"
+                        "/api/client/incidence/**",
+                        "/api/client/user/**"
                     ).hasRole(UserRole.CLIENT.toString())
 
                     .requestMatchers(HttpMethod.GET,
@@ -125,19 +126,18 @@ public class SecurityConfig {
                         "/api/admin/account/**",
                         "/api/admin/branch/**",
                         "/api/admin/operation/**",
-                        "/api/admin/incidence/**"
+                        "/api/admin/incidence/**",
+                        "/api/admin/user/**"
                     ).hasRole(UserRole.ADMIN.toString())
 
                     .requestMatchers(HttpMethod.GET,
-                        "/api/message/**",
-                        "/api/user/**"
+                        "/api/message/**"
                     ).hasRole(UserRole.ADMIN.toString())
 
                     .requestMatchers(HttpMethod.POST,
                         "/api/accounttype",
                         "/api/country",
-                        "/api/incidencetype",
-                        "/api/user"
+                        "/api/incidencetype"
                     ).hasRole(UserRole.ADMIN.toString())
 
                     .requestMatchers(HttpMethod.PUT,

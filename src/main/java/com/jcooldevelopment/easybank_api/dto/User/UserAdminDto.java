@@ -3,16 +3,15 @@ package com.jcooldevelopment.easybank_api.dto.User;
 import java.util.UUID;
 
 import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
-import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class UserDto {
+@Data 
+@AllArgsConstructor 
+@NoArgsConstructor 
+public class UserAdminDto {
 
     private UUID id;
 
@@ -26,7 +25,7 @@ public class UserDto {
 
     private String phone;
 
-    private UserRole role;
+    private String usercode;
 
-    private UserStatus status;
+    private UserRole role;
 }

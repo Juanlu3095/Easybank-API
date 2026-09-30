@@ -13,8 +13,19 @@ public interface UserService {
 
     public PaginatedResponse<UserDto> getAll(int page, int size);
 
+    /**
+     * It obtains authenticated user data using JWT. For client role only
+     * @return User data as DTO.
+     */
+    public UserDto getByAuth();
+
     public UserDto getById(UUID id);
 
+    /**
+     * Creates user by admin. It does not send confirmation email.
+     * @param createUserDto The necessary data to create a new user.
+     * @return UserDto.
+     */
     public UserDto create(CreateUserDto createUserDto);
 
     public UserDto update(UUID id, UpdateUserDto updateUserDto);

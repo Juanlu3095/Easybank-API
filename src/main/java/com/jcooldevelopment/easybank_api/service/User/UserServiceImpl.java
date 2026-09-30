@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
+import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
 import com.jcooldevelopment.easybank_api.dto.User.CreatePinDto;
 import com.jcooldevelopment.easybank_api.dto.User.CreateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UpdateUserDto;
@@ -66,6 +67,15 @@ public class UserServiceImpl implements UserService{
 
         PaginatedResponse<UserDto> paginatedResponse = DataFormater.paginate(usersDto);
         return paginatedResponse;
+    }
+
+    @Override 
+    public UserDto getByAuth(){
+        String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = this.userRepository.findByUsercode(usercode)
+            .orElseThrow(()-> new ResourceNotFoundException("User data not found."));
+        
+        return userMapper.EntityToDto(user);
     }
 
     @Override
@@ -124,7 +134,7 @@ public class UserServiceImpl implements UserService{
             if (countEmail > 0) throw new EmailAlreadyExistsException("Email already exists.");
         }
 
-        if (userToUpdate.getDni().equals(updateUserDto.getDni())) {
+        if (userToUpdate.getDni().toUpperCase().equals(updateUserDto.getDni())) {
             if (countDni > 1) throw new DniAlreadyExistsException("DNI already exists.");
         } else {
             if (countDni > 0) throw new DniAlreadyExistsException("DNI already exists.");
@@ -147,6 +157,7 @@ public class UserServiceImpl implements UserService{
         userToUpdate.setPhone(updateUserDto.getPhone());
         userToUpdate.setRole(UserRole.valueOf(updateUserDto.getRole()));
         userToUpdate.setUsercode(usercode);
+        userToUpdate.setStatus(UserStatus.valueOf(updateUserDto.getStatus()));
         if(!passwordEncoder.matches(updateUserDto.getPassword(), userToUpdate.getPassword())) // Validates if new password equals the one from before
             userToUpdate.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
         userToUpdate.setPin(updateUserDto.getPin());

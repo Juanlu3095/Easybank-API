@@ -5,6 +5,7 @@ import org.hibernate.validator.constraints.Length;
 import com.jcooldevelopment.easybank_api.annotations.DniValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.annotations.EnumValidatorAnnotation;
 import com.jcooldevelopment.easybank_api.contracts.enums.UserRole;
+import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -49,4 +50,7 @@ public class UpdateUserDto {
 
     @EnumValidatorAnnotation(enumClass = UserRole.class, allowNull = false, message = "Role is not a valid value.")
     private String role;
+
+    @EnumValidatorAnnotation(enumClass = UserStatus.class, allowNull = false, message = "Status is not a valid value.")
+    private String status;
 }

@@ -1,0 +1,4 @@
+### Get user data by JWT
+GET http://localhost:8080/api/client/user
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwNjA4NjIzLCJleHAiOjE3OTA2MTA0MjN9.li1ir3SYoRYUUHn1mErHxzcdL09kC5Vmk5xQavMStTA
