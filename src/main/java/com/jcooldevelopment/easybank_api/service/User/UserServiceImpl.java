@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,9 @@ import com.jcooldevelopment.easybank_api.contracts.enums.UserStatus;
 import com.jcooldevelopment.easybank_api.dto.User.CreatePinDto;
 import com.jcooldevelopment.easybank_api.dto.User.CreateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UpdateUserDto;
+import com.jcooldevelopment.easybank_api.dto.User.UserAdminDto;
 import com.jcooldevelopment.easybank_api.dto.User.UserDto;
+import com.jcooldevelopment.easybank_api.dto.User.UserFilterDto;
 import com.jcooldevelopment.easybank_api.exception.ClientPinAlreadySetException;
 import com.jcooldevelopment.easybank_api.exception.DniAlreadyExistsException;
 import com.jcooldevelopment.easybank_api.exception.EmailAlreadyExistsException;
@@ -29,6 +32,7 @@ import com.jcooldevelopment.easybank_api.mapper.UserMapper;
 import com.jcooldevelopment.easybank_api.repository.UserRepository;
 import com.jcooldevelopment.easybank_api.service.ActivationCode.ActivationCodeService;
 import com.jcooldevelopment.easybank_api.service.Email.EmailService;
+import com.jcooldevelopment.easybank_api.specs.User.UserSpecs;
 import com.jcooldevelopment.easybank_api.utils.DataFormater;
 import com.jcooldevelopment.easybank_api.utils.EncryptUtils;
 
@@ -56,16 +60,24 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public PaginatedResponse<UserDto> getAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(User::getSurname).descending());
-        Page<User> users = this.userRepository.findAll(pageable);
-        Page<UserDto> usersDto = new PageImpl<UserDto>(users.getContent()
+    public PaginatedResponse<UserAdminDto> getAll(UserFilterDto filterDto) {
+        Specification<User> filters = Specification
+            .where(UserSpecs.findByName(filterDto.getName()))
+            .and(UserSpecs.findBySurname(filterDto.getSurname()))
+            .and(UserSpecs.findByDni(filterDto.getDni()))
+            .and(UserSpecs.findByEmail(filterDto.getEmail()))
+            .and(UserSpecs.findByPhone(filterDto.getPhone()))
+            .and(UserSpecs.findByRole(filterDto.getRole()))
+            .and(UserSpecs.findByStatus(filterDto.getStatus()));
+        Pageable pageable = PageRequest.of(filterDto.getPage() - 1, filterDto.getSize(), Sort.by(User::getSurname).descending());
+        Page<User> users = this.userRepository.findAll(filters, pageable);
+        Page<UserAdminDto> usersDto = new PageImpl<UserAdminDto>(users.getContent()
             .stream()
-            .map(userDto -> userMapper.EntityToDto(userDto))
+            .map(user -> userMapper.EntityToAdminDto(user))
             .toList()
         );
 
-        PaginatedResponse<UserDto> paginatedResponse = DataFormater.paginate(usersDto);
+        PaginatedResponse<UserAdminDto> paginatedResponse = DataFormater.paginate(usersDto);
         return paginatedResponse;
     }
 
@@ -79,15 +91,15 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserDto getById(UUID id) {
+    public UserAdminDto getById(UUID id) {
         User user = this.userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Incidence not found."));
 
-        return userMapper.EntityToDto(user);
+        return userMapper.EntityToAdminDto(user);
     }
 
     @Override
-    public UserDto create(CreateUserDto createUserDto) {
+    public UserAdminDto create(CreateUserDto createUserDto) {
         createUserDto.setDni(createUserDto.getDni().toUpperCase());
         // Validate if email and DNI already exist
         int countEmail = this.userRepository.countByEmail(createUserDto.getEmail());
@@ -114,11 +126,11 @@ public class UserServiceImpl implements UserService{
         userToSave.setUsercode(usercode);
         userToSave.setCreatedAt(LocalDateTime.now());
         User savedUser = this.userRepository.save(userToSave);
-        return userMapper.EntityToDto(savedUser);
+        return userMapper.EntityToAdminDto(savedUser);
     }
 
     @Override
-    public UserDto update(UUID id, UpdateUserDto updateUserDto) { 
+    public UserAdminDto update(UUID id, UpdateUserDto updateUserDto) { 
         User userToUpdate = this.userRepository.findById(id)
             .orElseThrow(()-> new ResourceNotFoundException("User not found."));
         
@@ -163,16 +175,15 @@ public class UserServiceImpl implements UserService{
         userToUpdate.setPin(updateUserDto.getPin());
         User savedUser = this.userRepository.save(userToUpdate);
 
-        return userMapper.EntityToDto(savedUser);
+        return userMapper.EntityToAdminDto(savedUser);
     }
 
     @Override
-    public boolean delete(UUID id) {
+    public void delete(UUID id) {
         User user = this.userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Incidence not found."));
         
         userRepository.delete(user);
-        return true;
     }
 
     @Override

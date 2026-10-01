@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.dto.User.CreateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UpdateUserDto;
+import com.jcooldevelopment.easybank_api.dto.User.UserAdminDto;
 import com.jcooldevelopment.easybank_api.dto.User.UserDto;
 
 @Component
@@ -25,7 +26,11 @@ public class UserMapper {
        return modelMapper.map(updateUserDto, User.class);
     }
 
-    public UserDto EntityToDto(User User) {
-        return modelMapper.map(User, UserDto.class);
+    public UserDto EntityToDto(User user) {
+        return modelMapper.map(user, UserDto.class);
+    }
+
+    public UserAdminDto EntityToAdminDto (User user){
+        return modelMapper.map(user, UserAdminDto.class);
     }
 }

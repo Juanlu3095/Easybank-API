@@ -6,12 +6,19 @@ import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.User.CreatePinDto;
 import com.jcooldevelopment.easybank_api.dto.User.CreateUserDto;
 import com.jcooldevelopment.easybank_api.dto.User.UpdateUserDto;
+import com.jcooldevelopment.easybank_api.dto.User.UserAdminDto;
 import com.jcooldevelopment.easybank_api.dto.User.UserDto;
+import com.jcooldevelopment.easybank_api.dto.User.UserFilterDto;
 import com.jcooldevelopment.easybank_api.exception.UserAlreadyEnabledException;
 
 public interface UserService {
 
-    public PaginatedResponse<UserDto> getAll(int page, int size);
+    /**
+     * Finds all Users with filters. For admin role onñy.
+     * @param filterDto It containts page, size and data about users to filter.
+     * @return User DTO for admin
+     */
+    public PaginatedResponse<UserAdminDto> getAll(UserFilterDto filterDto);
 
     /**
      * It obtains authenticated user data using JWT. For client role only
@@ -19,18 +26,18 @@ public interface UserService {
      */
     public UserDto getByAuth();
 
-    public UserDto getById(UUID id);
+    public UserAdminDto getById(UUID id);
 
     /**
      * Creates user by admin. It does not send confirmation email.
      * @param createUserDto The necessary data to create a new user.
      * @return UserDto.
      */
-    public UserDto create(CreateUserDto createUserDto);
+    public UserAdminDto create(CreateUserDto createUserDto);
 
-    public UserDto update(UUID id, UpdateUserDto updateUserDto);
+    public UserAdminDto update(UUID id, UpdateUserDto updateUserDto);
 
-    public boolean delete(UUID id);
+    public void delete(UUID id);
 
     /**
      * Allows to send again email to activate account.

@@ -1,17 +1,52 @@
 ### Get all users
 GET http://localhost:8080/api/admin/user
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODA1NzgyLCJleHAiOjE3OTA4MDc1ODJ9.ykXyONIrAO-_c4KHdzuvxLtSFyYzmtTz_AyQamw82FQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODkzNDc3LCJleHAiOjE3OTA4OTUyNzd9.u4ryTwYcw3gv-hHXAkQ80wXKtqHLXh9UkS7JIFIoEPk
+
+### Get all users by name
+GET http://localhost:8080/api/admin/user?name=Pepe
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODkzNDc3LCJleHAiOjE3OTA4OTUyNzd9.u4ryTwYcw3gv-hHXAkQ80wXKtqHLXh9UkS7JIFIoEPk
+
+### Get all users by name and surname
+GET http://localhost:8080/api/admin/user?name=Pepe&surname=Pé
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODkzNDc3LCJleHAiOjE3OTA4OTUyNzd9.u4ryTwYcw3gv-hHXAkQ80wXKtqHLXh9UkS7JIFIoEPk
+
+### Get all users by email
+GET http://localhost:8080/api/admin/user?email=pepe@gmail.com
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODkzNDc3LCJleHAiOjE3OTA4OTUyNzd9.u4ryTwYcw3gv-hHXAkQ80wXKtqHLXh9UkS7JIFIoEPk
+
+### Get all users by dni
+GET http://localhost:8080/api/admin/user?dni=83998868Q
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODkzNDc3LCJleHAiOjE3OTA4OTUyNzd9.u4ryTwYcw3gv-hHXAkQ80wXKtqHLXh9UkS7JIFIoEPk
+
+### Get all users by role
+GET http://localhost:8080/api/admin/user?role=CLIENT
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODkzNDc3LCJleHAiOjE3OTA4OTUyNzd9.u4ryTwYcw3gv-hHXAkQ80wXKtqHLXh9UkS7JIFIoEPk
+
+### Get all users by phone
+GET http://localhost:8080/api/admin/user?phone=123456789
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODkzNDc3LCJleHAiOjE3OTA4OTUyNzd9.u4ryTwYcw3gv-hHXAkQ80wXKtqHLXh9UkS7JIFIoEPk
+
+### Get all users by status
+GET http://localhost:8080/api/admin/user?status=ENABLED
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODkzNDc3LCJleHAiOjE3OTA4OTUyNzd9.u4ryTwYcw3gv-hHXAkQ80wXKtqHLXh9UkS7JIFIoEPk
 
 ### Get user by id
 GET http://localhost:8080/api/admin/user/d5fb388a-c86b-4238-aaf2-fa81edb54ec8
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwNzA1Mjc2LCJleHAiOjE3OTA3MDcwNzZ9.J2AHnIFyny8OroUcZ18GOK5C7zo-kiZWYWo2VlPQwlU
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODkzNDc3LCJleHAiOjE3OTA4OTUyNzd9.u4ryTwYcw3gv-hHXAkQ80wXKtqHLXh9UkS7JIFIoEPk
 
 ### Creates a new user
 POST http://localhost:8080/api/admin/user
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODA2ODkwLCJleHAiOjE3OTA4MDg2OTB9.RF6LU5i2MkKgulQGsJ1ppRqTW0b3dQ5l7XIn_kgRLp4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODkzNDc3LCJleHAiOjE3OTA4OTUyNzd9.u4ryTwYcw3gv-hHXAkQ80wXKtqHLXh9UkS7JIFIoEPk
 
 {
   "name": "Pepe",
@@ -28,7 +63,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxN
 ### Updates an existent user
 PATCH http://localhost:8080/api/admin/user/51cfd504-8734-4ba6-8bb1-52295da5aca9
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODA2ODkwLCJleHAiOjE3OTA4MDg2OTB9.RF6LU5i2MkKgulQGsJ1ppRqTW0b3dQ5l7XIn_kgRLp4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODkzNDc3LCJleHAiOjE3OTA4OTUyNzd9.u4ryTwYcw3gv-hHXAkQ80wXKtqHLXh9UkS7JIFIoEPk
 
 {
   "name": "Juan",
@@ -46,4 +81,4 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxN
 ### Deletes an user
 DELETE http://localhost:8080/api/admin/user/88aa4ccc-2d9e-4e46-be2b-af239ab0ca9d
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODA1OTI3LCJleHAiOjE3OTA4MDc3Mjd9.jlw37MXaz8mgTXTym88ALhl_XUnCacxYSvpv_U8M7J4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwODcwMDA1LCJleHAiOjE3OTA4NzE4MDV9.Lj4edBYHWuiEErfzVtHR3XKQBwRBXILQWLT2vo7bVJ8

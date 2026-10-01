@@ -4,13 +4,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.User;
 import com.jcooldevelopment.easybank_api.projections.user.UserNameAndSurnameProjection;
 
-public interface UserRepository extends JpaRepository<User, UUID>{
+public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User>{
 
     // https://stackoverflow.com/questions/29202277/update-single-field-using-spring-data-jpa
     @Modifying // This is used only with @Query
