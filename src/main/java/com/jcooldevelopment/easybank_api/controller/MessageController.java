@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +17,11 @@ import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.service.Message.MessageService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 
 import com.jcooldevelopment.easybank_api.dto.Message.CreateMessageDto;
+import com.jcooldevelopment.easybank_api.dto.Message.MessageAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Message.MessageDto;
+import com.jcooldevelopment.easybank_api.dto.Message.MessageFilterDto;
 import com.jcooldevelopment.easybank_api.dto.Message.UpdateMessageDto;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,18 +40,17 @@ public class MessageController {
 
     // For RequestParams validation: https://docs.hibernate.org/validator/5.1/reference/en-US/html/chapter-message-interpolation.html#section-interpolation-with-message-expressions
     @GetMapping("")
-    public ResponseEntity<Apiresponse<PaginatedResponse<MessageDto>>> getMessages(
-        @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page, // The page to retrieve, the name of the variable is the same for the url
-        @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size // The size of data in page
+    public ResponseEntity<Apiresponse<PaginatedResponse<MessageAdminDto>>> getMessages(
+        @Valid MessageFilterDto filtersDto
     ) {
-        PaginatedResponse<MessageDto> messages = this.messageService.getAll(page, size);
-        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<PaginatedResponse<MessageDto>>("Messages were found.", messages));
+        PaginatedResponse<MessageAdminDto> messages = this.messageService.getAll(filtersDto);
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<PaginatedResponse<MessageAdminDto>>("Messages were found.", messages));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Apiresponse<MessageDto>> getMessage(@PathVariable UUID id){
-        MessageDto message = this.messageService.getById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<MessageDto>("Message found.", message));
+    public ResponseEntity<Apiresponse<MessageAdminDto>> getMessage(@PathVariable UUID id){
+        MessageAdminDto message = this.messageService.getById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<MessageAdminDto>("Message found.", message));
     }
 
     @PostMapping("")
@@ -65,10 +64,10 @@ public class MessageController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Apiresponse<MessageDto>> putMessage(@PathVariable UUID id, @Valid @RequestBody UpdateMessageDto message) {
-        MessageDto updatedMessage = this.messageService.update(id, message);
+    public ResponseEntity<Apiresponse<MessageAdminDto>> putMessage(@PathVariable UUID id, @Valid @RequestBody UpdateMessageDto message) {
+        MessageAdminDto updatedMessage = this.messageService.update(id, message);
         return ResponseEntity.status(HttpStatus.OK)
-            .body(new Apiresponse<MessageDto>("Message updated.", updatedMessage));
+            .body(new Apiresponse<MessageAdminDto>("Message updated.", updatedMessage));
     }
 
     @DeleteMapping("/{id}")

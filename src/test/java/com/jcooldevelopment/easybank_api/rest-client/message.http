@@ -1,5 +1,36 @@
-## Get all messages
+### Create a message
+POST http://localhost:8080/api/message
+Content-Type: application/json
+
+{
+  "name": "Pepe",
+  "surname": "González",
+  "email": "pepe@example.com",
+  "phone": "123456789",
+  "message": "Hola que tal?"
+}
+
+### Get all messages
 GET http://localhost:8080/api/message
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMDE3MTc5LCJleHAiOjE3OTAwMTg5Nzl9.g9o6wMGHw9NfQoinkF0wCZ5MkQ5WbD5e7iPnk5pZVWc
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwOTYyNzAxLCJleHAiOjE3OTA5NjQ1MDF9.qtWgWXc2x2b3h-a-KTgIjcGHblQSlP4J_dg4b6goeic
 
+### Get all messages by name and surname
+GET http://localhost:8080/api/message?name=Pepe&surname=G
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwOTYyNzAxLCJleHAiOjE3OTA5NjQ1MDF9.qtWgWXc2x2b3h-a-KTgIjcGHblQSlP4J_dg4b6goeic
+
+### Get all messages by phone
+GET http://localhost:8080/api/message?phone=123456789
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwOTYyNzAxLCJleHAiOjE3OTA5NjQ1MDF9.qtWgWXc2x2b3h-a-KTgIjcGHblQSlP4J_dg4b6goeic
+
+### Get all messages by email
+GET http://localhost:8080/api/message?email=pepe@example.com
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwOTYyNzAxLCJleHAiOjE3OTA5NjQ1MDF9.qtWgWXc2x2b3h-a-KTgIjcGHblQSlP4J_dg4b6goeic
+
+### Get all messages by message
+GET http://localhost:8080/api/message?message=Hola
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwOTYyNzAxLCJleHAiOjE3OTA5NjQ1MDF9.qtWgWXc2x2b3h-a-KTgIjcGHblQSlP4J_dg4b6goeic

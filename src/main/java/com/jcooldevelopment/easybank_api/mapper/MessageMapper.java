@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import com.jcooldevelopment.easybank_api.contracts.entity.Message;
 import com.jcooldevelopment.easybank_api.dto.Message.CreateMessageDto;
+import com.jcooldevelopment.easybank_api.dto.Message.MessageAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Message.MessageDto;
 import com.jcooldevelopment.easybank_api.dto.Message.UpdateMessageDto;
 
@@ -26,5 +27,9 @@ public class MessageMapper {
 
     public MessageDto EntityToDto(Message message) {
         return modelMapper.map(message, MessageDto.class);
+    }
+
+    public MessageAdminDto EntityToAdminDto(Message message){
+        return modelMapper.map(message, MessageAdminDto.class);
     }
 }
