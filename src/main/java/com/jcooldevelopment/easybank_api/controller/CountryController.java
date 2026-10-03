@@ -60,11 +60,8 @@ public class CountryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Apiresponse<Void>> deleteCountry(int id) {
-        boolean result = this.countryService.delete(id);
-        if(!result) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Service unavailable.", null));
-        }
+    public ResponseEntity<Apiresponse<Void>> deleteCountry(@PathVariable int id) {
+        this.countryService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("Country deleted.", null));
     }
 }

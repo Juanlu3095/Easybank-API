@@ -69,12 +69,11 @@ public class CountryServiceImpl implements CountryService{
     }
 
     @Override
-    public boolean delete(int id) {
+    public void delete(int id) {
         Country country = this.countryRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Country not found."));
 
         this.countryRepository.delete(country);
-        return true;
     }
 
 }

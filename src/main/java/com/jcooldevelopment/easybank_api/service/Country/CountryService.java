@@ -16,5 +16,5 @@ public interface CountryService {
 
     CountryDto update(int id, UpdateCountryDto updateCountryDto);
 
-    boolean delete(int id);
+    void delete(int id);
 }
