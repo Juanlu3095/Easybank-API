@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +30,16 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
 import com.jcooldevelopment.easybank_api.controller.MessageController;
 import com.jcooldevelopment.easybank_api.dto.Message.CreateMessageDto;
+import com.jcooldevelopment.easybank_api.dto.Message.MessageAdminDto;
 import com.jcooldevelopment.easybank_api.dto.Message.MessageDto;
 import com.jcooldevelopment.easybank_api.dto.Message.UpdateMessageDto;
 import com.jcooldevelopment.easybank_api.exception.ResourceNotFoundException;
 import com.jcooldevelopment.easybank_api.repository.MessageRepository;
 
-@SpringBootTest
+// http://baeldung.com/spring-boot-testing -> Feature tests with h2, in-memory database
+@SpringBootTest // Searches for main class which has @SpringBootApplication
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("test") // Allows to use application-test.properties configuration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // Need this to use non-static beforeAll: https://www.baeldung.com/java-beforeall-afterall-non-static
 public class MessageTest {
 
@@ -47,7 +50,7 @@ public class MessageTest {
     private MessageController messageController;
 
     @Autowired
-    private MockMvc mockMvc;
+    private MockMvc mockMvc; // For testing without server using Hamcrest. MockMvcTester uses AssertJ
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -87,6 +90,11 @@ public class MessageTest {
         this.messageRepository.deleteAll(); // Deletes all rows in message table
     }
 
+    @BeforeEach 
+    public void beforeEach() throws Exception{
+        this.messageRepository.deleteAll();
+    }
+
     @Test
     public void getDatabaseName(){
         assertEquals("jdbc:postgresql://127.0.0.1:5432/easybank_test", db);
@@ -106,6 +114,7 @@ public class MessageTest {
         newMessage.setPhone("952214578");
         newMessage.setSurname("Pérez");
         
+        // Executes the http query and returns response
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/message")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(newMessage))
@@ -146,7 +155,6 @@ public class MessageTest {
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN") // https://codefarm0.medium.com/deep-dive-into-rest-api-integration-testing-in-spring-boot-d7ac3051cc07
     public void getAllMessages() throws Exception {
-        this.messageRepository.deleteAll();
         MessageDto newMessage = this.createMockMessage();
         UUID id = newMessage.getId();
         mockMvc.perform(MockMvcRequestBuilders.get("/api/message")
@@ -159,7 +167,128 @@ public class MessageTest {
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.jsonPath("$.data.data", Matchers.hasSize(1)))
         .andExpect(MockMvcResultMatchers.jsonPath("$.data.data[0].id", Matchers.equalTo(id.toString())))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.data.pageSize", Matchers.is(1))); // Also: https://stackoverflow.com/questions/13745332/how-to-count-members-with-jsonpath
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.pageSize", Matchers.is(5))) // Also: https://stackoverflow.com/questions/13745332/how-to-count-members-with-jsonpath
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.totalItems", Matchers.is(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.currentPage", Matchers.is(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.hasNext", Matchers.is(false)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.hasPrevious", Matchers.is(false)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.totalPages", Matchers.is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    public void getAllMessagesByNameAndSurname() throws Exception {
+        MessageDto newMessage = this.createMockMessage();
+        UUID id = newMessage.getId();
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message?name=Gustavo&surname=Ramír")
+            .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data", Matchers.hasSize(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data[0].id", Matchers.equalTo(id.toString())))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.pageSize", Matchers.is(5))) // Also: https://stackoverflow.com/questions/13745332/how-to-count-members-with-jsonpath
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.totalItems", Matchers.is(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.currentPage", Matchers.is(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.hasNext", Matchers.is(false)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.hasPrevious", Matchers.is(false)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.totalPages", Matchers.is(1)));
+
+        // Name and surname don't exist
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message?name=Pepe&surname=Ramír")
+            .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data", Matchers.hasSize(0)));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    public void getAllMessagesByEmail() throws Exception {
+        MessageDto newMessage = this.createMockMessage();
+        UUID id = newMessage.getId();
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message?email=gustavo@gmail.com")
+            .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data", Matchers.hasSize(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data[0].id", Matchers.equalTo(id.toString())))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.pageSize", Matchers.is(5))) // Also: https://stackoverflow.com/questions/13745332/how-to-count-members-with-jsonpath
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.totalItems", Matchers.is(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.currentPage", Matchers.is(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.hasNext", Matchers.is(false)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.hasPrevious", Matchers.is(false)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.totalPages", Matchers.is(1)));
+
+        // Email does not exist
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message?email=pepe@gmail.com")
+            .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data", Matchers.hasSize(0)));
+
+        // Email has no valid format to search. 422 error
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message?email=pepe")
+            .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(MockMvcResultMatchers.status().isUnprocessableContent())
+        .andExpect((response) -> assertTrue(response.getResolvedException() instanceof MethodArgumentNotValidException));
+        
+    }
+
+    @Test 
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    public void getAllMessagesByPhone() throws Exception {
+        MessageDto newMessage = this.createMockMessage();
+        UUID id = newMessage.getId();
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message?phone=952211222")
+            .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data", Matchers.hasSize(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data[0].id", Matchers.equalTo(id.toString())))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.pageSize", Matchers.is(5))) // Also: https://stackoverflow.com/questions/13745332/how-to-count-members-with-jsonpath
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.totalItems", Matchers.is(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.currentPage", Matchers.is(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.hasNext", Matchers.is(false)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.hasPrevious", Matchers.is(false)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.totalPages", Matchers.is(1)));
+
+        // Email does not exist
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message?phone=1")
+            .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data", Matchers.hasSize(0)));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    public void getAllMessagesByMessage() throws Exception {
+        MessageDto newMessage = this.createMockMessage();
+        UUID id = newMessage.getId();
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message?message=Hola")
+            .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data", Matchers.hasSize(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data[0].id", Matchers.equalTo(id.toString())))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.pageSize", Matchers.is(5))) // Also: https://stackoverflow.com/questions/13745332/how-to-count-members-with-jsonpath
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.totalItems", Matchers.is(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.currentPage", Matchers.is(1)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.hasNext", Matchers.is(false)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.hasPrevious", Matchers.is(false)))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.totalPages", Matchers.is(1)));
+
+        // Message does not exist
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/message?message=aa")
+            .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.jsonPath("$.data.data", Matchers.hasSize(0)));
     }
 
     @Test
@@ -182,9 +311,9 @@ public class MessageTest {
         .andReturn();
 
         String response = result.getResponse().getContentAsString();
-        Apiresponse<MessageDto> apiresponse = this.objectMapper.readValue(
+        Apiresponse<MessageAdminDto> apiresponse = this.objectMapper.readValue(
             response,
-            new TypeReference<Apiresponse<MessageDto>>() {}
+            new TypeReference<Apiresponse<MessageAdminDto>>() {}
         );
 
         assertEquals(newMessage.getEmail(), apiresponse.getData().getEmail());

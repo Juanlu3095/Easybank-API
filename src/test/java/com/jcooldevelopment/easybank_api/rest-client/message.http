@@ -13,7 +13,7 @@ Content-Type: application/json
 ### Get all messages
 GET http://localhost:8080/api/message
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwOTYyNzAxLCJleHAiOjE3OTA5NjQ1MDF9.qtWgWXc2x2b3h-a-KTgIjcGHblQSlP4J_dg4b6goeic
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwOTgxNjY2LCJleHAiOjE3OTA5ODM0NjZ9.Ce06r2hrufRqlseW_7qE9JJakCbvLB4DGosPeTKqD5Y
 
 ### Get all messages by name and surname
 GET http://localhost:8080/api/message?name=Pepe&surname=G

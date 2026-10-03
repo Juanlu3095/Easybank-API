@@ -72,10 +72,7 @@ public class MessageController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Apiresponse<Void>> deleteMessage(@PathVariable UUID id) {
-        boolean result = this.messageService.delete(id);
-        if(!result) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Service unavailable.", null));
-        }
+        this.messageService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("Message deleted.", null));
     }
 }

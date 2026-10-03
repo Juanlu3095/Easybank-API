@@ -19,5 +19,5 @@ public interface MessageService {
 
     public MessageAdminDto update(UUID id, UpdateMessageDto message);
 
-    public boolean delete(UUID id);
+    public void delete(UUID id);
 }

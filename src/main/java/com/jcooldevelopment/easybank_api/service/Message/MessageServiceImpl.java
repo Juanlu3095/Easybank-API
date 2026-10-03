@@ -84,13 +84,11 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public boolean delete(UUID id) {
+    public void delete(UUID id) {
         Message messageToDelete = this.messageRepository.findById(id)
             .orElseThrow(()-> new ResourceNotFoundException("Message not found."));
 
         messageRepository.delete(messageToDelete);
-        return true;
     }
-
 
 }
