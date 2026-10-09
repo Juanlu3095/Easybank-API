@@ -11,9 +11,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxN
 ### Create a country
 POST http://localhost:8080/api/country
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMDc5MjgzLCJleHAiOjE3OTAwODEwODN9.R8u5wLozCqKtOdPORoT4R0J-IhAJCWGWA-ai3CWKjb0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkxNTgxMDQ1LCJleHAiOjE3OTE1ODI4NDV9.OmMTI_fdE1HlRTdY4zmkubBlAchwIeDvnQ1VnHDLkes
 
 {
     "name": "Portugal",
-    "code": "PR"
+    "code": "PR-pr"
 }

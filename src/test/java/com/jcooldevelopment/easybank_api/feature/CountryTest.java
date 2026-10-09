@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -271,5 +272,31 @@ public class CountryTest {
                 assertThat(country.getCode()).isEqualTo(apiresponse.getData().getCode());
             }
         );
+    }
+
+    @Test
+    @WithMockUser(value = "user", roles = "ADMIN")
+    public void createCountry_AsAdminBadFormat () throws Exception {
+        String requestBody = String.format("""
+            {
+                "name": "%s",
+                "code": "%s"
+            }        
+        """,
+        mockCountryName, "ES-es");
+
+        var result = mockMvcTester
+            .post()
+            .uri("/api/country")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+            .exchange();
+
+        String jsonResponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = objectMapper.readValue(jsonResponse, new TypeReference<ProblemDetail>(){});
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(422);
+        assertThat(apiresponse.getStatus()).isEqualTo(422);
+        assertThat(apiresponse.getTitle()).isEqualTo("Request body not valid");
     }
 }

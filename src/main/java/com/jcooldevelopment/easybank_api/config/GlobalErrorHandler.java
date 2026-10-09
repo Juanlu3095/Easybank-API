@@ -16,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.jcooldevelopment.easybank_api.contracts.common.CustomProblemDetail;
 import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
 import com.jcooldevelopment.easybank_api.exception.AccountPurposeNotValid;
 import com.jcooldevelopment.easybank_api.exception.ActivationCodeExpiredException;
@@ -298,12 +299,13 @@ public class GlobalErrorHandler {
         }
 
         // https://howtodoinjava.com/spring-mvc/spring-problemdetail-errorresponse/
-        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT,
-            "One or more fields have wrong format.");
+        CustomProblemDetail problemDetails = new CustomProblemDetail();
+        problemDetails.setStatus(HttpStatus.UNPROCESSABLE_CONTENT);
+        problemDetails.setDetail("One or more fields have wrong format.");
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
         problemDetails.setTitle("Request body not valid");
-        problemDetails.setProperty("timestamp", LocalDateTime.now().toString());
-        problemDetails.setProperty("errors", errors);
+        problemDetails.setTimestamp();
+        problemDetails.setErrors("errors", errors);
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(problemDetails);
     }

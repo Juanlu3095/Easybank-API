@@ -24,4 +24,6 @@ public class CustomErrorResponse implements ErrorResponse{
         this.bodyDetail = detail;
     }
 
+    public CustomErrorResponse(){}
+
 }
