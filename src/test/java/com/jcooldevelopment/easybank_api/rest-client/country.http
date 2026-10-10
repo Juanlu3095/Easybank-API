@@ -1,19 +1,39 @@
 ### Get all countries
 GET http://localhost:8080/api/country
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMDc5MjgzLCJleHAiOjE3OTAwODEwODN9.R8u5wLozCqKtOdPORoT4R0J-IhAJCWGWA-ai3CWKjb0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkxNjUwMjcyLCJleHAiOjE3OTE2NTIwNzJ9.__kFHYPxqvMhMy3bxVYQbXsUqS5m27q-A83az3ojXBc
 
 ### Get one country by id
-GET http://localhost:8080/api/country/1
+GET http://localhost:8080/api/country/5
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcHprNlR4WUtyIiwiaWF0IjoxNzkwMDc5MjgzLCJleHAiOjE3OTAwODEwODN9.R8u5wLozCqKtOdPORoT4R0J-IhAJCWGWA-ai3CWKjb0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkxNjU0OTAyLCJleHAiOjE3OTE2NTY3MDJ9.ov0u60681UYW261hitDem_2wzavAle9BA9F9P1L4v4g
 
-### Create a country
+### Create a country, error 422
 POST http://localhost:8080/api/country
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkxNTgxMDQ1LCJleHAiOjE3OTE1ODI4NDV9.OmMTI_fdE1HlRTdY4zmkubBlAchwIeDvnQ1VnHDLkes
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkxNjUwMjcyLCJleHAiOjE3OTE2NTIwNzJ9.__kFHYPxqvMhMy3bxVYQbXsUqS5m27q-A83az3ojXBc
 
 {
     "name": "Portugal",
     "code": "PR-pr"
+}
+
+### Create a country
+POST http://localhost:8080/api/country
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkxNjUwMjcyLCJleHAiOjE3OTE2NTIwNzJ9.__kFHYPxqvMhMy3bxVYQbXsUqS5m27q-A83az3ojXBc
+
+{
+    "name": "España",
+    "code": "ES"
+}
+
+### Update a country already exists
+PUT http://localhost:8080/api/country/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkxNjUwMjcyLCJleHAiOjE3OTE2NTIwNzJ9.__kFHYPxqvMhMy3bxVYQbXsUqS5m27q-A83az3ojXBc
+
+{
+    "name": "España",
+    "code": "ES"
 }
