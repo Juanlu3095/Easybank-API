@@ -304,7 +304,7 @@ public class GlobalErrorHandler {
         problemDetails.setDetail("One or more fields have wrong format.");
         problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
         problemDetails.setTitle("Request body not valid");
-        problemDetails.setTimestamp();
+        problemDetails.setTimestamp(LocalDateTime.now());
         problemDetails.setErrors("errors", errors);
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(problemDetails);

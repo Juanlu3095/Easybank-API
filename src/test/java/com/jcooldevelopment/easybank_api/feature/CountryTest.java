@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ProblemDetail;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -23,6 +22,7 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
+import com.jcooldevelopment.easybank_api.contracts.common.CustomProblemDetail;
 import com.jcooldevelopment.easybank_api.contracts.entity.Country;
 import com.jcooldevelopment.easybank_api.dto.Country.CountryDto;
 import com.jcooldevelopment.easybank_api.repository.CountryRepository;
@@ -293,7 +293,7 @@ public class CountryTest {
             .exchange();
 
         String jsonResponse = result.getMvcResult().getResponse().getContentAsString();
-        ProblemDetail apiresponse = objectMapper.readValue(jsonResponse, new TypeReference<ProblemDetail>(){});
+        CustomProblemDetail apiresponse = objectMapper.readValue(jsonResponse, new TypeReference<CustomProblemDetail>(){});
 
         assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(422);
         assertThat(apiresponse.getStatus()).isEqualTo(422);

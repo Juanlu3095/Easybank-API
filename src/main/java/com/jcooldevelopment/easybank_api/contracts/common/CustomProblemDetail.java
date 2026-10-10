@@ -12,14 +12,21 @@ public class CustomProblemDetail extends ProblemDetail{
     private LocalDateTime timestamp;
     private Map<String, String> errors = new HashMap<>(); // HashMap with "errors"
 
-    public void setTimestamp() {
-        this.timestamp = LocalDateTime.now();
-        this.setProperty("timestamp", timestamp);
+    public void setTimestamp(LocalDateTime date) {
+        this.timestamp = date;
     }
 
     public void setErrors(String errorTitle, HashMap<String, String> errorsList) {
         this.errors = errorsList;
-        this.setProperty(errorTitle, errors);
+    }
+
+    // Getters are the one which allows to show properties in JSON objects
+    public LocalDateTime getTimestamp(){
+        return this.timestamp;
+    }
+
+    public Map<String, String> getErrors(){
+        return this.errors;
     }
 
     public CustomProblemDetail() {
