@@ -1,5 +1,7 @@
 package com.jcooldevelopment.easybank_api.feature;
 
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.javafaker.Faker;
 import com.jcooldevelopment.easybank_api.contracts.entity.IncidenceType;
 import com.jcooldevelopment.easybank_api.repository.IncidenceTypeRepository;
 
@@ -28,6 +31,9 @@ public class IncidenceTypeTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired 
+    private Faker faker;
+
     String mockIncidenceTypeName = "Question";
 
     public void beforeAll() {
@@ -38,15 +44,22 @@ public class IncidenceTypeTest {
         this.incidenceTypeRepository.deleteAll();
     }
 
-    private IncidenceType createMockIncidenceType(){
-        IncidenceType incidenceType = new IncidenceType();
-        incidenceType.setName(mockIncidenceTypeName);
-        return this.incidenceTypeRepository.save(incidenceType);
+    private ArrayList<IncidenceType> createMockIncidenceTypes(){
+        ArrayList<IncidenceType> incidenceTypes = new ArrayList<>();
+        // Creates 3 random incidenceTypes
+        // https://stackoverflow.com/questions/69279535/java-spring-boot-how-to-seed-a-database-like-in-php-laravel
+        for(int i = 0; i <3; i++) {
+            IncidenceType newIncidenceType = new IncidenceType();
+            newIncidenceType.setName(faker.funnyName().name());
+            IncidenceType savedIncidenceType = this.incidenceTypeRepository.save(newIncidenceType);
+            incidenceTypes.add(savedIncidenceType);
+        }
+        return incidenceTypes;
     }
 
     @Test
     public void getAllIncidenceTypes_NoCrendentials() throws Exception {
-
+        this.createMockIncidenceTypes();
     }
 
     @Test
