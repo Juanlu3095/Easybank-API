@@ -1,13 +1,14 @@
 package com.jcooldevelopment.easybank_api.service.IncidenceType;
 
-import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
+import java.util.List;
+
 import com.jcooldevelopment.easybank_api.dto.IncidenceType.CreateIncidenceTypeDto;
 import com.jcooldevelopment.easybank_api.dto.IncidenceType.IncidenceTypeDto;
 import com.jcooldevelopment.easybank_api.dto.IncidenceType.UpdateIncidenceTypeDto;
 
 public interface IncidenceTypeService {
 
-    public PaginatedResponse<IncidenceTypeDto> getAll(int page, int size);
+    public List<IncidenceTypeDto> getAll();
 
     public IncidenceTypeDto getById(int id);
 
@@ -15,5 +16,5 @@ public interface IncidenceTypeService {
 
     public IncidenceTypeDto update(int id, UpdateIncidenceTypeDto updateIncidenceTypeDto);
 
-    public boolean delete(int id);
+    public void delete(int id);
 }

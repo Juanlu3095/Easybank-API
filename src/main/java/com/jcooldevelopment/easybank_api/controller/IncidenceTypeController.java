@@ -1,6 +1,7 @@
 package com.jcooldevelopment.easybank_api.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,18 +13,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
-import com.jcooldevelopment.easybank_api.contracts.common.PaginatedResponse;
 import com.jcooldevelopment.easybank_api.dto.IncidenceType.CreateIncidenceTypeDto;
 import com.jcooldevelopment.easybank_api.dto.IncidenceType.IncidenceTypeDto;
 import com.jcooldevelopment.easybank_api.dto.IncidenceType.UpdateIncidenceTypeDto;
 import com.jcooldevelopment.easybank_api.service.IncidenceType.IncidenceTypeService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 
 @RestController
 @RequestMapping("/api/incidencetype")
@@ -36,14 +34,12 @@ public class IncidenceTypeController {
         this.incidenceTypeService = incidenceTypeService;
     }
 
+    // We suppose there is not to many incidences types, thus, we don't use pagination. Also, they are going to be used in select input
     // For RequestParams validation: https://docs.hibernate.org/validator/5.1/reference/en-US/html/chapter-message-interpolation.html#section-interpolation-with-message-expressions
     @GetMapping("")
-    public ResponseEntity<Apiresponse<PaginatedResponse<IncidenceTypeDto>>> getIncidenceTypes(
-        @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "Page minimal value is 1.") int page, // The page to retrieve, the name of the variable is the same for the url
-        @RequestParam(required = false, defaultValue = "10") @Min(value = 1, message = "Page size minimal value is 1.") int size // The size of data in page
-    ) {
-        PaginatedResponse<IncidenceTypeDto> incidenceTypes = this.incidenceTypeService.getAll(page, size);
-        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<PaginatedResponse<IncidenceTypeDto>>("Incidence types were found.", incidenceTypes));
+    public ResponseEntity<Apiresponse<List<IncidenceTypeDto>>> getIncidenceTypes() {
+        List<IncidenceTypeDto> incidenceTypes = this.incidenceTypeService.getAll();
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<List<IncidenceTypeDto>>("Incidence types were found.", incidenceTypes));
     }
 
     @GetMapping("/{id}")
@@ -69,10 +65,7 @@ public class IncidenceTypeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Apiresponse<Void>> deleteMessage(int id) {
-        boolean result = this.incidenceTypeService.delete(id);
-        if(!result) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Service unavailable.", null));
-        }
+        this.incidenceTypeService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("Incidence type deleted.", null));
     }
 }
