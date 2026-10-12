@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class CreateIncidenceTypeDto {
 
     @NotBlank(message="Name cannot be blank.")
-    @Length(max=50, message="Name cannot have more than 50 characters.")
+    @Length(min = 0, max=50, message="Name cannot have more than 50 characters.")
     private String name;
 }

@@ -7,6 +7,15 @@ content-type: application/json
     "password": "stringggg"
 }
 
+### Login with client credentials with other user
+POST http://localhost:8080/api/auth/login
+content-type: application/json
+
+{
+    "usercode": "1bJLvUXVp8",
+    "password": "stringggg"
+}
+
 ### Login with admin credentials
 POST http://localhost:8080/api/auth/login
 content-type: application/json
@@ -14,4 +23,27 @@ content-type: application/json
 {
     "usercode": "iK51rrJpAK",
     "password": "stringggg"
+}
+
+### Login with admin credentials with other user
+POST http://localhost:8080/api/auth/login
+content-type: application/json
+
+{
+    "usercode": "1bJLvUXVp8",
+    "password": "stringggg"
+}
+
+### Register new user
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "password": "stringggg",
+  "repeatPassword": "stringggg",
+  "name": "Juan",
+  "surname": "Pepe",
+  "dni": "39833110P",
+  "email": "jcooldevelopment@gmail.com",
+  "phone": "123456789"
 }

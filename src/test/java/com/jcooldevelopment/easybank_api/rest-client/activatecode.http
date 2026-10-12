@@ -1,0 +1,3 @@
+### Activate account from email
+POST http://localhost:8080/api/activate/SICK9972nDDYxXRyYVsavIN49IAMtBdfGqMzwKHGRqf9tñ0sSU8iDuMNPgFD6NS0
+Content-Type: application/json

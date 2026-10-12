@@ -1,8 +1,22 @@
 ### Creates an incidence type
 POST http://localhost:8080/api/incidencetype
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpSzUxcnJKcEFLIiwiaWF0IjoxNzkwMjU5OTMzLCJleHAiOjE3OTAyNjE3MzN9.ef5SRV4Wk0z4vmDYD8I5KWMjBUjoEItro06Be99qFdU
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxYkpMdlVYVnA4IiwiaWF0IjoxNzkxODEyNjA5LCJleHAiOjE3OTE4MTQ0MDl9.NqNu29SPPXz7UCuIkeV5BkIHwXNxzvK8Ml1JfLykEgE
 
 {
     "name": "Technical problem"
 }
+
+### Creates an incidence type, but instead receives a 422 exception
+POST http://localhost:8080/api/incidencetype
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxYkpMdlVYVnA4IiwiaWF0IjoxNzkxODMxMDM2LCJleHAiOjE3OTE4MzI4MzZ9.XErGY_PSgC03ME4l96pyjeTw8ffWpIV-DQDzu6sg1gM
+
+{
+    "name": ""
+}
+
+### Get all incidence types
+GET http://localhost:8080/api/incidencetype
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxYkpMdlVYVnA4IiwiaWF0IjoxNzkxODEyMjc3LCJleHAiOjE3OTE4MTQwNzd9.8AzRLuVb6ecZnlAEfDR7BcthBPs2WyKtV-0pJ8iD_lM

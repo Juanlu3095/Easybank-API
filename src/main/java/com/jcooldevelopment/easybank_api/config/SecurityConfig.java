@@ -90,7 +90,8 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET,
                         "/api/accounttype/**",
                         "/api/country/**",
-                        "/api/operationreceipt/**"
+                        "/api/operationreceipt/**",
+                        "/api/incidencetype/**"
                     ).authenticated()
 
                     // Client role
