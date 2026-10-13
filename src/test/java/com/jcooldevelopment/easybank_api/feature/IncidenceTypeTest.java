@@ -18,9 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -84,8 +86,17 @@ public class IncidenceTypeTest {
             .contentType(MediaType.APPLICATION_JSON)
             .exchange();
 
-        assertThat(result)
-            .hasStatus(HttpStatus.UNAUTHORIZED);
+        assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        // This properties are set in AuthorizationExceptionHandler class
+        assertThat(apiresponse.getTitle()).isEqualTo("User not authenticated");
+        assertThat(apiresponse.getStatus()).isEqualTo(401);
+        assertThat(apiresponse.getDetail()).isEqualTo("You need to log to access data.");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
+        
     }
 
     @Test
@@ -137,6 +148,15 @@ public class IncidenceTypeTest {
             .exchange();
 
         assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(401);
+        
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        // This properties are set in AuthorizationExceptionHandler class
+        assertThat(apiresponse.getTitle()).isEqualTo("User not authenticated");
+        assertThat(apiresponse.getStatus()).isEqualTo(401);
+        assertThat(apiresponse.getDetail()).isEqualTo("You need to log to access data.");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
         
     }
 
@@ -191,8 +211,16 @@ public class IncidenceTypeTest {
             .contentType(MediaType.APPLICATION_JSON)
             .exchange();
 
-        assertThat(result)
-            .hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        assertThat(apiresponse.getStatus()).isEqualTo(404);
+        assertThat(apiresponse.getTitle()).isEqualTo("Resource not found");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404"));
+        assertThat(apiresponse.getDetail()).isEqualTo("Incidence type not found.");
+    
     }
 
     @Test
@@ -214,6 +242,21 @@ public class IncidenceTypeTest {
             .exchange();
 
         assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(401);
+    
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        // This properties are set in AuthorizationExceptionHandler class
+        assertThat(apiresponse.getTitle()).isEqualTo("User not authenticated");
+        assertThat(apiresponse.getStatus()).isEqualTo(401);
+        assertThat(apiresponse.getDetail()).isEqualTo("You need to log to access data.");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
+        
+        // Validate if row was not updated
+        List<IncidenceType> searchIncidenceType = this.incidenceTypeRepository.findAll();
+
+        assertThat(searchIncidenceType).isEmpty();
+    
     }
 
     @Test
@@ -327,7 +370,16 @@ public class IncidenceTypeTest {
             .exchange();
 
         assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(401);
-    
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        // This properties are set in AuthorizationExceptionHandler class
+        assertThat(apiresponse.getTitle()).isEqualTo("User not authenticated");
+        assertThat(apiresponse.getStatus()).isEqualTo(401);
+        assertThat(apiresponse.getDetail()).isEqualTo("You need to log to access data.");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
+        
         // Verify if incidence type in database has not been updated
         Optional<IncidenceType> incidenceTypeInDatabase = this.incidenceTypeRepository.findById(incidenceTypes.get(1).getId());
         
@@ -337,48 +389,243 @@ public class IncidenceTypeTest {
     @Test
     @WithMockUser(value = "user", roles = "CLIENT")
     public void putIncidenceType_AsClient() throws Exception {
+        ArrayList<IncidenceType> incidenceTypes = this.createMockIncidenceTypes();
+
+        String requestBody = String.format("""
+            {
+                "name": ""
+            }
+            """
+        );
+
+        var result = mockMvcTester
+            .put()
+            .uri("/api/incidencetype/" + incidenceTypes.get(1).getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(403);
+    
+        // Verify if incidence type in database has not been updated
+        Optional<IncidenceType> incidenceTypeInDatabase = this.incidenceTypeRepository.findById(incidenceTypes.get(1).getId());
         
+        assertThat(incidenceTypeInDatabase.get().getName()).isEqualTo(incidenceTypes.get(1).getName());
+    
     }
 
     @Test
     @WithMockUser(value = "user", roles = "ADMIN")
     public void putIncidenceType_AsAdmin() throws Exception {
+        ArrayList<IncidenceType> incidenceTypes = this.createMockIncidenceTypes();
+
+        String requestBody = String.format("""
+            {
+                "name": "Example"
+            }
+            """
+        );
+
+        var result = mockMvcTester
+            .put()
+            .uri("/api/incidencetype/" + incidenceTypes.get(1).getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(200);
+    
+        // Verify if incidence type in database has not been updated
+        Optional<IncidenceType> incidenceTypeInDatabase = this.incidenceTypeRepository.findById(incidenceTypes.get(1).getId());
         
+        assertThat(incidenceTypeInDatabase.get().getName()).isEqualTo("Example");
+    
     }
 
     @Test
     @WithMockUser(value = "user", roles = "ADMIN")
     public void putIncidenceType_AsAdmin_NotFound() throws Exception {
+        ArrayList<IncidenceType> incidenceTypes = this.createMockIncidenceTypes();
 
+        String requestBody = String.format("""
+            {
+                "name": "Example"
+            }
+            """
+        );
+
+        var result = mockMvcTester
+            .put()
+            .uri("/api/incidencetype/" + incidenceTypes.get(1).getId() + 1)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(404);
+    
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        assertThat(apiresponse.getStatus()).isEqualTo(404);
+        assertThat(apiresponse.getTitle()).isEqualTo("Resource not found");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404"));
+        assertThat(apiresponse.getDetail()).isEqualTo("Incidence type not found.");
+    
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"})
     @WithMockUser(value = "user", roles = "ADMIN")
-    public void putIncidenceType_AsAdmin_BadFormat() throws Exception {
+    public void putIncidenceType_AsAdmin_BadFormat(String incidenceTypeName) throws Exception {
+        ArrayList<IncidenceType> incidenceTypes = this.createMockIncidenceTypes();
 
+        String requestBody = String.format("""
+            {
+                "name": "%s"
+            }
+            """,
+            incidenceTypeName
+        );
+
+        var result = mockMvcTester
+            .put()
+            .uri("/api/incidencetype/" + incidenceTypes.get(1).getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(422);
+    
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        CustomProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<CustomProblemDetail>(){});
+
+        assertThat(apiresponse.getStatus()).isEqualTo(422);
+        assertThat(result.getMvcResult().getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class);
+        assertThat(apiresponse.getTitle()).isEqualTo("Request body not valid");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
+        assertThat(apiresponse.getDetail()).isEqualTo("One or more fields have wrong format.");
+        assertThat(apiresponse.getTimestamp()).isNotNull();
+        assertThat(apiresponse.getErrors()).hasFieldOrProperty("name");
+        assertThat(apiresponse.getErrors()).hasSize(1);
+        
+        if(incidenceTypeName.isEmpty()){
+            assertThat(apiresponse.getErrors()).containsValue("Name cannot be blank.");
+        } else {
+            assertThat(apiresponse.getErrors()).containsValue("Name cannot have more than 50 characters.");
+        }
+
+        // Validate if row was not updated
+        Optional<IncidenceType> searchIncidenceType = this.incidenceTypeRepository.findById(incidenceTypes.get(1).getId());
+
+        assertThat(searchIncidenceType.get().getName()).isEqualTo(incidenceTypes.get(1).getName());
     }
 
     @Test
     public void deleteIncidenceType_NoCrendentials() throws Exception {
+        ArrayList<IncidenceType> incidenceTypes = this.createMockIncidenceTypes();
 
+        var result = mockMvcTester
+            .delete()
+            .uri("/api/incidencetype/" + incidenceTypes.get(1).getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(401);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        // This properties are set in AuthorizationExceptionHandler class
+        assertThat(apiresponse.getTitle()).isEqualTo("User not authenticated");
+        assertThat(apiresponse.getStatus()).isEqualTo(401);
+        assertThat(apiresponse.getDetail()).isEqualTo("You need to log to access data.");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
+        
+        // According to Spring documentation, AuthenticationException and AccessDeniedException are caught by Spring
+        // Security filters, so this test may not get the exception instance. However, at some point it also says:
+        // "If the application does not throw an AccessDeniedException or an AuthenticationException, then ExceptionTranslationFilter does not do anything.",
+        // which gives me more doubts.
+        // https://docs.spring.io/spring-security/reference/servlet/architecture.html#servlet-exceptiontranslationfilter
+        // assertThat(result.getMvcResult().getResolvedException()).isInstanceOf(AuthenticationException.class);
+    
+        Optional<IncidenceType> searchIncidenceType = this.incidenceTypeRepository.findById(incidenceTypes.get(1).getId());
+
+        assertThat(searchIncidenceType).isNotEmpty();
     }
 
     @Test
     @WithMockUser(value = "user", roles = "CLIENT")
     public void deleteIncidenceType_AsClient() throws Exception {
+        ArrayList<IncidenceType> incidenceTypes = this.createMockIncidenceTypes();
+
+        var result = mockMvcTester
+            .delete()
+            .uri("/api/incidencetype/" + incidenceTypes.get(1).getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(403);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        // This properties are set in AccessDeniedExceptionHandler class
+        assertThat(apiresponse.getTitle()).isEqualTo("Access denied");
+        assertThat(apiresponse.getStatus()).isEqualTo(403);
+        assertThat(apiresponse.getDetail()).isEqualTo("User has no permissions to access.");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403"));
         
+        Optional<IncidenceType> searchIncidenceType = this.incidenceTypeRepository.findById(incidenceTypes.get(1).getId());
+
+        assertThat(searchIncidenceType).isNotEmpty();
     }
 
     @Test
     @WithMockUser(value = "user", roles = "ADMIN")
     public void deleteIncidenceType_AsAdmin() throws Exception {
-        
+        ArrayList<IncidenceType> incidenceTypes = this.createMockIncidenceTypes();
+
+        var result = mockMvcTester
+            .delete()
+            .uri("/api/incidencetype/" + incidenceTypes.get(1).getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(200);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        Apiresponse<Void> apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<Apiresponse<Void>>(){});
+
+        // This properties are set in AccessDeniedExceptionHandler class
+        assertThat(apiresponse.getMessage()).isEqualTo("Incidence type deleted.");
+        assertThat(apiresponse.getData()).isEqualTo(null);
+
+        Optional<IncidenceType> searchIncidenceType = this.incidenceTypeRepository.findById(incidenceTypes.get(1).getId());
+
+        assertThat(searchIncidenceType).isEmpty();
     }
 
     @Test
     @WithMockUser(value = "user", roles = "ADMIN")
     public void deleteIncidenceType_AsAdmin_NotFound() throws Exception {
+        ArrayList<IncidenceType> incidenceTypes = this.createMockIncidenceTypes();
 
+        var result = mockMvcTester
+            .delete()
+            .uri("/api/incidencetype/" + incidenceTypes.get(1).getId() + 1)
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(404);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        assertThat(apiresponse.getStatus()).isEqualTo(404);
+        assertThat(apiresponse.getTitle()).isEqualTo("Resource not found");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404"));
+        assertThat(apiresponse.getDetail()).isEqualTo("Incidence type not found.");
+    
     }
 
 }

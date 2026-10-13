@@ -64,7 +64,7 @@ public class IncidenceTypeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Apiresponse<Void>> deleteMessage(int id) {
+    public ResponseEntity<Apiresponse<Void>> deleteMessage(@PathVariable int id) {
         this.incidenceTypeService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("Incidence type deleted.", null));
     }
