@@ -62,10 +62,7 @@ public class AccountTypeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Apiresponse<Void>> deleteMessage(UUID id) {
-        boolean result = this.accountTypeService.delete(id);
-        if(!result) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Service unavailable.", null));
-        }
+        this.accountTypeService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("Account type deleted.", null));
     }
 }

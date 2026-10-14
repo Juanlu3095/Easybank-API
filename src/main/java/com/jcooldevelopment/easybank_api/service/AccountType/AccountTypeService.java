@@ -17,5 +17,5 @@ public interface AccountTypeService {
 
     AccountTypeDto update(UUID id, UpdateAccountTypeDto updateAccountTypeDto);
 
-    boolean delete(UUID id);
+    void delete(UUID id);
 }

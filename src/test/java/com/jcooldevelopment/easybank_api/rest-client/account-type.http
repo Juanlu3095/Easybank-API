@@ -1,0 +1,14 @@
+### Get an account type by id
+GET http://localhost:8080/api/accounttype/9193e491-8f97-4f2f-85d9-0a9cd3c8c98a
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxYkpMdlVYVnA4IiwiaWF0IjoxNzkyMDAwNDQxLCJleHAiOjE3OTIwMDIyNDF9.9JjRwIIHSPsFbcSvm-6mE92nbdhnxbVb2kA9-MgESJM
+
+### Create a new account type
+POST http://localhost:8080/api/accounttype
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxYkpMdlVYVnA4IiwiaWF0IjoxNzkyMDAwMzc2LCJleHAiOjE3OTIwMDIxNzZ9.rhYEVYk2TXULXpStz_OA0ikX46H1VNe1tJ25LFFr9ko
+
+{
+    "name": "Nómina",
+    "terms": "Los términos"
+}

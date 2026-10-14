@@ -59,12 +59,11 @@ public class AccountTypeServiceImpl implements AccountTypeService{
     }
 
     @Override
-    public boolean delete(UUID id) {
+    public void delete(UUID id) {
         AccountType accountType = this.accountTypeRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Account type not found."));
 
         this.accountTypeRepository.delete(accountType);
-        return true;
     }
 
 }
