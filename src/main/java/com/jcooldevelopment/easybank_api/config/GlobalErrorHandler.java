@@ -15,6 +15,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.jcooldevelopment.easybank_api.contracts.common.CustomProblemDetail;
 import com.jcooldevelopment.easybank_api.exception.AccountNotActivatedException;
@@ -328,7 +329,19 @@ public class GlobalErrorHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(problemDetails);
     }
 
-    // ERROR HANDLER WHEN A FIELD DATA IS REPEATED AND MUST BE UNIQUE
+    // Exception for pathVariables in Controllers, error 422
+    // https://www.codejava.net/frameworks/spring-boot/rest-api-validate-path-variables-examples
+    // https://stacktips.com/articles/how-to-validate-the-pathvariable-in-spring-boot
+    // Explanation about exception class: https://blog.masteringbackend.com/mastering-path-variable-in-spring-boot
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ProblemDetail> handleRequestPathVariableMismatchException(MethodArgumentTypeMismatchException exception){
+        ProblemDetail problemDetails = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT,
+            "Path variable has no correct format.");
+        problemDetails.setType(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
+        problemDetails.setTitle("Invalid path variable");
+    
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(problemDetails);
+    }
 
     // 500 exception
     /* @ExceptionHandler(Exception.class)

@@ -229,9 +229,26 @@ public class AccountTypeTest {
     }
 
     // It seems the path variable format is validated too and gets an 400 error if it is no good
-    @Test 
+    @Test
+    @WithMockUser(value = "user", roles = "ADMIN")
     public void getAccountType_BadPathVariable() throws Exception{
-        ArrayList<AccountType> accountTypes = this.createMockAccountTypes();
+        this.createMockAccountTypes();
 
+        var result = mockMvcTester
+            .get()
+            .uri("/api/accounttype/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange();
+
+        assertThat(result).hasStatus(HttpStatus.UNPROCESSABLE_CONTENT);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        assertThat(apiresponse.getStatus()).isEqualTo(422);
+        assertThat(apiresponse.getTitle()).isEqualTo("Invalid path variable");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
+        assertThat(apiresponse.getDetail()).isEqualTo("Path variable has no correct format.");
+    
     }
 }
