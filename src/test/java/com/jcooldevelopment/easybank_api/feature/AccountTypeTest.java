@@ -16,6 +16,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import com.jcooldevelopment.easybank_api.contracts.common.Apiresponse;
+import com.jcooldevelopment.easybank_api.contracts.common.CustomProblemDetail;
 import com.jcooldevelopment.easybank_api.contracts.entity.AccountType;
 import com.jcooldevelopment.easybank_api.dto.AccountType.AccountTypeDto;
 import com.jcooldevelopment.easybank_api.repository.AccountTypeRepository;
@@ -202,7 +204,7 @@ public class AccountTypeTest {
         assertThat(apiresponse.getData().getName()).isEqualTo(accountTypes.get(1).getName());
         assertThat(apiresponse.getData().getTerms()).isEqualTo(accountTypes.get(1).getTerms());
         assertThat(apiresponse.getData()).hasOnlyFields("id", "name", "terms");
-    
+        
     }
 
     @Test
@@ -250,5 +252,157 @@ public class AccountTypeTest {
         assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
         assertThat(apiresponse.getDetail()).isEqualTo("Path variable has no correct format.");
     
+    }
+
+    @Test
+    public void postAccountType_NoCredentials() throws Exception {
+        String mockName = "Example";
+        String mockTerms = "Example terms";
+        String requestBody = String.format("""
+            {
+                "name": "%s",
+                "terms": "%s"
+            }
+            """,
+            mockName, mockTerms);
+        
+        var result = mockMvcTester
+            .post()
+            .uri("/api/accounttype")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(401);
+    
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        // This properties are set in AuthorizationExceptionHandler class
+        assertThat(apiresponse.getTitle()).isEqualTo("User not authenticated");
+        assertThat(apiresponse.getStatus()).isEqualTo(401);
+        assertThat(apiresponse.getDetail()).isEqualTo("You need to log to access data.");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
+        
+        // Validate if row was not updated
+        List<AccountType> searchAccountType = this.accountTypeRepository.findAll();
+
+        assertThat(searchAccountType).isEmpty();
+    }
+
+    @Test
+    @WithMockUser(value = "user", roles = "CLIENT")
+    public void postAccountType_AsClient() throws Exception {
+        String mockName = "Example";
+        String mockTerms = "Example terms";
+        String requestBody = String.format("""
+            {
+                "name": "%s",
+                "terms": "%s"
+            }
+            """,
+            mockName, mockTerms);
+        
+        var result = mockMvcTester
+            .post()
+            .uri("/api/accounttype")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(403);
+    
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        // This properties are set in AuthorizationExceptionHandler class
+        assertThat(apiresponse.getTitle()).isEqualTo("Access denied");
+        assertThat(apiresponse.getStatus()).isEqualTo(403);
+        assertThat(apiresponse.getDetail()).isEqualTo("User has no permissions to access.");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403"));
+        
+        // Validate if row was not updated
+        List<AccountType> searchAccountType = this.accountTypeRepository.findAll();
+
+        assertThat(searchAccountType).isEmpty();
+    }
+
+    @Test
+    @WithMockUser(value = "user", roles = "ADMIN")
+    public void postAccountType_AsAdmin() throws Exception {
+        String mockName = "Example";
+        String mockTerms = "Example terms";
+        String requestBody = String.format("""
+            {
+                "name": "%s",
+                "terms": "%s"
+            }
+            """,
+            mockName, mockTerms);
+
+        // Validates if there is nothing in database
+        assertThat(this.accountTypeRepository.findAll()).isEmpty();
+        
+        var result = mockMvcTester
+            .post()
+            .uri("/api/accounttype")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(201);
+    
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        Apiresponse<AccountTypeDto> apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<Apiresponse<AccountTypeDto>>(){});
+    
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(201);
+        assertThat(apiresponse.getMessage()).isEqualTo("Account type saved.");
+        assertThat(apiresponse.getData().getName()).isEqualTo(mockName);
+        assertThat(apiresponse.getData().getTerms()).isEqualTo(mockTerms);
+        assertThat(apiresponse.getData()).isInstanceOf(AccountTypeDto.class);
+
+        List<AccountType> accountTypesFromRepo = this.accountTypeRepository.findAll();
+
+        assertThat(accountTypesFromRepo.size()).isEqualTo(1);
+        assertThat(accountTypesFromRepo.get(0).getName()).isEqualTo(mockName);
+        assertThat(accountTypesFromRepo.get(0).getTerms()).isEqualTo(mockTerms);
+    
+    }
+
+    @Test
+    @WithMockUser(value = "user", roles = "ADMIN")
+    public void postAccountType_AsAdmin_BodyBadFormat() throws Exception {
+        String mockName = "";
+        String mockTerms = "";
+        String requestBody = String.format("""
+            {
+                "name": "%s",
+                "terms": "%s"
+            }
+            """,
+            mockName, mockTerms);
+        
+        var result = mockMvcTester
+            .post()
+            .uri("/api/accounttype")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(422);
+    
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        CustomProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<CustomProblemDetail>(){});
+
+        assertThat(apiresponse.getStatus()).isEqualTo(422);
+        assertThat(apiresponse.getErrors()).containsKeys("name", "terms");
+        assertThat(apiresponse.getErrors().get("name")).isEqualTo("Name cannot be blank.");
+        assertThat(apiresponse.getErrors().get("terms")).isEqualTo("Terms cannot be blank.");
+        assertThat(apiresponse.getDetail()).isEqualTo("One or more fields have wrong format.");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
+        assertThat(apiresponse.getTitle()).isEqualTo("Request body not valid");
+        assertThat(apiresponse.getTimestamp()).isNotNull();
+        assertThat(result.getMvcResult().getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class);
+        
     }
 }

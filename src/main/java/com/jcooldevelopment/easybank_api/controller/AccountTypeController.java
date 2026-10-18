@@ -46,7 +46,7 @@ public class AccountTypeController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Apiresponse<AccountTypeDto>> postMessage(@Valid @RequestBody CreateAccountTypeDto createAccountTypeDto) {
+    public ResponseEntity<Apiresponse<AccountTypeDto>> postAccountType(@Valid @RequestBody CreateAccountTypeDto createAccountTypeDto) {
         AccountTypeDto accountTypeSaved = this.accountTypeService.create(createAccountTypeDto);
         return ResponseEntity.status(HttpStatus.CREATED)
             .location(URI.create("/api/accounttype/" + accountTypeSaved.getId())) 
@@ -54,14 +54,14 @@ public class AccountTypeController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Apiresponse<AccountTypeDto>> putMessage(@PathVariable UUID id, @Valid @RequestBody UpdateAccountTypeDto updateAccountTypeDto) {
+    public ResponseEntity<Apiresponse<AccountTypeDto>> putAccountType(@PathVariable UUID id, @Valid @RequestBody UpdateAccountTypeDto updateAccountTypeDto) {
         AccountTypeDto updatedAccountType = this.accountTypeService.update(id, updateAccountTypeDto);
         return ResponseEntity.status(HttpStatus.OK)
             .body(new Apiresponse<AccountTypeDto>("Account type updated.", updatedAccountType));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Apiresponse<Void>> deleteMessage(UUID id) {
+    public ResponseEntity<Apiresponse<Void>> deleteAccountType(UUID id) {
         this.accountTypeService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("Account type deleted.", null));
     }
