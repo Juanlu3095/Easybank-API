@@ -628,4 +628,27 @@ public class IncidenceTypeTest {
     
     }
 
+    @Test
+    @WithMockUser(value = "user", roles = "ADMIN")
+    public void deleteIncidenceType_AsAdmin_BadFormat() throws Exception {
+        this.createMockIncidenceTypes();
+
+        var result = mockMvcTester
+            .delete()
+            .uri("/api/incidencetype/-1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(422);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        assertThat(apiresponse.getStatus()).isEqualTo(422);
+        assertThat(apiresponse.getTitle()).isEqualTo("Invalid path variable");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
+        assertThat(apiresponse.getDetail()).isEqualTo("Path variable has no correct format.");
+    
+    }
+
 }

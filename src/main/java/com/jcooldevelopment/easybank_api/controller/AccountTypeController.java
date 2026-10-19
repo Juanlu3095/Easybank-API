@@ -61,7 +61,7 @@ public class AccountTypeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Apiresponse<Void>> deleteAccountType(UUID id) {
+    public ResponseEntity<Apiresponse<Void>> deleteAccountType(@PathVariable UUID id) {
         this.accountTypeService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("Account type deleted.", null));
     }

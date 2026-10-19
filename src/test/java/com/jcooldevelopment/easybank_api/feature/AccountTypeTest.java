@@ -641,28 +641,142 @@ public class AccountTypeTest {
 
     @Test
     public void deleteAccountType_BadCredentials() throws Exception {
+        // Validates there is nothing before creating some rows
+        assertThat(this.accountTypeRepository.findAll()).isEmpty();
+
         List<AccountType> createAccountTypes = this.createMockAccountTypes();
 
+        var result = mockMvcTester
+            .delete()
+            .uri("/api/accounttype/" + createAccountTypes.get(0).getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(401);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        // This properties are set in AuthorizationExceptionHandler class
+        assertThat(apiresponse.getTitle()).isEqualTo("User not authenticated");
+        assertThat(apiresponse.getStatus()).isEqualTo(401);
+        assertThat(apiresponse.getDetail()).isEqualTo("You need to log to access data.");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401"));
+        
+        Optional<AccountType> searchAccountType = this.accountTypeRepository.findById(createAccountTypes.get(0).getId());
+        assertThat(searchAccountType).isNotEmpty();
     }
 
     @Test
     @WithMockUser(value = "user", roles = "CLIENT")
     public void deleteAccountType_AsClient() throws Exception {
+        // Validates there is nothing before creating some rows
+        assertThat(this.accountTypeRepository.findAll()).isEmpty();
+
         List<AccountType> createAccountTypes = this.createMockAccountTypes();
+
+        var result = mockMvcTester
+            .delete()
+            .uri("/api/accounttype/" + createAccountTypes.get(0).getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(403);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        // This properties are set in AccessDeniedExceptionHandler class
+        assertThat(apiresponse.getTitle()).isEqualTo("Access denied");
+        assertThat(apiresponse.getStatus()).isEqualTo(403);
+        assertThat(apiresponse.getDetail()).isEqualTo("User has no permissions to access.");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403"));
+        
+        Optional<AccountType> searchAccountType = this.accountTypeRepository.findById(createAccountTypes.get(0).getId());
+        assertThat(searchAccountType).isNotEmpty();
 
     }
 
     @Test
     @WithMockUser(value = "user", roles = "ADMIN")
     public void deleteAccountType_AsAdmin() throws Exception {
+        // Validates there is nothing before creating some rows
+        assertThat(this.accountTypeRepository.findAll()).isEmpty();
+
         List<AccountType> createAccountTypes = this.createMockAccountTypes();
+
+        var result = mockMvcTester
+            .delete()
+            .uri("/api/accounttype/" + createAccountTypes.get(0).getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(200);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        Apiresponse<Void> apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<>(){});
+
+        assertThat(apiresponse.getMessage()).isEqualTo("Account type deleted.");
+        assertThat(apiresponse.getData()).isNull();
+
+        Optional<AccountType> searchAccountType = this.accountTypeRepository.findById(createAccountTypes.get(0).getId());
+        assertThat(searchAccountType).isEmpty();
 
     }
 
     @Test
     @WithMockUser(value = "user", roles = "ADMIN")
     public void deleteAccountType_AsAdmin_NotFound() throws Exception {
-        List<AccountType> createAccountTypes = this.createMockAccountTypes();
+        // Validates there is nothing before creating some rows
+        assertThat(this.accountTypeRepository.findAll()).isEmpty();
 
+        this.createMockAccountTypes();
+
+        var result = mockMvcTester
+            .delete()
+            .uri("/api/accounttype/9193e491-8f97-4f2f-85d9-0a9cd3c8c98a")
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(404);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        assertThat(apiresponse.getStatus()).isEqualTo(404);
+        assertThat(apiresponse.getTitle()).isEqualTo("Resource not found");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404"));
+        assertThat(apiresponse.getDetail()).isEqualTo("Account type not found.");
+
+        List<AccountType> searchAccountType = this.accountTypeRepository.findAll();
+        assertThat(searchAccountType).hasSize(3);
+    }
+
+    @Test
+    @WithMockUser(value = "user", roles = "ADMIN")
+    public void deleteAccountType_AsAdmin_BadFormat() throws Exception {
+        // Validates there is nothing before creating some rows
+        assertThat(this.accountTypeRepository.findAll()).isEmpty();
+
+        this.createMockAccountTypes();
+
+        var result = mockMvcTester
+            .delete()
+            .uri("/api/accounttype/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .exchange();
+
+        assertThat(result.getMvcResult().getResponse().getStatus()).isEqualTo(422);
+
+        String jsonresponse = result.getMvcResult().getResponse().getContentAsString();
+        ProblemDetail apiresponse = this.objectMapper.readValue(jsonresponse, new TypeReference<ProblemDetail>(){});
+
+        assertThat(apiresponse.getStatus()).isEqualTo(422);
+        assertThat(apiresponse.getTitle()).isEqualTo("Invalid path variable");
+        assertThat(apiresponse.getType()).isEqualTo(URI.create("https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/422"));
+        assertThat(apiresponse.getDetail()).isEqualTo("Path variable has no correct format.");
+    
+        List<AccountType> searchAccountType = this.accountTypeRepository.findAll();
+        assertThat(searchAccountType).hasSize(3);
     }
 }

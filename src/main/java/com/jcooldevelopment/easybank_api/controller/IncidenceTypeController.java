@@ -22,6 +22,7 @@ import com.jcooldevelopment.easybank_api.dto.IncidenceType.UpdateIncidenceTypeDt
 import com.jcooldevelopment.easybank_api.service.IncidenceType.IncidenceTypeService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping("/api/incidencetype")
@@ -64,7 +65,7 @@ public class IncidenceTypeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Apiresponse<Void>> deleteMessage(@PathVariable int id) {
+    public ResponseEntity<Apiresponse<Void>> deleteMessage(@PathVariable @Positive int id) {
         this.incidenceTypeService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<Void>("Incidence type deleted.", null));
     }
