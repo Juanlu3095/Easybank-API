@@ -13,6 +13,6 @@ public class UpdateAccountTypeDto {
     @NotBlank(message = "Name cannot be blank.")
     private String name;
 
-    @NotBlank(message = "Name cannot be blank.")
+    @NotBlank(message = "Terms cannot be blank.")
     private String terms;
 }

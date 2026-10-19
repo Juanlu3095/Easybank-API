@@ -56,6 +56,12 @@ mvnw test -Dtest=MessageTest#createMessage
 
 where "MessageTest" is the class name and "createMessage" is the method with @Test annotation to run.
 
+If source code has been changed without re-compiling, use:
+
+```bash
+mvnw clean test -Dtest=MessageTest
+```
+
 ## Deploy
 
 You can compile this project with the maven command:
