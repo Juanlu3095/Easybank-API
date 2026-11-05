@@ -99,7 +99,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public boolean register(RegisterDto userRegister) {
+    public void register(RegisterDto userRegister) {
         userRegister.setDni(userRegister.getDni().toUpperCase());
         var usercode = "";
         boolean usercodeExists = true;
@@ -131,11 +131,10 @@ public class AuthServiceImpl implements AuthService{
         User savedUser = this.userRepository.save(user);
         String activationCode = this.activationCodeService.createCode(savedUser.getId());
         this.emailService.sendMailToEnableUser(usercode, activationCode, user.getEmail());
-        return true;
     }
 
     @Override
-    public boolean changePassword(ChangePasswordDto passwordRequest) {
+    public void changePassword(ChangePasswordDto passwordRequest) {
         String usercode = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = this.userRepository.findByUsercode(usercode)
             .orElseThrow(() -> new ResourceNotFoundException("User does not exists."));
@@ -145,7 +144,6 @@ public class AuthServiceImpl implements AuthService{
         
         user.setPassword(this.passwordEncoder.encode(passwordRequest.getPassword()));
         this.userRepository.save(user);
-        return true;
     }
 
     @Override

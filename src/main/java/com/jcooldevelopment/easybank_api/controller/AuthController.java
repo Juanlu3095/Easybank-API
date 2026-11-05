@@ -40,23 +40,15 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Apiresponse<Void>> register(@Valid @RequestBody RegisterDto userRegister) {
-        boolean result = this.authService.register(userRegister);
-        if (result) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(new Apiresponse<>("Register successful.", null));
-        } else {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Register failed.", null));
-        }
+        this.authService.register(userRegister);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new Apiresponse<>("Register successful.", null));
         
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<Apiresponse<Void>> changePassword (@Valid @RequestBody ChangePasswordDto ChangePasswordDto) {
-        boolean result = this.authService.changePassword(ChangePasswordDto);
-        if(result) {
-            return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<>("Password updated.", null));
-        } else {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new Apiresponse<>("Password could not be changed.", null));
-        }
+        this.authService.changePassword(ChangePasswordDto);
+        return ResponseEntity.status(HttpStatus.OK).body(new Apiresponse<>("Password updated.", null));
     }
 
     @PostMapping("/forgot-password")
