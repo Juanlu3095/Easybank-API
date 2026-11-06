@@ -30,6 +30,12 @@ For Linux/Bash (Careful with chmod permissions!):
 ./mvnw spring-boot:run
 ```
 
+To create data in database like admin account and some types use:
+
+```bash
+mvnw exec:java -Dexec.mainClass="com.jcooldevelopment.easybank_api.database.seeder.Seeders"
+```
+
 ## Testing
 
 Must create a different PostgreSQL database than the one used for production or development. Once is done, create a file test/resources/application-test.properties with database
